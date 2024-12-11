@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "607824012683",
+    "project_id": "studenthelpcenter-5e6fe",
+    "storage_bucket": "studenthelpcenter-5e6fe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:607824012683:android:8dc4fae54529231075bb8e",
+        "android_client_info": {
+          "package_name": "com.example.abcd"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8jozUQkXsakf10TyTyhrl1kI-sRIP0Hc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
