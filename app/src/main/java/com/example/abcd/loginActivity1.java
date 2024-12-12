@@ -7,9 +7,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.abcd.utils.SessionManager;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,12 +21,14 @@ public class loginActivity1 extends AppCompatActivity {
 
     EditText eml, pswd;
     Button buttonLogin;
+    SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login1);
+
+        sessionManager = new SessionManager(this);
 
         eml = findViewById(R.id.editTextEmail);
         pswd = findViewById(R.id.editTextPassword);
@@ -89,8 +91,12 @@ public class loginActivity1 extends AppCompatActivity {
                     if (dbPassword != null && dbPassword.equals(password)) {
                         Toast.makeText(loginActivity1.this, "Login Successful", Toast.LENGTH_SHORT).show();
 
-                        // You can navigate to another activity here, e.g., MainActivity
-                    startActivity(new Intent(loginActivity1.this,mainDashBoard.class));
+                        // Save login session
+                        sessionManager.setLogin(true, email);
+
+                        // Navigate to the Main Dashboard
+                        startActivity(new Intent(loginActivity1.this, mainDashBoard.class));
+                        finish();
                     } else {
                         pswd.setError("Incorrect password");
                     }

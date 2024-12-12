@@ -15,6 +15,9 @@
         android:theme="@style/Theme.Abcd"
         tools:targetApi="31">
         <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".mainDashBoard"
             android:exported="false" />
         <activity

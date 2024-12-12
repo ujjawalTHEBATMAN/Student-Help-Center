@@ -1,6 +1,5 @@
 package com.example.abcd;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
+import com.example.abcd.utils.SessionManager;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,12 +23,15 @@ public class loginActivity2 extends AppCompatActivity {
     Button button, buttonLoginRedirection;
     FirebaseDatabase firebase;
     DatabaseReference reference;
+    SessionManager sessionManager;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login2);
+
+        // Initialize SessionManager
+        sessionManager = new SessionManager(this);
 
         // UI Components
         email = findViewById(R.id.editTextTextEmailAddress2);
@@ -66,9 +69,13 @@ public class loginActivity2 extends AppCompatActivity {
                             HelperClassPOJO helperClass = new HelperClassPOJO(emailInput, passwordInput, usernameInput);
                             reference.child(sanitizedEmail).setValue(helperClass);
 
+                            // Save login session after registration
+                            sessionManager.setLogin(true, emailInput);
+
                             Toast.makeText(loginActivity2.this, "You as " + usernameInput + " are registered successfully", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(loginActivity2.this, loginActivity1.class);
+                            Intent intent = new Intent(loginActivity2.this, mainDashBoard.class);
                             startActivity(intent);
+                            finish();
                         }
                     }
 

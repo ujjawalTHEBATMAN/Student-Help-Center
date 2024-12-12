@@ -7,4 +7,61 @@
     android:layout_height="match_parent"
     tools:context=".mainDashBoard">
 
+    <!-- CardView for User Profile -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/profileCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="openProfile"
+        tools:ignore="MissingConstraints,OnClick">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <!-- Profile Image -->
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_default_profile"
+                android:layout_gravity="center_horizontal"
+                android:contentDescription="User Profile Picture"
+                android:scaleType="centerCrop" />
+
+            <!-- User Information (Name) -->
+            <TextView
+                android:id="@+id/usernameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Username"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp" />
+
+            <!-- Logout Text Inside the Card -->
+            <TextView
+                android:id="@+id/logoutText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logout"
+                android:textColor="#FF0000"
+                android:textSize="16sp"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"
+                android:onClick="logout"/>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
