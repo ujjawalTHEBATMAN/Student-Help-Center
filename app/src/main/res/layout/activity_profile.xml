@@ -1,10 +1,262 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity">
+    android:background="#121212">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Gradient Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/toolbar_gradient"
+        android:elevation="8dp"
+        app:title="Digital Profile"
+        app:titleTextColor="#FFFFFF"/>
+
+    <!-- Scrollable Content with Futuristic Design -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:background="#1E1E1E"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Futuristic Profile Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/profileCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="#2C2C2C"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="16dp"
+                app:strokeColor="#4A4A4A"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Profile Header with Holographic Effect -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <!-- Glowing Profile Image -->
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/profileImage"
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:src="@drawable/ic_default_profile"
+                            android:scaleType="centerCrop"
+                            android:padding="4dp"
+                            android:background="@drawable/holographic_border"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"/>
+
+                        <!-- User Details with Neon Text -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="20dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvUsername"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ujjawal"
+                                android:textSize="26sp"
+                                android:textStyle="bold"
+                                android:textColor="#00E5FF"
+                                android:shadowColor="#00E5FF"
+                                android:shadowRadius="10"/>
+
+                            <TextView
+                                android:id="@+id/tvUserEmail"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="johndoe@example.com"
+                                android:textSize="16sp"
+                                android:textColor="#B0BEC5"
+                                android:layout_marginTop="6dp"/>
+
+                            <TextView
+                                android:id="@+id/tvUserRole"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Software Developer"
+                                android:textSize="16sp"
+                                android:textColor="#7C4DFF"
+                                android:layout_marginTop="6dp"
+                                android:background="@drawable/rounded_background"
+                                android:padding="4dp"/>    </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Futuristic Stats with Glowing Separators -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3"
+                        android:layout_marginTop="20dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvPostsCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="256"
+                                android:textStyle="bold"
+                                android:textSize="22sp"
+                                android:textColor="#00E5FF"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Posts"
+                                android:textColor="#B0BEC5"/>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#4A4A4A"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvFollowersCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="1.2K"
+                                android:textStyle="bold"
+                                android:textSize="22sp"
+                                android:textColor="#7C4DFF"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Followers"
+                                android:textColor="#B0BEC5"/>
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="1dp"
+                            android:layout_height="match_parent"
+                            android:background="#4A4A4A"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvFollowingCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="542"
+                                android:textStyle="bold"
+                                android:textSize="22sp"
+                                android:textColor="#FF4081"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Following"
+                                android:textColor="#B0BEC5"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Futuristic Action Buttons -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="20dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnLogout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Logout"
+                            android:textColor="#FFFFFF"
+                            android:backgroundTint="#6A1B9A"
+                            app:cornerRadius="12dp"
+                            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Futuristic Additional Information Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="#2C2C2C"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="16dp"
+                app:strokeColor="#4A4A4A"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Digital Credentials"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:textColor="#00E5FF"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🏫 University: VNSGU"
+                        android:drawablePadding="8dp"
+                        android:padding="10dp"
+                        android:textColor="#B0BEC5"
+                        android:background="#33FFFFFF"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📚 Course: BCA"
+                        android:drawablePadding="8dp"
+                        android:padding="10dp"
+                        android:textColor="#B0BEC5"
+                        android:background="#33FFFFFF"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

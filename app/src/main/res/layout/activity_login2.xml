@@ -1,88 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:padding="16dp"
-    android:background="@android:color/holo_blue_light">
+    android:background="#0A0A1A">
 
-    <!-- Header Section -->
-    <TextView
-        android:id="@+id/headerTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Create an Account"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/white"
-        android:layout_marginBottom="24dp" />
-
-    <!-- Email Input -->
-    <EditText
-        android:id="@+id/editTextTextEmailAddress2"
+    <!-- Glowing Background Effect -->
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter Email"
-        android:inputType="textEmailAddress"
-        android:padding="12dp"
-        android:background="@android:drawable/edit_text"
-        android:drawableStart="@android:drawable/ic_dialog_email"
-        android:drawablePadding="10dp"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="match_parent"
+        android:background="@drawable/glowing_background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <!-- Username Input -->
-    <EditText
-        android:id="@+id/editTextusername"
+    <!-- Holographic Overlay -->
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter Username"
-        android:inputType="text"
-        android:padding="12dp"
-        android:background="@android:drawable/edit_text"
-        android:drawableStart="@android:drawable/ic_input_add"
-        android:drawablePadding="10dp"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="match_parent"
+        android:alpha="0.2"
+        android:background="@drawable/holographic_overlay"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <!-- Password Input -->
-    <EditText
-        android:id="@+id/editTextTextPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter Password"
-        android:inputType="textPassword"
-        android:padding="12dp"
-        android:background="@android:drawable/edit_text"
-        android:drawableStart="@android:drawable/ic_lock_idle_lock"
-        android:drawablePadding="10dp"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"
-        android:layout_marginBottom="24dp" />
+    <!-- Main Container -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginVertical="32dp"
+        app:cardBackgroundColor="#1A1A2E"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="16dp"
+        app:layout_constraintWidth_percent="0.9"
+        app:layout_constraintHeight_percent="0.9"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-    <!-- Register Button -->
-    <Button
-        android:id="@+id/button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Register"
-        android:background="@android:color/holo_blue_dark"
-        android:textColor="@android:color/white"
-        android:textSize="16sp"
-        android:padding="12dp"
-        android:layout_marginBottom="16dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center">
 
-    <!-- Redirect to Login -->
-    <Button
-        android:id="@+id/loginRedirectionButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Button" />
+            <!-- Futuristic Title -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="DIGITAL REGISTRATION"
+                android:textColor="#00FFFF"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="32dp"/>
 
+            <!-- Email Input with Cyber Styling -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/emailInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/CyberTextInputLayout"
+                android:layout_marginBottom="16dp">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="DIGITAL IDENTITY"
+                    android:inputType="textEmailAddress"
+                    android:textColor="#00FFFF"
+                    android:textColorHint="#4DFFFFFF"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-</LinearLayout>
+            <!-- Username Input with Cyber Styling -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/usernameInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/CyberTextInputLayout"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextUsername"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="SYSTEM USERNAME"
+                    android:inputType="text"
+                    android:textColor="#00FFFF"
+                    android:textColorHint="#4DFFFFFF"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Password Input with Cyber Styling -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/passwordInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/CyberTextInputLayout"
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTintMode="src_in"
+                android:layout_marginBottom="24dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="ACCESS CODE"
+                    android:inputType="textPassword"
+                    android:textColor="#00FFFF"
+                    android:textColorHint="#4DFFFFFF"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Futuristic Register Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonRegister"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:text="INITIALIZE PROFILE"
+                android:textColor="#000000"
+                android:backgroundTint="#00FFFF"
+                app:cornerRadius="12dp"
+                android:textStyle="bold"/>
+
+            <!-- Login Redirection with Cyber Style -->
+            <TextView
+                android:id="@+id/textViewLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="EXISTING USER? RECONNECT SYSTEM"
+                android:textColor="#4DFFFFFF"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:clickable="true"
+                android:layout_marginTop="16dp"
+                android:padding="8dp"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

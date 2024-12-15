@@ -15,10 +15,14 @@
         android:theme="@style/Theme.Abcd"
         tools:targetApi="31">
         <activity
-            android:name=".ProfileActivity"
+            android:name=".DashboardActivity"
             android:exported="false" />
         <activity
             android:name=".mainDashBoard"
+            android:exported="false"
+            android:label="@string/title_activity_main_dash_board" />
+        <activity
+            android:name=".ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".loginActivity1"

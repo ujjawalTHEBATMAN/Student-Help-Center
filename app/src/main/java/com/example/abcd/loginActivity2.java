@@ -1,10 +1,12 @@
 package com.example.abcd;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,11 +22,13 @@ import com.google.firebase.database.ValueEventListener;
 public class loginActivity2 extends AppCompatActivity {
 
     EditText email, password, username;
-    Button button, buttonLoginRedirection;
+    Button buttonRegister;
+    TextView buttonLoginRedirection;
     FirebaseDatabase firebase;
     DatabaseReference reference;
     SessionManager sessionManager;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,13 +38,13 @@ public class loginActivity2 extends AppCompatActivity {
         sessionManager = new SessionManager(this);
 
         // UI Components
-        email = findViewById(R.id.editTextTextEmailAddress2);
-        password = findViewById(R.id.editTextTextPassword);
-        button = findViewById(R.id.button);
-        username = findViewById(R.id.editTextusername);
-        buttonLoginRedirection = findViewById(R.id.loginRedirectionButton);
+        email = findViewById(R.id.editTextEmail);
+        password = findViewById(R.id.editTextPassword);
+        username = findViewById(R.id.editTextUsername);
+        buttonRegister = findViewById(R.id.buttonRegister);
+        buttonLoginRedirection = findViewById(R.id.textViewLogin);
 
-        button.setOnClickListener(new View.OnClickListener() {
+        buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String emailInput = email.getText().toString().trim();
