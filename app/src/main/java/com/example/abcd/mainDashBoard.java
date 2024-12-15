@@ -1,164 +1,84 @@
 package com.example.abcd;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import android.view.MenuItem;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import com.example.abcd.utils.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.card.MaterialCardView;
-
-import java.util.Random;
+import com.example.abcd.fragment.dashboardFragment;
+import com.example.abcd.fragment.homeFragment;
+import com.example.abcd.fragment.treatMeWellFragment;
+import com.example.abcd.fragment.ProfileFragment;
 
 public class mainDashBoard extends AppCompatActivity {
+    private BottomNavigationView bottomNavView;
+    private Fragment activeFragment;
 
-    private MaterialCardView dynamicCardView;
-    private TextView cardTitle, cardSubtitle;
-    private ImageView cardImage, profileImageToolbar;
-
-    // Card Cycling Variables
-    private Handler handler;
-    private int currentCardIndex = 0;
-
-    // Session Management
-    private SessionManager sessionManager;
-
-    // Dynamic Card Data
-    private String[] cardTitles = {
-            "BCA Help Center",
-            "AI Integration",
-            "Messaging Support"
-    };
-
-    private String[] cardSubtitles = {
-            "BCA Help Center offers study material, old papers, and quizzes",
-            "AI integration offers profile image generation, resume creation, and chatbot services",
-            "Messaging support offers real-time communication, instant assistance, and customer service"
-    };
-
-    private int[] cardImages = {
-            R.drawable.cardviewimage1,
-            R.drawable.cardviewimage2,
-            R.drawable.cardviewimage3
-    };
-
-    // Profile Image Resources
-    private int[] availableProfileImages = {
-            R.drawable.profile1,
-            R.drawable.profile2,
-            R.drawable.profile3,
-            R.drawable.profile4,
-            R.drawable.profile5
-    };
-
-    @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_dash_board);
 
-        // Initialize Session Manager
-        sessionManager = new SessionManager(this);
-
-        // Initialize Views
         initializeViews();
+        setupBottomNavigation();
 
-        // Setup Profile Image
-        setupProfileImage();
-
-        // Set up Profile Icon Click
-        setupProfileIconClick();
-
-        // Set up Dynamic Card Click
-        setupDynamicCardClick();
-
-        // Start Card Changer
-        startCardChanger();
-
-
-
-
-
+        // Set default fragment
+        if (savedInstanceState == null) {
+            loadFragment(new homeFragment());
+        }
     }
 
     private void initializeViews() {
-        profileImageToolbar = findViewById(R.id.profileImageToolbar);
-        dynamicCardView = findViewById(R.id.dynamicCardView);
-        cardTitle = findViewById(R.id.cardTitle);
-        cardSubtitle = findViewById(R.id.cardSubtitle);
-        cardImage = findViewById(R.id.cardImage);
-
-        // Initialize Handler
-        handler = new Handler();
+        bottomNavView = findViewById(R.id.bottomNavigation);
     }
 
-    private void setupProfileImage() {
-        // Check if a profile image is already saved
-        int savedImageId = sessionManager.getProfileImage();
+    private void setupBottomNavigation() {
+        bottomNavView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Fragment fragment = null;
 
-        if (savedImageId == -1) {
-            // No saved image, select a random one
-            savedImageId = selectRandomProfileImage();
-            sessionManager.saveProfileImage(savedImageId);
-        }
+                // Handle navigation selection
+                if (item.getItemId() == R.id.navigation_home) {
+                    fragment = new homeFragment();
+                } else if (item.getItemId() == R.id.navigation_dashboard) {
+                    fragment = new dashboardFragment();
+                } else if (item.getItemId() == R.id.treatme) {
+                    fragment = new treatMeWellFragment();
+                } else if (item.getItemId() == R.id.navigation_profile) {
+                    fragment = new ProfileFragment();
+                }
 
-        // Set the profile image
-        profileImageToolbar.setImageResource(savedImageId);
-    }
-
-    private int selectRandomProfileImage() {
-        Random random = new Random();
-        int randomIndex = random.nextInt(availableProfileImages.length);
-        return availableProfileImages[randomIndex];
-    }
-
-    private void setupProfileIconClick() {
-        profileImageToolbar.setOnClickListener(v -> {
-            Intent intent = new Intent(mainDashBoard.this, ProfileActivity.class);
-            startActivity(intent);
+                return loadFragment(fragment);
+            }
         });
     }
 
-    private void setupDynamicCardClick() {
-        dynamicCardView.setOnClickListener(v ->
-                Toast.makeText(
-                        mainDashBoard.this,
-                        "Learn More: " + cardTitle.getText(),
-                        Toast.LENGTH_SHORT
-                ).show()
-        );
-    }
+    private boolean loadFragment(Fragment fragment) {
+        if (fragment != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            android.R.anim.fade_in,
+                            android.R.anim.fade_out
+                    )
+                    .replace(R.id.fragmentContainer, fragment)
+                    .commit();
 
-    private void startCardChanger() {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Update card content dynamically
-                currentCardIndex = (currentCardIndex + 1) % cardTitles.length;
-
-                cardTitle.setText(cardTitles[currentCardIndex]);
-                cardSubtitle.setText(cardSubtitles[currentCardIndex]);
-                cardImage.setImageResource(cardImages[currentCardIndex]);
-
-                // Schedule next card change
-                handler.postDelayed(this, 3000); // Change every 3 seconds
-            }
-        }, 3000);
+            activeFragment = fragment;
+            return true;
+        }
+        return false;
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Remove any pending callbacks to prevent memory leaks
-        if (handler != null) {
-            handler.removeCallbacksAndMessages(null);
+    public void onBackPressed() {
+        // If we're not on the home fragment, go to home
+        if (!(activeFragment instanceof homeFragment)) {
+            bottomNavView.setSelectedItemId(R.id.navigation_home);
+        } else {
+            super.onBackPressed();
         }
     }
 }
