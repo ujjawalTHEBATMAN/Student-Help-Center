@@ -1,5 +1,7 @@
 # 🎓 Student-Help-Center 📱
 
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Courier+Prime&size=25&duration=3000&pause=500&color=00DDF7&background=000000&center=true&vCenter=true&width=600&lines=Welcome+to+the+Future+of+Learning;Smart+%7C+Efficient+%7C+Innovative)](https://git.io/typing-svg)
+
 This Android app is a student's one-stop shop for all their academic needs. It provides a variety of helpful tools and resources, all within a single app.
 
 ## Features
