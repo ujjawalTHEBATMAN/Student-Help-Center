@@ -15,6 +15,9 @@
         android:theme="@style/Theme.Abcd"
         tools:targetApi="31">
         <activity
+            android:name=".bca_help"
+            android:exported="false" />
+        <activity
             android:name=".DashboardActivity"
             android:exported="false" />
         <activity

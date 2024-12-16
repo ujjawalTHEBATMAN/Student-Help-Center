@@ -1,14 +1,364 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+<ScrollView android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.dashboardFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:background="@drawable/futuristic_gradient_background">
 
-</FrameLayout>
+        <!-- Title Section -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/headerCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginHorizontal="16dp"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="15dp"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/futuristic_gradient_background">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DASHBOARD"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:padding="20dp"
+                    android:layout_centerInParent="true"
+                    android:elevation="4dp"
+                    android:shadowColor="#80FFFFFF"
+                    android:shadowDx="0"
+                    android:shadowDy="0"
+                    android:shadowRadius="20"/>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Blue CardView below the title -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/featureCard"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="35dp"
+            app:cardElevation="20dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/headerCard">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FFFFFF"> <!-- Use your preferred blue color -->
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/slidingCardView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    app:cardCornerRadius="15dp"
+                    app:cardElevation="10dp">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="8dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <!-- Image with an overlay for better readability of text -->
+                            <ImageView
+                                android:id="@+id/slideImage"
+                                android:layout_width="match_parent"
+                                android:layout_height="150dp"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/ic_chatbot" />
+
+                            <!-- Semi-transparent overlay to make the text pop -->
+                            <FrameLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="150dp"
+                                android:background="@android:color/black"
+                                android:alpha="0.4"/>
+
+                            <!-- Text displayed on top of the image with shadow effect -->
+                            <TextView
+                                android:id="@+id/slideName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:text="Slide Name"
+                                android:textColor="#FFFFFF"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:shadowColor="#80000000"
+                                android:shadowDx="0"
+                                android:shadowDy="0"
+                                android:shadowRadius="10"/>
+                        </RelativeLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FEATURE AREA"
+                    android:textColor="#FFFFFF"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_centerInParent="true"/>
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- GridLayout at the bottom -->
+        <androidx.gridlayout.widget.GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            app:columnCount="2"
+            app:rowCount="3"
+            app:layout_constraintTop_toBottomOf="@id/featureCard"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Grid Item 1 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="12dp"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/futuristic_gradient_background">
+
+                    <ImageView
+                        android:id="@+id/icon1"
+                        android:layout_width="77dp"
+                        android:layout_height="77dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="20dp"
+                        android:src="@drawable/ic_username"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="STUDY VIDEO"
+                        android:textColor="#E6FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_below="@id/icon1"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="12dp"
+                        android:textAlignment="center"/>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Grid Item 2 (Add more items as required) -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="12dp"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/futuristic_gradient_background">
+
+                    <ImageView
+                        android:id="@+id/icon2"
+                        android:layout_width="77dp"
+                        android:layout_height="77dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="20dp"
+                        android:src="@drawable/ic_stats"
+                        app:tint="#FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="OLD PAPERS"
+                        android:textColor="#E6FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_below="@id/icon2"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="12dp"
+                        android:textAlignment="center"/>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Grid Item 3 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="12dp"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/futuristic_gradient_background">
+
+                    <ImageView
+                        android:id="@+id/icon3"
+                        android:layout_width="77dp"
+                        android:layout_height="77dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="20dp"
+                        android:src="@drawable/ic_chatbot"
+                        app:tint="#E6FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="QUIZES"
+                        android:textColor="#E6FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_below="@id/icon3"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="12dp"
+                        android:textAlignment="center"/>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Grid Item 4 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="12dp"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/futuristic_gradient_background">
+
+                    <ImageView
+                        android:id="@+id/icon4"
+                        android:layout_width="77dp"
+                        android:layout_height="77dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="20dp"
+                        android:src="@drawable/ic_chatbot"
+                        app:tint="#E6FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RESUME MAKER"
+                        android:textColor="#E6FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_below="@id/icon4"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="12dp"
+                        android:textAlignment="center"/>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Grid Item 5 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="12dp"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/futuristic_gradient_background">
+
+                    <ImageView
+                        android:id="@+id/icon5"
+                        android:layout_width="77dp"
+                        android:layout_height="77dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="20dp"
+                        android:src="@drawable/ic_chatbot"
+                        app:tint="#E6FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ASSIGNMENT CREATOR"
+                        android:textColor="#E6FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_below="@id/icon5"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="12dp"
+                        android:textAlignment="center"/>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Grid Item 6 -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                app:cardCornerRadius="25dp"
+                app:cardElevation="12dp"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/futuristic_gradient_background">
+
+                    <ImageView
+                        android:id="@+id/icon6"
+                        android:layout_width="77dp"
+                        android:layout_height="77dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="20dp"
+                        android:src="@drawable/ic_chatbot"
+                        app:tint="#E6FFFFFF" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MESSAGING"
+                        android:textColor="#E6FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_below="@id/icon6"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="12dp"
+                        android:textAlignment="center"/>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+        </androidx.gridlayout.widget.GridLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
