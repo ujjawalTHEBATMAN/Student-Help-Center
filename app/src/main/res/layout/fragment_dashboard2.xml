@@ -15,8 +15,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:layout_marginHorizontal="16dp"
-            app:cardCornerRadius="30dp"
-            app:cardElevation="15dp"
+            app:cardCornerRadius="35dp"
+            app:cardElevation="18dp"
+            app:cardBackgroundColor="#1A237E"
             app:layout_constraintTop_toTopOf="parent">
 
             <RelativeLayout
@@ -29,15 +30,16 @@
                     android:layout_height="wrap_content"
                     android:text="DASHBOARD"
                     android:textColor="#E6FFFFFF"
-                    android:textSize="32sp"
+                    android:textSize="36sp"
+                    android:fontFamily="sans-serif-medium"
                     android:textStyle="bold"
                     android:padding="20dp"
                     android:layout_centerInParent="true"
-                    android:elevation="4dp"
+                    android:elevation="6dp"
                     android:shadowColor="#80FFFFFF"
                     android:shadowDx="0"
                     android:shadowDy="0"
-                    android:shadowRadius="20"/>
+                    android:shadowRadius="25"/>
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
@@ -45,17 +47,18 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/featureCard"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="200dp"
             android:layout_margin="16dp"
-            app:cardCornerRadius="35dp"
-            app:cardElevation="20dp"
+            app:cardCornerRadius="40dp"
+            app:cardElevation="24dp"
             android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#311B92"
             app:layout_constraintTop_toBottomOf="@id/headerCard">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#FFFFFF"> <!-- Use your preferred blue color -->
+                android:background="#FFFFFF"> 
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/slidingCardView"
@@ -88,7 +91,7 @@
                             <FrameLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="150dp"
-                                android:background="@android:color/black"
+                                android:background="@drawable/glowing_background"
                                 android:alpha="0.4"/>
 
                             <!-- Text displayed on top of the image with shadow effect -->
@@ -97,14 +100,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
-                                android:text="Slide Name"
+                                android:text="Featured Content"
                                 android:textColor="#FFFFFF"
-                                android:textSize="20sp"
+                                android:textSize="24sp"
+                                android:fontFamily="sans-serif-light"
                                 android:textStyle="bold"
                                 android:shadowColor="#80000000"
                                 android:shadowDx="0"
                                 android:shadowDy="0"
-                                android:shadowRadius="10"/>
+                                android:shadowRadius="15"/>
                         </RelativeLayout>
                     </androidx.cardview.widget.CardView>
 
@@ -135,16 +139,19 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="12dp"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="16dp"
+                app:cardBackgroundColor="#283593"
                 app:layout_columnWeight="1"
                 app:layout_rowWeight="1">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/futuristic_gradient_background">
+                    android:clickable="true"
+                    android:background="@drawable/futuristic_gradient_background"
+                    android:padding="12dp">
 
                     <ImageView
                         android:id="@+id/icon1"
@@ -159,8 +166,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="STUDY VIDEO"
-                        android:textColor="#E6FFFFFF"
+                        android:textColor="#F5F5F5"
                         android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
                         android:textStyle="bold"
                         android:layout_below="@id/icon1"
                         android:layout_centerHorizontal="true"
@@ -173,16 +181,21 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="12dp"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="16dp"
+                app:cardBackgroundColor="#283593"
                 app:layout_columnWeight="1"
                 app:layout_rowWeight="1">
 
                 <RelativeLayout
+                    android:id="@+id/quizLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/futuristic_gradient_background">
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="12dp">
 
                     <ImageView
                         android:id="@+id/icon2"
@@ -197,8 +210,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="OLD PAPERS"
-                        android:textColor="#E6FFFFFF"
+                        android:textColor="#F5F5F5"
                         android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
                         android:textStyle="bold"
                         android:layout_below="@id/icon2"
                         android:layout_centerHorizontal="true"
@@ -211,16 +225,18 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="12dp"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="16dp"
+                app:cardBackgroundColor="#283593"
                 app:layout_columnWeight="1"
                 app:layout_rowWeight="1">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/futuristic_gradient_background">
+                    android:background="@drawable/futuristic_gradient_background"
+                    android:padding="12dp">
 
                     <ImageView
                         android:id="@+id/icon3"
@@ -235,8 +251,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="QUIZES"
-                        android:textColor="#E6FFFFFF"
+                        android:textColor="#F5F5F5"
                         android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
                         android:textStyle="bold"
                         android:layout_below="@id/icon3"
                         android:layout_centerHorizontal="true"
@@ -249,16 +266,18 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="12dp"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="16dp"
+                app:cardBackgroundColor="#283593"
                 app:layout_columnWeight="1"
                 app:layout_rowWeight="1">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/futuristic_gradient_background">
+                    android:background="@drawable/futuristic_gradient_background"
+                    android:padding="12dp">
 
                     <ImageView
                         android:id="@+id/icon4"
@@ -273,8 +292,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="RESUME MAKER"
-                        android:textColor="#E6FFFFFF"
+                        android:textColor="#F5F5F5"
                         android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
                         android:textStyle="bold"
                         android:layout_below="@id/icon4"
                         android:layout_centerHorizontal="true"
@@ -287,16 +307,18 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="12dp"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="16dp"
+                app:cardBackgroundColor="#283593"
                 app:layout_columnWeight="1"
                 app:layout_rowWeight="1">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/futuristic_gradient_background">
+                    android:background="@drawable/futuristic_gradient_background"
+                    android:padding="12dp">
 
                     <ImageView
                         android:id="@+id/icon5"
@@ -311,8 +333,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="ASSIGNMENT CREATOR"
-                        android:textColor="#E6FFFFFF"
+                        android:textColor="#F5F5F5"
                         android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
                         android:textStyle="bold"
                         android:layout_below="@id/icon5"
                         android:layout_centerHorizontal="true"
@@ -325,16 +348,18 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                app:cardCornerRadius="25dp"
-                app:cardElevation="12dp"
+                android:layout_margin="8dp"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="16dp"
+                app:cardBackgroundColor="#283593"
                 app:layout_columnWeight="1"
                 app:layout_rowWeight="1">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/futuristic_gradient_background">
+                    android:background="@drawable/futuristic_gradient_background"
+                    android:padding="12dp">
 
                     <ImageView
                         android:id="@+id/icon6"
@@ -349,8 +374,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="MESSAGING"
-                        android:textColor="#E6FFFFFF"
+                        android:textColor="#F5F5F5"
                         android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
                         android:textStyle="bold"
                         android:layout_below="@id/icon6"
                         android:layout_centerHorizontal="true"

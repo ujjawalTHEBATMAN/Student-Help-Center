@@ -58,4 +58,21 @@ dependencies {
     implementation("com.google.android.material:material:1.10.0")
     implementation ("com.google.android.play:integrity:1.2.0")
     implementation ("androidx.core:core-splashscreen:1.0.1")
+
+    implementation ("com.android.volley:volley:1.2.1")
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    implementation("com.google.android.material:material:1.10.0")
+    implementation ("com.google.android.play:integrity:1.2.0")
+    implementation ("androidx.core:core-splashscreen:1.0.1")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.google.code.gson:gson:2.10.1")
+    implementation ("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
+    implementation ("androidx.transition:transition:1.4.1")
+    implementation ("androidx.lifecycle:lifecycle-runtime:2.6.2")
+    implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
+
 }

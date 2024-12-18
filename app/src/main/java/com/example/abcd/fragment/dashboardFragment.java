@@ -1,5 +1,6 @@
 package com.example.abcd.fragment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +18,7 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.example.abcd.R;
+import com.example.abcd.QuizActivity;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
@@ -51,6 +54,15 @@ public class dashboardFragment extends Fragment {
         slidingCardView = view.findViewById(R.id.slidingCardView);
         slideImage = view.findViewById(R.id.slideImage);
         slideName = view.findViewById(R.id.slideName);
+
+        // Find and set click listener for icon2
+        RelativeLayout quizLayout = view.findViewById(R.id.quizLayout);
+        if (quizLayout != null) {
+            quizLayout.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), QuizActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 
     private void setupSlideShow() {
