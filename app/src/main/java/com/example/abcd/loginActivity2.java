@@ -70,7 +70,7 @@ public class loginActivity2 extends AppCompatActivity {
                             Toast.makeText(loginActivity2.this, "Email already exists!", Toast.LENGTH_SHORT).show();
                         } else {
                             // Save user data
-                            HelperClassPOJO helperClass = new HelperClassPOJO(emailInput, passwordInput, usernameInput);
+                            HelperClassPOJO helperClass = new HelperClassPOJO(usernameInput, emailInput, passwordInput, "user");
                             reference.child(sanitizedEmail).setValue(helperClass);
 
                             // Save login session after registration

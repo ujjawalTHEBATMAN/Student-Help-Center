@@ -1,5 +1,6 @@
 package com.example.abcd;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -12,6 +13,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.abcd.models.QuizQuestion;
 import com.example.abcd.models.QuizManager;
+import com.example.abcd.models.RewardManager;
+import com.example.abcd.models.RewardManager;
 import java.util.List;
 
 public class QuizQuestionsActivity extends AppCompatActivity {
@@ -26,6 +29,7 @@ public class QuizQuestionsActivity extends AppCompatActivity {
     private int score = 0;
     private CountDownTimer questionTimer;
     private static final int QUESTION_TIMER_SECONDS = 30;
+    private long startTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +44,20 @@ public class QuizQuestionsActivity extends AppCompatActivity {
         timerProgressBar = findViewById(R.id.timerProgressBar);
         timerText = findViewById(R.id.timerText);
 
-        // Get the selected category
-        String category = getIntent().getStringExtra("CATEGORY");
+        // Get the selected semester and subject
+        String semester = getIntent().getStringExtra("SEMESTER");
+        String subject = getIntent().getStringExtra("SUBJECT");
 
-        // Get questions for the selected semester
-        questions = QuizManager.getQuizQuestions(category.toLowerCase());
+        // Get questions for the selected semester and subject
+        questions = QuizManager.getQuizQuestions(semester.toLowerCase(), subject);
 
         if (questions.isEmpty()) {
-            showError("No questions available for this semester");
+            showError("No questions available for this semester and subject");
             return;
         }
+
+        // Record start time
+        startTime = System.currentTimeMillis();
 
         // Show first question
         displayQuestion(currentQuestionIndex);
@@ -118,8 +126,21 @@ public class QuizQuestionsActivity extends AppCompatActivity {
         if (questionTimer != null) {
             questionTimer.cancel();
         }
-        String message = String.format("Quiz completed!\nScore: %d out of %d", score, questions.size());
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+        // Calculate time spent
+        long timeSpent = System.currentTimeMillis() - startTime;
+
+        // Calculate reward
+        RewardManager.Reward reward = RewardManager.calculateReward(score, questions.size(), timeSpent);
+        String motivationalMsg = RewardManager.getMotivationalMessage(score, questions.size());
+
+        // Launch reward activity
+        Intent intent = new Intent(this, RewardActivity.class);
+        intent.putExtra("REWARD_TITLE", reward.getTitle());
+        intent.putExtra("REWARD_MESSAGE", reward.getMessage());
+        intent.putExtra("REWARD_POINTS", reward.getPoints());
+        intent.putExtra("MOTIVATIONAL_MESSAGE", motivationalMsg);
+        startActivity(intent);
         finish();
     }
 

@@ -130,7 +130,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Posts"
+                                android:text="Quizzes"
                                 android:textColor="#B0BEC5"/>
                         </LinearLayout>
 
@@ -150,15 +150,15 @@
                                 android:id="@+id/tvFollowersCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="1.2K"
+                                android:text="0"
                                 android:textStyle="bold"
                                 android:textSize="22sp"
-                                android:textColor="#7C4DFF"/>
+                                android:textColor="#00E5FF"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Followers"
+                                android:text="Points Earned"
                                 android:textColor="#B0BEC5"/>
                         </LinearLayout>
 
@@ -178,15 +178,15 @@
                                 android:id="@+id/tvFollowingCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="542"
+                                android:text="0"
                                 android:textStyle="bold"
                                 android:textSize="22sp"
-                                android:textColor="#FF4081"/>
+                                android:textColor="#00E5FF"/>
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Following"
+                                android:text="Total Points"
                                 android:textColor="#B0BEC5"/>
                         </LinearLayout>
                     </LinearLayout>

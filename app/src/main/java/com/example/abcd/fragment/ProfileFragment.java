@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.abcd.R;
 import com.example.abcd.loginActivity1;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
+import com.example.abcd.models.UserStats;
 import com.example.abcd.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -177,10 +178,43 @@ public class ProfileFragment extends Fragment {
         // Set user role from the database
         tvUserRole.setText(user.getUserRole());
 
-        // Update profile stats from the database
-        tvPostsCount.setText(String.valueOf(user.getPostsCount()));
-        tvFollowersCount.setText(String.valueOf(user.getFollowersCount()));
-        tvFollowingCount.setText(String.valueOf(user.getFollowingCount()));
+        // Update stats from Firebase
+        String sanitizedEmail = email.replace(".", ",");
+        DatabaseReference statsRef = FirebaseDatabase.getInstance().getReference("users")
+            .child(sanitizedEmail)
+            .child("stats");
+
+        statsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (isAdded() && getContext() != null) {
+                    if (dataSnapshot.exists()) {
+                        UserStats stats = dataSnapshot.getValue(UserStats.class);
+                        if (stats != null) {
+                            // Update UI with stats
+                            tvPostsCount.setText(String.valueOf(stats.getTotalQuizzes()));
+                            tvFollowersCount.setText(String.valueOf(stats.getEarnedPoints()));
+                            tvFollowingCount.setText(String.valueOf(stats.getTotalPoints()));
+                        }
+                    } else {
+                        // Set default values if no stats exist
+                        tvPostsCount.setText("0");
+                        tvFollowersCount.setText("0");
+                        tvFollowingCount.setText("0");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                if (isAdded() && getContext() != null) {
+                    // Handle error
+                    Toast.makeText(requireContext(), 
+                        "Failed to load stats: " + databaseError.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void setupClickListeners() {

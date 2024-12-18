@@ -33,9 +33,9 @@ public class QuizActivity extends AppCompatActivity {
         sem6Card.setOnClickListener(v -> startQuiz("sem6"));
     }
 
-    private void startQuiz(String category) {
-        Intent intent = new Intent(this, QuizQuestionsActivity.class);
-        intent.putExtra("CATEGORY", category);
+    private void startQuiz(String semester) {
+        Intent intent = new Intent(this, SubjectSelectionActivity.class);
+        intent.putExtra("SEMESTER", semester);
         startActivity(intent);
     }
 }
