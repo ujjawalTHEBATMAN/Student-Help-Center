@@ -1,4 +1,5 @@
-<ScrollView android:layout_width="match_parent"
+<ScrollView xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,23 +18,22 @@
             android:layout_marginHorizontal="16dp"
             app:cardCornerRadius="35dp"
             app:cardElevation="18dp"
-            app:cardBackgroundColor="#1A237E"
-            app:layout_constraintTop_toTopOf="parent">
+            tools:ignore="MissingConstraints">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/futuristic_gradient_background">
+                android:background="@drawable/premium_gradient_background">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="DASHBOARD"
-                    android:textColor="#E6FFFFFF"
-                    android:textSize="36sp"
-                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#FFFFFF"
+                    android:textSize="40sp"
+                    android:fontFamily="sans-serif-black"
                     android:textStyle="bold"
-                    android:padding="20dp"
+                    android:padding="24dp"
                     android:layout_centerInParent="true"
                     android:elevation="6dp"
                     android:shadowColor="#80FFFFFF"
@@ -47,18 +47,17 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/featureCard"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="220dp"
             android:layout_margin="16dp"
             app:cardCornerRadius="40dp"
             app:cardElevation="24dp"
             android:layout_marginTop="16dp"
-            app:cardBackgroundColor="#311B92"
-            app:layout_constraintTop_toBottomOf="@id/headerCard">
+            tools:ignore="MissingConstraints">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#FFFFFF"> 
+                android:background="@drawable/futuristic_gradient_background">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/slidingCardView"
@@ -79,7 +78,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
 
-                            <!-- Image with an overlay for better readability of text -->
                             <ImageView
                                 android:id="@+id/slideImage"
                                 android:layout_width="match_parent"
@@ -87,14 +85,12 @@
                                 android:scaleType="centerCrop"
                                 android:src="@drawable/ic_chatbot" />
 
-                            <!-- Semi-transparent overlay to make the text pop -->
                             <FrameLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="150dp"
                                 android:background="@drawable/glowing_background"
                                 android:alpha="0.4"/>
 
-                            <!-- Text displayed on top of the image with shadow effect -->
                             <TextView
                                 android:id="@+id/slideName"
                                 android:layout_width="wrap_content"
@@ -111,17 +107,8 @@
                                 android:shadowRadius="15"/>
                         </RelativeLayout>
                     </androidx.cardview.widget.CardView>
-
                 </androidx.cardview.widget.CardView>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="FEATURE AREA"
-                    android:textColor="#FFFFFF"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:layout_centerInParent="true"/>
             </RelativeLayout>
         </androidx.cardview.widget.CardView>
 
@@ -233,9 +220,12 @@
                 app:layout_rowWeight="1">
 
                 <RelativeLayout
+                    android:id="@+id/button3Layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/futuristic_gradient_background"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"
                     android:padding="12dp">
 
                     <ImageView

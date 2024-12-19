@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.abcd.R;
 import com.example.abcd.QuizActivity;
+import com.example.abcd.SemestersActivity;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
@@ -33,17 +34,16 @@ public class dashboardFragment extends Fragment {
     private Runnable slideRunnable;
     private int currentCardIndex = 0;
 
-    private final SlideData[] slides = {
-            new SlideData(R.drawable.cardviewimage1, "BCA Help"),
-            new SlideData(R.drawable.cardviewimage2, "AI Integration"),
-            new SlideData(R.drawable.cardviewimage3, "Communication"),
-            new SlideData(R.drawable.cardviewimagedefault, "Payments")
+    private final SlideData[] slides = new SlideData[]{
+            new SlideData(R.drawable.ic_chatbot, "Featured Content"),
+            new SlideData(R.drawable.ic_stats, "Latest Updates"),
+            new SlideData(R.drawable.ic_username, "Trending Topics")
     };
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+                            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dashboard2, container, false);
         initializeViews(view);
         setupSlideShow();
@@ -55,10 +55,19 @@ public class dashboardFragment extends Fragment {
         slideImage = view.findViewById(R.id.slideImage);
         slideName = view.findViewById(R.id.slideName);
 
-        // Find and set click listener for icon2
+        // Set click listener for button2 (OLD PAPERS) to go to SemestersActivity
         RelativeLayout quizLayout = view.findViewById(R.id.quizLayout);
         if (quizLayout != null) {
             quizLayout.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), SemestersActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        // Set click listener for button3 (QUIZES) to go to QuizActivity
+        RelativeLayout button3Layout = view.findViewById(R.id.button3Layout);
+        if (button3Layout != null) {
+            button3Layout.setOnClickListener(v -> {
                 Intent intent = new Intent(getActivity(), QuizActivity.class);
                 startActivity(intent);
             });
