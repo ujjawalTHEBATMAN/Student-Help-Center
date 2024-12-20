@@ -1,15 +1,47 @@
 package com.example.abcd.fragment;
 
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import android.util.Log;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.abcd.R;
+import com.example.abcd.models.Message;
+import com.example.abcd.utils.SessionManager;
+import com.example.abcd.firebaseLogin.HelperClassPOJO;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 public class homeFragment extends Fragment {
+    private static final String TAG = "homeFragment";
+    private RecyclerView recyclerView;
+    private EditText editTextMessage;
+    private Button buttonSend;
+    private DatabaseReference messagesRef;
+    private DatabaseReference userRef;
+    private List<Message> messagesList;
+    private HomeAdapter adapter;
+    private SessionManager sessionManager;
+    private String currentUserName;
+
     public homeFragment() {
         // Required empty public constructor
     }
@@ -17,7 +49,110 @@ public class homeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        // Initialize SessionManager
+        sessionManager = new SessionManager(requireContext());
+        String userEmail = sessionManager.getEmail();
+
+        if (userEmail == null || userEmail.isEmpty()) {
+            Toast.makeText(getContext(), "Please sign in to continue", Toast.LENGTH_LONG).show();
+            return view;
+        }
+
+        // Initialize views
+        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        editTextMessage = view.findViewById(R.id.editTextMessage);
+        buttonSend = view.findViewById(R.id.buttonSend);
+        buttonSend.setEnabled(false); // Disable button until we have the username
+
+        messagesList = new ArrayList<>();
+        adapter = new HomeAdapter(messagesList);
+        recyclerView.setAdapter(adapter);
+
+        // Initialize Firebase Database references
+        messagesRef = FirebaseDatabase.getInstance().getReference("messages");
+        String sanitizedEmail = userEmail.replace(".", ",");
+        userRef = FirebaseDatabase.getInstance().getReference("users").child(sanitizedEmail);
+
+        // Get user data and setup message sending
+        setupUserData();
+
+        // Listen for new messages
+        messagesRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                messagesList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Message message = snapshot.getValue(Message.class);
+                    if (message != null) {
+                        messagesList.add(message);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+                if (messagesList.size() > 0) {
+                    recyclerView.smoothScrollToPosition(messagesList.size() - 1);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "Failed to read messages", databaseError.toException());
+                Toast.makeText(getContext(), "Failed to load messages", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        return view;
+    }
+
+    private void setupUserData() {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    HelperClassPOJO user = dataSnapshot.getValue(HelperClassPOJO.class);
+                    if (user != null && user.getUser() != null) {
+                        currentUserName = user.getUser();
+                        buttonSend.setEnabled(true);
+                        setupSendButton();
+                    } else {
+                        Log.e(TAG, "User data is null or username is null");
+                        Toast.makeText(getContext(), "Failed to load user data", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Log.e(TAG, "User data does not exist");
+                    Toast.makeText(getContext(), "User not found", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "Failed to read user data", databaseError.toException());
+                Toast.makeText(getContext(), "Failed to load user data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupSendButton() {
+        buttonSend.setOnClickListener(v -> {
+            String messageText = editTextMessage.getText().toString().trim();
+            if (!messageText.isEmpty() && currentUserName != null) {
+                // Create and send the message
+                Message message = new Message(messageText, currentUserName);
+
+                // Push the message to Firebase
+                String messageId = String.valueOf(message.getTimestamp());
+                messagesRef.child(messageId).setValue(message)
+                        .addOnSuccessListener(aVoid -> {
+                            editTextMessage.setText("");
+                            Log.d(TAG, "Message sent successfully");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Failed to send message", e);
+                            Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
+                        });
+            }
+        });
     }
 }
