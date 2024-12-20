@@ -62,8 +62,23 @@
                             android:scaleType="centerCrop"
                             android:padding="4dp"
                             android:background="@drawable/holographic_border"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"/>
+                            android:foreground="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                           app:shapeAppearanceOverlay="@style/CircleImageView"/>
+          
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/changeImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_gravity="center_vertical"
+            android:text="Change Image"
+            android:textAllCaps="false"
+            app:cornerRadius="20dp"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF"/>
                         <!-- User Details with Neon Text -->
                         <LinearLayout
                             android:layout_width="match_parent"

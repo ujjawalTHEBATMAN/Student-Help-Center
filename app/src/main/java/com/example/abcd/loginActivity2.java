@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
 import com.example.abcd.utils.SessionManager;
@@ -24,6 +26,8 @@ public class loginActivity2 extends AppCompatActivity {
     EditText email, password, username;
     Button buttonRegister;
     TextView buttonLoginRedirection;
+    ImageView profileImageView;
+    CardView changeImageCardView;
     FirebaseDatabase firebase;
     DatabaseReference reference;
     SessionManager sessionManager;
@@ -43,6 +47,24 @@ public class loginActivity2 extends AppCompatActivity {
         username = findViewById(R.id.editTextUsername);
         buttonRegister = findViewById(R.id.buttonRegister);
         buttonLoginRedirection = findViewById(R.id.textViewLogin);
+        profileImageView = findViewById(R.id.profileImageView);
+        changeImageCardView = findViewById(R.id.changeImageCardView);
+        changeImageCardView.setVisibility(View.GONE);
+
+        profileImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeImageCardView.setVisibility(View.VISIBLE);
+            }
+        });
+
+        changeImageCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Logic to change the profile image
+                changeImageCardView.setVisibility(View.GONE);
+            }
+        });
 
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
