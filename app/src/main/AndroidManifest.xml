@@ -25,6 +25,16 @@
             android:name=".SubjectsActivity"
             android:exported="false" />
         <activity
+            android:name=".videoplayers1.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".videoplayers1.VideoShowActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+            android:exported="false" />
+        <activity
+            android:name=".videoplayers1.PlaylistShowActivity"
+            android:exported="false" />
+        <activity
             android:name=".SemestersActivity"
             android:exported="false" />
         <activity

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".videoplayers1.MainActivity">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BCA Study Video"
+        android:textSize="24sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/sem1_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Semester 1"
+        android:layout_below="@id/title"
+        android:layout_marginTop="32dp"/>
+
+    <Button
+        android:id="@+id/sem2_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Semester 2"
+        android:layout_below="@id/sem1_button"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/sem3_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Semester 3"
+        android:layout_below="@id/sem2_button"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/sem4_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Semester 4"
+        android:layout_below="@id/sem3_button"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/sem5_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Semester 5"
+        android:layout_below="@id/sem4_button"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/sem6_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Semester 6"
+        android:layout_below="@id/sem5_button"
+        android:layout_marginTop="16dp"/>
+
+</RelativeLayout>

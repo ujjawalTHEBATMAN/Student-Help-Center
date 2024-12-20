@@ -55,6 +55,15 @@ public class dashboardFragment extends Fragment {
         slideImage = view.findViewById(R.id.slideImage);
         slideName = view.findViewById(R.id.slideName);
 
+        // Set click listener for button1 (STUDY VIDEO) to go to VideoPlaylistActivity
+        RelativeLayout studyVideoLayout = view.findViewById(R.id.studyVideoLayout);
+        if (studyVideoLayout != null) {
+            studyVideoLayout.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), com.example.abcd.videoplayers1.MainActivity.class);
+                startActivity(intent);
+            });
+        }
+
         // Set click listener for button2 (OLD PAPERS) to go to SemestersActivity
         RelativeLayout quizLayout = view.findViewById(R.id.quizLayout);
         if (quizLayout != null) {

@@ -75,4 +75,17 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-runtime:2.6.2")
     implementation ("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
+    // video play all dependency
+
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.android.exoplayer:exoplayer:2.16.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.5.1")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("com.google.android.material:material:1.6.0")
+    implementation("com.github.bumptech.glide:glide:4.11.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.11.0")
+
 }

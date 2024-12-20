@@ -134,9 +134,11 @@
                 app:layout_rowWeight="1">
 
                 <RelativeLayout
+                    android:id="@+id/studyVideoLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
+                    android:focusable="true"
                     android:background="@drawable/futuristic_gradient_background"
                     android:padding="12dp">
 
