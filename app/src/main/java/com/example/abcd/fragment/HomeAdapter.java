@@ -6,10 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
 import com.example.abcd.R;
 import com.example.abcd.models.Message;
 import com.example.abcd.utils.SessionManager;
@@ -42,6 +44,19 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         holder.textUserName.setText(message.getUserName());
         holder.textMessage.setText(message.getMessageText());
         holder.textTimestamp.setText(message.getFormattedTime());
+
+        // Handle image loading
+        String imageUrl = message.getImageURL();
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            holder.messageImage.setVisibility(View.VISIBLE);
+            Glide.with(holder.itemView.getContext())
+                .load(imageUrl)
+                .placeholder(R.drawable.image_placeholder)
+                .error(R.drawable.image_error)
+                .into(holder.messageImage);
+        } else {
+            holder.messageImage.setVisibility(View.GONE);
+        }
         
         // Get current user's email
         SessionManager sessionManager = new SessionManager(holder.itemView.getContext());
@@ -108,17 +123,18 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView textUserName, textMessage, textLikes, textTimestamp;
+        TextView textUserName, textMessage, textTimestamp, textLikes;
         ImageButton btnLike;
+        ImageView messageImage;
 
-        @SuppressLint("WrongViewCast")
         ViewHolder(View itemView) {
             super(itemView);
             textUserName = itemView.findViewById(R.id.textUserName);
             textMessage = itemView.findViewById(R.id.textMessage);
-            textLikes = itemView.findViewById(R.id.textLikes);
             textTimestamp = itemView.findViewById(R.id.textTimestamp);
+            textLikes = itemView.findViewById(R.id.textLikes);
             btnLike = itemView.findViewById(R.id.btnLike);
+            messageImage = itemView.findViewById(R.id.messageImage);
         }
     }
 }
