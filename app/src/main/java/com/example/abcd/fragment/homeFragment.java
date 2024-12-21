@@ -1,8 +1,7 @@
 package com.example.abcd.fragment;
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
+import android.content.Intent;
 import android.widget.Toast;
 import android.util.Log;
 
@@ -15,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.abcd.R;
+import com.example.abcd.SendLiveMessageActivity;
 import com.example.abcd.models.Message;
 import com.example.abcd.utils.SessionManager;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
@@ -30,17 +30,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 public class homeFragment extends Fragment {
     private static final String TAG = "homeFragment";
     private RecyclerView recyclerView;
-    private EditText editTextMessage;
-    private Button buttonSend;
     private DatabaseReference messagesRef;
     private DatabaseReference userRef;
     private List<Message> messagesList;
     private HomeAdapter adapter;
     private SessionManager sessionManager;
     private String currentUserName;
+    private FloatingActionButton fab;
 
     public homeFragment() {
         // Required empty public constructor
@@ -63,10 +64,6 @@ public class homeFragment extends Fragment {
         // Initialize views
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        editTextMessage = view.findViewById(R.id.editTextMessage);
-        buttonSend = view.findViewById(R.id.buttonSend);
-        buttonSend.setEnabled(false); // Disable button until we have the username
-
         messagesList = new ArrayList<>();
         adapter = new HomeAdapter(messagesList);
         recyclerView.setAdapter(adapter);
@@ -103,6 +100,12 @@ public class homeFragment extends Fragment {
             }
         });
 
+        fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SendLiveMessageActivity.class);
+            startActivity(intent);
+        });
+
         return view;
     }
 
@@ -114,8 +117,6 @@ public class homeFragment extends Fragment {
                     HelperClassPOJO user = dataSnapshot.getValue(HelperClassPOJO.class);
                     if (user != null && user.getUser() != null) {
                         currentUserName = user.getUser();
-                        buttonSend.setEnabled(true);
-                        setupSendButton();
                     } else {
                         Log.e(TAG, "User data is null or username is null");
                         Toast.makeText(getContext(), "Failed to load user data", Toast.LENGTH_SHORT).show();
@@ -130,28 +131,6 @@ public class homeFragment extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
                 Log.e(TAG, "Failed to read user data", databaseError.toException());
                 Toast.makeText(getContext(), "Failed to load user data", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void setupSendButton() {
-        buttonSend.setOnClickListener(v -> {
-            String messageText = editTextMessage.getText().toString().trim();
-            if (!messageText.isEmpty() && currentUserName != null) {
-                // Create and send the message
-                Message message = new Message(messageText, currentUserName);
-
-                // Push the message to Firebase
-                String messageId = String.valueOf(message.getTimestamp());
-                messagesRef.child(messageId).setValue(message)
-                        .addOnSuccessListener(aVoid -> {
-                            editTextMessage.setText("");
-                            Log.d(TAG, "Message sent successfully");
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.e(TAG, "Failed to send message", e);
-                            Toast.makeText(getContext(), "Failed to send message", Toast.LENGTH_SHORT).show();
-                        });
             }
         });
     }

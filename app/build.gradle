@@ -62,7 +62,10 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.11.0'
     implementation 'com.android.volley:volley:1.2.1'
 
-    // Image Loading
+    // Image Loading and Processing
+    implementation 'com.cloudinary:cloudinary-android:2.3.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation 'id.zelory:compressor:3.0.1'
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 

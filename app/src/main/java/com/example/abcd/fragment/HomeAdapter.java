@@ -1,5 +1,6 @@
 package com.example.abcd.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.res.TypedArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -110,6 +111,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         TextView textUserName, textMessage, textLikes, textTimestamp;
         ImageButton btnLike;
 
+        @SuppressLint("WrongViewCast")
         ViewHolder(View itemView) {
             super(itemView);
             textUserName = itemView.findViewById(R.id.textUserName);

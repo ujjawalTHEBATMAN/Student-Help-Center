@@ -12,6 +12,7 @@ public class Message {
     private int totalLikes;
     private String profilePicUrl;
     private int likes;
+    private String imageURL;
 
     public Message() {
         // Default constructor required for Firebase
@@ -99,6 +100,14 @@ public class Message {
 
     public void setLikes(int likes) {
         this.likes = likes;
+    }
+
+    public String getImageURL() {
+        return imageURL;
+    }
+
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
 
     // Like functionality
