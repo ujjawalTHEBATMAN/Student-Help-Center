@@ -1,8 +1,13 @@
 package com.example.abcd.fragment;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +15,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
+import com.cloudinary.android.MediaManager;
+import com.cloudinary.android.callback.ErrorInfo;
+import com.cloudinary.android.callback.UploadCallback;
 import com.example.abcd.R;
 import com.example.abcd.loginActivity1;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
@@ -22,11 +32,26 @@ import com.example.abcd.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 public class ProfileFragment extends Fragment {
 
@@ -44,8 +69,31 @@ public class ProfileFragment extends Fragment {
     private ValueEventListener userDataListener;
     private View rootView;
 
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int PERMISSION_REQUEST_CODE = 2;
+    private Uri selectedImageUri;
+
     public ProfileFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initCloudinary();
+    }
+
+    private void initCloudinary() {
+        try {
+            Map<String, String> config = new HashMap<>();
+            config.put("cloud_name", "dqlhjvblv");
+            config.put("api_key", "965822312279393");
+            config.put("api_secret", "OhXXmqN1MluEb5uX0gPYbNPnfd0");
+            config.put("secure", "true");
+            MediaManager.init(requireContext(), config);
+        } catch (IllegalStateException e) {
+            // MediaManager already initialized
+        }
     }
 
     @Override
@@ -71,8 +119,8 @@ public class ProfileFragment extends Fragment {
         sessionManager = new SessionManager(requireContext());
         email = sessionManager.getEmail();
 
-        // Set profile image from session
-        setProfileImage();
+        // Load profile image from Firebase
+        loadProfileImageFromFirebase();
 
         // Validate and load user data
         validateAndLoadUserData();
@@ -108,10 +156,52 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private void setProfileImage() {
-        int savedImageId = sessionManager.getProfileImage();
-        if (savedImageId != -1) {
-            profileImage.setImageResource(savedImageId);
+    private void loadProfileImageFromFirebase() {
+        if (email != null && isAdded() && getContext() != null) {
+            String sanitizedEmail = email.replace(".", ",");
+            DatabaseReference userRef = FirebaseDatabase.getInstance()
+                    .getReference("users")
+                    .child(sanitizedEmail);
+
+            userRef.child("imageSend").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (isAdded() && getContext() != null) {
+                        String imageUrl = dataSnapshot.getValue(String.class);
+                        if (imageUrl != null && !imageUrl.isEmpty()) {
+                            // Clear Glide cache for this image
+                            Glide.get(requireContext()).clearMemory();
+                            // Load image using Glide
+                            Glide.with(requireContext())
+                                    .load(imageUrl)
+                                    .placeholder(R.drawable.ic_default_profile)
+                                    .error(R.drawable.ic_default_profile)
+                                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                    .skipMemoryCache(true)
+                                    .into(profileImage);
+                        } else {
+                            // Set default image if no URL is found
+                            profileImage.setImageResource(R.drawable.ic_default_profile);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    if (isAdded() && getContext() != null) {
+                        // Handle error and set default image
+                        profileImage.setImageResource(R.drawable.ic_default_profile);
+                        Toast.makeText(requireContext(),
+                                "Failed to load profile image: " + databaseError.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        } else {
+            // Set default image if no email is found
+            if (isAdded() && getContext() != null) {
+                profileImage.setImageResource(R.drawable.ic_default_profile);
+            }
         }
     }
 
@@ -178,6 +268,9 @@ public class ProfileFragment extends Fragment {
         // Set user role from the database
         tvUserRole.setText(user.getUserRole());
 
+        // Load profile image
+        loadProfileImageFromFirebase();
+
         // Update stats from Firebase
         String sanitizedEmail = email.replace(".", ",");
         DatabaseReference statsRef = FirebaseDatabase.getInstance().getReference("users")
@@ -208,10 +301,9 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 if (isAdded() && getContext() != null) {
-                    // Handle error
-                    Toast.makeText(requireContext(), 
-                        "Failed to load stats: " + databaseError.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(),
+                            "Failed to load stats: " + databaseError.getMessage(),
+                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -232,6 +324,142 @@ public class ProfileFragment extends Fragment {
             // Redirect to login
             redirectToLogin();
         });
+
+        profileImage.setOnClickListener(v -> checkPermissionAndPickImage());
+    }
+
+    private void checkPermissionAndPickImage() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_CODE
+            );
+        } else {
+            openImagePicker();
+        }
+    }
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                         @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openImagePicker();
+            } else {
+                Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
+            selectedImageUri = data.getData();
+            if (selectedImageUri != null) {
+                // Show selected image in ImageView
+                profileImage.setImageURI(selectedImageUri);
+                // Upload to Cloudinary
+                uploadImageToCloudinary(selectedImageUri);
+            }
+        }
+    }
+
+    private void uploadImageToCloudinary(Uri imageUri) {
+        if (getContext() != null) {
+            Toast.makeText(requireContext(), "Uploading image...", Toast.LENGTH_SHORT).show();
+        }
+
+        String requestId = MediaManager.get().upload(imageUri)
+                .unsigned("usersImage")
+                .option("timeout", 60000)  // Increase timeout to 60 seconds
+                .callback(new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        if (getContext() != null) {
+                            Toast.makeText(requireContext(), "Upload starting...", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+                        if (getContext() != null) {
+                            double progress = (bytes * 100) / totalBytes;
+                            Toast.makeText(requireContext(), 
+                                "Uploading: " + (int)progress + "%", 
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        if (getContext() != null) {
+                            String imageUrl = (String) resultData.get("secure_url"); // Use secure_url instead of url
+                            if (imageUrl != null && !imageUrl.isEmpty()) {
+                                // Save URL to Firebase
+                                saveImageUrlToFirebase(imageUrl);
+                            } else {
+                                Toast.makeText(requireContext(), 
+                                    "Failed to get image URL from Cloudinary", 
+                                    Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+                        if (getContext() != null) {
+                            Toast.makeText(requireContext(), 
+                                "Upload error: " + error.getDescription(), 
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+                        // Handle reschedule
+                    }
+                })
+                .dispatch();
+    }
+
+    private void saveImageUrlToFirebase(String imageUrl) {
+        if (email != null) {
+            String sanitizedEmail = email.replace(".", ",");
+            DatabaseReference userRef = FirebaseDatabase.getInstance()
+                    .getReference("users")
+                    .child(sanitizedEmail);
+
+            userRef.child("imageSend").setValue(imageUrl)
+                    .addOnSuccessListener(aVoid -> {
+                        if (isAdded() && getContext() != null) {
+                            // Load the image immediately after successful upload
+                            Glide.with(requireContext())
+                                    .load(imageUrl)
+                                    .placeholder(R.drawable.ic_default_profile)
+                                    .error(R.drawable.ic_default_profile)
+                                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                    .into(profileImage);
+                            
+                            Toast.makeText(requireContext(), 
+                                "Profile image updated successfully", 
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        if (isAdded() && getContext() != null) {
+                            Toast.makeText(requireContext(), 
+                                "Failed to update profile image: " + e.getMessage(), 
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 
     private void redirectToLogin() {
