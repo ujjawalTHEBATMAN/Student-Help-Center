@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.motion.widget.MotionLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layoutDescription="@xml/features_scene">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/featureTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Key Features"
+        android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/featuresRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"/>
+
+</androidx.constraintlayout.motion.widget.MotionLayout>

@@ -1,9 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#FF6200EE</color> <!-- Replace with your desired color -->
+
     <color name="gray">#9E9E9E</color>
     <color name="gradient_start">#6200EA</color>
     <color name="gradient_end">#03DAC6</color>
   <!-- Replace with your desired color -->
     <color name="ic_launcher_background">#3F51B5</color>
+
+
+    <!-- Primary colors -->
+    <color name="primary">#006C51</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#89F8D0</color>
+    <color name="on_primary_container">#002116</color>
+
+    <!-- Secondary colors -->
+    <color name="secondary">#4B635A</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="secondary_container">#CDE9DD</color>
+    <color name="on_secondary_container">#082017</color>
+
+    <!-- Tertiary colors -->
+    <color name="tertiary">#3D6374</color>
+    <color name="on_tertiary">#FFFFFF</color>
+    <color name="tertiary_container">#C1E8FC</color>
+    <color name="on_tertiary_container">#001F2A</color>
+
+    <!-- Surface colors -->
+    <color name="surface">#F8FAF8</color>
+    <color name="on_surface">#191C1B</color>
+    <color name="surface_variant">#DBE5E0</color>
+    <color name="on_surface_variant">#3F4945</color>
+    <color name="surface_container_high">#EAF1ED</color>
+
+    <!-- Background colors -->
+    <color name="background">#F8FAF8</color>
+    <color name="on_background">#191C1B</color>
+
+    <!-- Error colors -->
+    <color name="error">#BA1A1A</color>
+    <color name="on_error">#FFFFFF</color>
+    <color name="error_container">#FFDAD6</color>
+    <color name="on_error_container">#410002</color>
+
+    <!-- Outline colors -->
+    <color name="outline">#6F7975</color>
+    <color name="outline_variant">#BFC9C4</color>
+
 </resources>
