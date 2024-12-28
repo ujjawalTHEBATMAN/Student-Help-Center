@@ -71,7 +71,7 @@ public class treatMeWellFragment extends Fragment {
     }
 
     private void initializeViews(View view) {
-        btnGithubProject = view.findViewById(R.id.btnGithubProject);
+        btnGithubProject = view.findViewById(R.id.btnGithubSHC);
 
         // Initialize GitHub buttons
         for (int i = 0; i < 5; i++) {

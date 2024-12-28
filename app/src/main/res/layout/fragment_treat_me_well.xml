@@ -81,18 +81,21 @@
                             android:text="Material 3"
                             style="@style/Widget.Material3.Chip.Suggestion"/>
                     </com.google.android.material.chip.ChipGroup>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnGithubProject"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="16dp"
-                        android:textColor="#0B0B0B"
-                        android:text="View Project"
-                        app:icon="@drawable/ic_github"
-                        style="@style/Widget.Material3.Button.TonalButton"/>
-                </LinearLayout>
+                        android:padding="8dp"
+                        android:gravity="center">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnGithubSHC"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_github"
+                            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"/>
+
+
+                                   </LinearLayout>        </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -251,7 +254,7 @@
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Sarah Chen"
+                                android:text="madara"
                                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"/>
 
                             <com.google.android.material.chip.ChipGroup
@@ -345,7 +348,7 @@
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="David Park"
+                                android:text="itachi"
                                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"/>
 
                             <com.google.android.material.chip.ChipGroup
@@ -435,7 +438,7 @@
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Maya Singh"
+                                android:text="kakashi"
                                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"/>
 
                             <com.google.android.material.chip.ChipGroup
@@ -526,7 +529,7 @@
                             <com.google.android.material.textview.MaterialTextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Lucas Zhang"
+                                android:text="Primagan"
                                 android:textAppearance="@style/TextAppearance.Material3.TitleLarge"/>
 
                             <com.google.android.material.chip.ChipGroup

@@ -1,382 +1,207 @@
-<ScrollView xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/futuristic_gradient_background">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <!-- Title Section -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/headerCard"
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
+
+            <TextView
+                android:id="@+id/toolbarTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Dashboard"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"/>
+
+        </com.google.android.material.appbar.MaterialToolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginHorizontal="16dp"
-            app:cardCornerRadius="35dp"
-            app:cardElevation="18dp"
-            tools:ignore="MissingConstraints">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <RelativeLayout
+            <!-- Study Material Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Study Material"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/premium_gradient_background">
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="DASHBOARD"
-                    android:textColor="#FFFFFF"
-                    android:textSize="40sp"
-                    android:fontFamily="sans-serif-black"
-                    android:textStyle="bold"
-                    android:padding="24dp"
-                    android:layout_centerInParent="true"
-                    android:elevation="6dp"
-                    android:shadowColor="#80FFFFFF"
-                    android:shadowDx="0"
-                    android:shadowDy="0"
-                    android:shadowRadius="25"/>
-            </RelativeLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Blue CardView below the title -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/featureCard"
-            android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:layout_margin="16dp"
-            app:cardCornerRadius="40dp"
-            app:cardElevation="24dp"
-            android:layout_marginTop="16dp"
-            tools:ignore="MissingConstraints">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/futuristic_gradient_background">
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/slidingCardView"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    app:cardCornerRadius="15dp"
-                    app:cardElevation="10dp">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <androidx.cardview.widget.CardView
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnNotes"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="16dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="8dp">
+                        android:text="Notes"
+                        app:icon="@android:drawable/ic_menu_edit"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_marginBottom="8dp"/>
 
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAssignments"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Assignments"
+                        app:icon="@android:drawable/ic_menu_agenda"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_marginBottom="8dp"/>
 
-                            <ImageView
-                                android:id="@+id/slideImage"
-                                android:layout_width="match_parent"
-                                android:layout_height="150dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_chatbot" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnResources"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Resources"
+                        app:icon="@android:drawable/ic_menu_slideshow"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                            <FrameLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="150dp"
-                                android:background="@drawable/glowing_background"
-                                android:alpha="0.4"/>
-
-                            <TextView
-                                android:id="@+id/slideName"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:text="Featured Content"
-                                android:textColor="#FFFFFF"
-                                android:textSize="24sp"
-                                android:fontFamily="sans-serif-light"
-                                android:textStyle="bold"
-                                android:shadowColor="#80000000"
-                                android:shadowDx="0"
-                                android:shadowDy="0"
-                                android:shadowRadius="15"/>
-                        </RelativeLayout>
-                    </androidx.cardview.widget.CardView>
-                </androidx.cardview.widget.CardView>
-
-            </RelativeLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- GridLayout at the bottom -->
-        <androidx.gridlayout.widget.GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            app:columnCount="2"
-            app:rowCount="3"
-            app:layout_constraintTop_toBottomOf="@id/featureCard"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <!-- Grid Item 1 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
+            <!-- Helpful Tools Section -->
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="30dp"
-                app:cardElevation="16dp"
-                app:cardBackgroundColor="#283593"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1">
+                android:text="Helpful Tools"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
 
-                <RelativeLayout
-                    android:id="@+id/studyVideoLayout"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp">
+
+                <GridLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="@drawable/futuristic_gradient_background"
-                    android:padding="12dp">
+                    android:columnCount="2"
+                    android:padding="16dp">
 
-                    <ImageView
-                        android:id="@+id/icon1"
-                        android:layout_width="77dp"
-                        android:layout_height="77dp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="20dp"
-                        android:src="@drawable/ic_username"
-                        app:tint="#FFFFFF" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCalculator"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="STUDY VIDEO"
-                        android:textColor="#F5F5F5"
-                        android:textSize="16sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:layout_below="@id/icon1"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="12dp"
-                        android:textAlignment="center"/>
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+                        android:layout_columnWeight="1"
+                        android:layout_margin="4dp"
+                        android:text="Calculator"
+                        app:icon="@android:drawable/ic_dialog_dialer"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
 
-            <!-- Grid Item 2 (Add more items as required) -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnConverter"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="4dp"
+                        android:text="Converter"
+                        app:icon="@android:drawable/ic_menu_rotate"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFormulas"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="4dp"
+                        android:text="Formulas"
+                        app:icon="@android:drawable/ic_menu_info_details"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTimer"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="4dp"
+                        android:text="Timer"
+                        app:icon="@android:drawable/ic_menu_recent_history"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </GridLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Messaging Section -->
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="30dp"
-                app:cardElevation="16dp"
-                app:cardBackgroundColor="#283593"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1">
+                android:text="Messaging"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp"/>
 
-                <RelativeLayout
-                    android:id="@+id/quizLayout"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="?attr/selectableItemBackground"
-                    android:padding="12dp">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <ImageView
-                        android:id="@+id/icon2"
-                        android:layout_width="77dp"
-                        android:layout_height="77dp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="20dp"
-                        android:src="@drawable/ic_stats"
-                        app:tint="#FFFFFF" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChat"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="OLD PAPERS"
-                        android:textColor="#F5F5F5"
-                        android:textSize="16sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:layout_below="@id/icon2"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="12dp"
-                        android:textAlignment="center"/>
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+                        android:text="Group Chat"
+                        app:icon="@android:drawable/stat_notify_chat"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_marginBottom="8dp"/>
 
-            <!-- Grid Item 3 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="30dp"
-                app:cardElevation="16dp"
-                app:cardBackgroundColor="#283593"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1">
-
-                <RelativeLayout
-                    android:id="@+id/button3Layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="?attr/selectableItemBackground"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:id="@+id/icon3"
-                        android:layout_width="77dp"
-                        android:layout_height="77dp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="20dp"
-                        android:src="@drawable/ic_chatbot"
-                        app:tint="#E6FFFFFF" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnMessages"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="QUIZES"
-                        android:textColor="#F5F5F5"
-                        android:textSize="16sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:layout_below="@id/icon3"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="12dp"
-                        android:textAlignment="center"/>
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+                        android:text="Messages"
+                        app:icon="@android:drawable/ic_dialog_email"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_marginBottom="8dp"/>
 
-            <!-- Grid Item 4 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="30dp"
-                app:cardElevation="16dp"
-                app:cardBackgroundColor="#283593"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/futuristic_gradient_background"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:id="@+id/icon4"
-                        android:layout_width="77dp"
-                        android:layout_height="77dp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="20dp"
-                        android:src="@drawable/ic_chatbot"
-                        app:tint="#E6FFFFFF" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAnnouncements"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="RESUME MAKER"
-                        android:textColor="#F5F5F5"
-                        android:textSize="16sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:layout_below="@id/icon4"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="12dp"
-                        android:textAlignment="center"/>
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Grid Item 5 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="30dp"
-                app:cardElevation="16dp"
-                app:cardBackgroundColor="#283593"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/futuristic_gradient_background"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:id="@+id/icon5"
-                        android:layout_width="77dp"
-                        android:layout_height="77dp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="20dp"
-                        android:src="@drawable/ic_chatbot"
-                        app:tint="#E6FFFFFF" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="ASSIGNMENT CREATOR"
-                        android:textColor="#F5F5F5"
-                        android:textSize="16sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:layout_below="@id/icon5"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="12dp"
-                        android:textAlignment="center"/>
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Grid Item 6 -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="30dp"
-                app:cardElevation="16dp"
-                app:cardBackgroundColor="#283593"
-                app:layout_columnWeight="1"
-                app:layout_rowWeight="1">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/futuristic_gradient_background"
-                    android:padding="12dp">
-
-                    <ImageView
-                        android:id="@+id/icon6"
-                        android:layout_width="77dp"
-                        android:layout_height="77dp"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="20dp"
-                        android:src="@drawable/ic_chatbot"
-                        app:tint="#E6FFFFFF" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="MESSAGING"
-                        android:textColor="#F5F5F5"
-                        android:textSize="16sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:textStyle="bold"
-                        android:layout_below="@id/icon6"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginTop="12dp"
-                        android:textAlignment="center"/>
-                </RelativeLayout>
-            </androidx.cardview.widget.CardView>
-        </androidx.gridlayout.widget.GridLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+                        android:text="Announcements"
+                        app:icon="@android:drawable/ic_dialog_alert"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
