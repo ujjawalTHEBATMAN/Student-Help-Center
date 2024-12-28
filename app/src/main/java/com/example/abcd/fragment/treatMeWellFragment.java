@@ -19,52 +19,15 @@ public class treatMeWellFragment extends Fragment {
     private CardAdapter adapter;
 
     public treatMeWellFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_treat_me_well, container, false);
-        
-        recyclerView = view.findViewById(R.id.cardsRecyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        recyclerView.setLayoutManager(layoutManager);
 
-        // Initialize with 6 cards using placeholder images
-        ArrayList<Integer> cards = new ArrayList<>(Arrays.asList(
-            R.drawable.dark_gradient_background,
-            R.drawable.dark_gradient_background,
-            R.drawable.dark_gradient_background,
-            R.drawable.dark_gradient_background,
-            R.drawable.dark_gradient_background,
-            R.drawable.dark_gradient_background
-        ));
 
-        adapter = new CardAdapter(cards);
-        recyclerView.setAdapter(adapter);
-
-        // Set up swipe and drag functionality
-        ItemTouchHelper.Callback callback = new ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT,
-                0) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView,
-                                @NonNull RecyclerView.ViewHolder viewHolder,
-                                @NonNull RecyclerView.ViewHolder target) {
-                int fromPosition = viewHolder.getAdapterPosition();
-                int toPosition = target.getAdapterPosition();
-                adapter.swapItems(fromPosition, toPosition);
-                return true;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                // Not implementing swipe functionality
-            }
-        };
-
-        new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
         return view;
     }
 }
