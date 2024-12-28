@@ -79,7 +79,7 @@ public class treatMeWellFragment extends Fragment {
             githubButtons[i] = view.findViewById(githubId);
         }
 
-        // Initialize LinkedIn buttons
+
         for (int i = 0; i < 5; i++) {
             int linkedinId = getResources().getIdentifier("btnLinkedin" + (i + 1), "id", requireContext().getPackageName());
             linkedinButtons[i] = view.findViewById(linkedinId);
