@@ -2,6 +2,7 @@ package com.example.abcd.fragment;
 
 import android.os.Bundle;
 import android.content.Intent;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import android.util.Log;
 
@@ -15,7 +16,9 @@ import android.view.ViewGroup;
 
 import com.example.abcd.R;
 import com.example.abcd.SendLiveMessageActivity;
+import com.example.abcd.chataiwithdistilgpt2;
 import com.example.abcd.models.Message;
+import com.example.abcd.selectChatModel;
 import com.example.abcd.utils.SessionManager;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
 import com.google.firebase.database.DataSnapshot;
@@ -24,11 +27,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -51,6 +51,19 @@ public class homeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        /// onclick listener to nav to chat ai ok
+        ImageButton chatButton = view.findViewById(R.id.chatButton);
+        chatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create an intent to start model selector activity
+                Intent intent = new Intent(getActivity(), selectChatModel.class );
+                startActivity(intent);
+            }
+        });
+
+
 
         // Initialize SessionManager
         sessionManager = new SessionManager(requireContext());

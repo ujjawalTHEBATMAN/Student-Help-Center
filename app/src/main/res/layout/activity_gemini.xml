@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#FFFFFF"
+    android:gravity="start|top">
+
+    <!-- Chat Display Section -->
+    <TextView
+        android:id="@+id/chat_display_gemini"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp"
+        android:background="@drawable/rounded_background"
+        android:textColor="#000000"
+        android:textSize="16sp"
+        android:scrollbars="vertical"
+        android:gravity="start|top"
+        android:visibility="visible" />
+
+    <!-- User Input Section -->
+    <EditText
+        android:id="@+id/user_input_gemini"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter your message"
+        android:padding="16dp"
+        android:background="@drawable/rounded_background" />
+
+    <!-- Send Button -->
+    <Button
+        android:id="@+id/send_button_gemini"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:layout_gravity="end"
+        android:background="#FB5555"
+        android:padding="12dp" />
+
+</LinearLayout>
