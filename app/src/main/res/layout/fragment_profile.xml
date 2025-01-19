@@ -231,7 +231,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Digital Credentials"
+                        android:text="Collage Descreptions"
                         android:textStyle="bold"
                         android:textSize="20sp"
                         android:textColor="#00E5FF"
@@ -256,7 +256,93 @@
                         android:textColor="#B0BEC5"
                         android:background="#33FFFFFF"/>
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Collage Descreption"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:textColor="#00E5FF"
+                        android:layout_marginBottom="12dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="🏫 University: VNSGU"
+                        android:drawablePadding="8dp"
+                        android:padding="10dp"
+                        android:textColor="#B0BEC5"
+                        android:background="#33FFFFFF"
+                        android:layout_marginBottom="8dp"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="📚 Course: BCA"
+                        android:drawablePadding="8dp"
+                        android:padding="10dp"
+                        android:textColor="#B0BEC5"
+                        android:background="#33FFFFFF"/>
+                </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
+
+
+
+            <!--here we add stoage section here -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="#2C2C2C"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="16dp"
+                app:strokeColor="#4A4A4A"
+                app:strokeWidth="1dp">
+
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Storage"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:textColor="#00E5FF"
+                        android:layout_marginBottom="12dp"/>
+                    <ImageButton
+                        android:id="@+id/imageButton"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/rounded_button1"
+                        android:src="@drawable/filestoration"
+                        android:contentDescription="Upload Profile Image"
+                        android:scaleType="centerInside"
+                        android:padding="10dp" />
+
+
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
+
+
     </ScrollView>
 </RelativeLayout>

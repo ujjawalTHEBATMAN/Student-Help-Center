@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ import com.example.abcd.R;
 import com.example.abcd.loginActivity1;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
 import com.example.abcd.models.UserStats;
+import com.example.abcd.storage;
 import com.example.abcd.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -61,7 +63,7 @@ public class ProfileFragment extends Fragment {
     private MaterialButton btnLogout;
     private ShapeableImageView profileImage;
     private Toolbar toolbar;
-
+    private ImageButton imageButton;
     // Session and Firebase Management
     private SessionManager sessionManager;
     private String email;
@@ -81,6 +83,9 @@ public class ProfileFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initCloudinary();
+
+
+
     }
 
     private void initCloudinary() {
@@ -127,6 +132,14 @@ public class ProfileFragment extends Fragment {
 
         // Setup click listeners
         setupClickListeners();
+
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), storage.class));
+            }
+        });
+
     }
 
     @SuppressLint("WrongViewCast")
@@ -137,6 +150,7 @@ public class ProfileFragment extends Fragment {
         tvUserEmail = rootView.findViewById(R.id.tvUserEmail);
         tvUserRole = rootView.findViewById(R.id.tvUserRole);
         profileImage = rootView.findViewById(R.id.profileImage);
+        imageButton = rootView.findViewById(R.id.imageButton);
 
         // Profile Stats
         tvPostsCount = rootView.findViewById(R.id.tvPostsCount);
