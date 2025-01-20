@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
@@ -17,9 +18,15 @@ import java.util.List;
 public class StorageAdapter extends RecyclerView.Adapter<StorageAdapter.FileViewHolder> {
     private List<StorageFileModel> files;
     private Context context;
+    private DeleteListener deleteListener;
 
-    public StorageAdapter(Context context) {
+    public interface DeleteListener {
+        void onDeleteFile(String fileId);
+    }
+
+    public StorageAdapter(Context context, DeleteListener deleteListener) {
         this.context = context;
+        this.deleteListener = deleteListener;
         this.files = new ArrayList<>();
     }
 
@@ -35,21 +42,34 @@ public class StorageAdapter extends RecyclerView.Adapter<StorageAdapter.FileView
     public void onBindViewHolder(@NonNull FileViewHolder holder, int position) {
         StorageFileModel file = files.get(position);
 
-        // Load image using Glide
-        Glide.with(context)
-                .load(file.getUrl())
-                .placeholder(R.drawable.ic_default_profile)
-                .error(R.drawable.ic_default_profile)
-                .into(holder.fileImage);
-
-        // Set file name
         holder.fileName.setText(file.getName());
 
-        // Handle image click
+        if (!file.getUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(file.getUrl())
+                    .placeholder(R.drawable.ic_chat)
+                    .error(R.drawable.ic_chat)
+                    .into(holder.fileImage);
+        } else {
+            holder.fileImage.setImageResource(R.drawable.ic_chat);
+        }
+
         holder.fileImage.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(file.getUrl()));
-            context.startActivity(intent);
+            String url = file.getUrl();
+            if (url.isEmpty()) return;
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            if (intent.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(intent);
+            } else {
+                Toast.makeText(context, "No app found to open this file", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        holder.deleteButton.setOnClickListener(v -> {
+            if (deleteListener != null) {
+                deleteListener.onDeleteFile(file.getId());
+            }
         });
     }
 
@@ -67,11 +87,13 @@ public class StorageAdapter extends RecyclerView.Adapter<StorageAdapter.FileView
     static class FileViewHolder extends RecyclerView.ViewHolder {
         ImageView fileImage;
         TextView fileName;
+        ImageView deleteButton;
 
         FileViewHolder(@NonNull View itemView) {
             super(itemView);
             fileImage = itemView.findViewById(R.id.itemFileImage);
             fileName = itemView.findViewById(R.id.itemFileName);
+            deleteButton = itemView.findViewById(R.id.itemDeleteButton);
         }
     }
 }

@@ -5,29 +5,50 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="8dp"
+    android:background="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/itemFileName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:paddingEnd="8dp"/>
+
+            <ImageButton
+                android:id="@+id/itemDeleteButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_delete"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                />
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/itemFileImage"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:scaleType="centerCrop"/>
-
-        <TextView
-            android:id="@+id/itemFileName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
             android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="@android:color/black"/>
+            />
+
+
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

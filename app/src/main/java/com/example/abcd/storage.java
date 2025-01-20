@@ -1,9 +1,9 @@
-// StorageFileUpload.java
 package com.example.abcd;
 
 import android.app.Dialog;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,14 +25,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.example.abcd.utils.SessionManager;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class storage extends AppCompatActivity {
+public class storage extends AppCompatActivity implements StorageAdapter.DeleteListener {
     private Uri selectedImageUri;
     private ImageView uploadImageView;
     private EditText fileNameEditText;
@@ -59,25 +58,20 @@ public class storage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_storage);
 
-        initializeViews();
+        FloatingActionButton fab = findViewById(R.id.fabAddFile);
+        fab.setOnClickListener(v -> showUploadDialog());
+
         setupUserStorage();
+        initializeViews();
         loadFiles();
         initCloudinary();
-
     }
 
     private void initializeViews() {
-        FloatingActionButton addButton = findViewById(R.id.fabAddFile);
-        addButton.setOnClickListener(v -> showUploadDialog());
-
-        // Initialize RecyclerView
         recyclerView = findViewById(R.id.filesRecyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        adapter = new StorageAdapter(this);
+        adapter = new StorageAdapter(this, this);
         recyclerView.setAdapter(adapter);
-
-        // Load existing files
-        loadFiles();
     }
 
     private void loadFiles() {
@@ -91,12 +85,13 @@ public class storage extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<StorageFileModel> filesList = new ArrayList<>();
                 for (DataSnapshot fileSnapshot : snapshot.getChildren()) {
-                    StorageFileModel file = new StorageFileModel();
-                    file.setId(fileSnapshot.child("id").getValue(String.class));
-                    file.setName(fileSnapshot.child("name").getValue(String.class));
-                    file.setUrl(fileSnapshot.child("url").getValue(String.class));
-                    file.setTimestamp(fileSnapshot.child("timestamp").getValue(Long.class));
-                    filesList.add(file);
+                    try {
+                        StorageFileModel file = new StorageFileModel(fileSnapshot);
+                        filesList.add(file);
+                    } catch (IllegalArgumentException e) {
+                        fileSnapshot.getRef().removeValue();
+                        Log.w("InvalidEntry", "Removed invalid file entry: " + fileSnapshot.getKey());
+                    }
                 }
                 adapter.updateFiles(filesList);
             }
@@ -109,7 +104,6 @@ public class storage extends AppCompatActivity {
             }
         });
     }
-
 
     private void setupUserStorage() {
         sessionManager = new SessionManager(this);
@@ -188,22 +182,29 @@ public class storage extends AppCompatActivity {
     }
 
     private void uploadToCloudinary(Uri imageUri, String fileName) {
+        if (fileName == null || fileName.trim().isEmpty()) {
+            Toast.makeText(this, "File name cannot be empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (imageUri == null) {
+            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Toast.makeText(this, "Starting upload...", Toast.LENGTH_SHORT).show();
 
+        String sanitizedEmail = userEmail.replaceAll("[^a-zA-Z0-9]", "_");
         String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
 
         MediaManager.get().upload(imageUri)
-                .option("public_id", userEmail + "/" + uniqueFileName)
+                .option("public_id", sanitizedEmail + "/" + uniqueFileName)
                 .callback(new UploadCallback() {
                     @Override
-                    public void onStart(String requestId) {
-                        // Upload started
-                    }
+                    public void onStart(String requestId) {}
 
                     @Override
-                    public void onProgress(String requestId, long bytes, long totalBytes) {
-                        // Show progress if needed
-                    }
+                    public void onProgress(String requestId, long bytes, long totalBytes) {}
 
                     @Override
                     public void onSuccess(String requestId, Map resultData) {
@@ -219,11 +220,22 @@ public class storage extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onReschedule(String requestId, ErrorInfo error) {
-                        // Handle reschedule
-                    }
+                    public void onReschedule(String requestId, ErrorInfo error) {}
                 })
                 .dispatch();
+    }
+
+    @Override
+    public void onDeleteFile(String fileId) {
+        if (userStorageRef != null) {
+            userStorageRef.child(fileId).removeValue()
+                    .addOnSuccessListener(aVoid -> Toast.makeText(this,
+                            "File deleted successfully",
+                            Toast.LENGTH_SHORT).show())
+                    .addOnFailureListener(e -> Toast.makeText(this,
+                            "Failed to delete file: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show());
+        }
     }
 
     private void saveToFirebase(String imageUrl, String fileName) {
