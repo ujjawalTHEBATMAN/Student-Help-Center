@@ -3,72 +3,38 @@
     <item android:state_pressed="true">
         <set>
             <objectAnimator
-                android:propertyName="translationZ"
+                android:propertyName="cardElevation"
                 android:duration="100"
-                android:valueTo="8dp"
+                android:valueTo="12dp"
                 android:valueType="floatType"/>
             <objectAnimator
                 android:propertyName="scaleX"
                 android:duration="100"
-                android:valueTo="0.95"
+                android:valueTo="0.98"
                 android:valueType="floatType"/>
             <objectAnimator
                 android:propertyName="scaleY"
                 android:duration="100"
-                android:valueTo="0.95"
-                android:valueType="floatType"/>
-            <objectAnimator
-                android:propertyName="alpha"
-                android:duration="100"
-                android:valueTo="0.9"
-                android:valueType="floatType"/>
-        </set>
-    </item>
-    <item android:state_enabled="true">
-        <set>
-            <objectAnimator
-                android:propertyName="translationZ"
-                android:duration="100"
-                android:valueTo="4dp"
-                android:valueType="floatType"/>
-            <objectAnimator
-                android:propertyName="scaleX"
-                android:duration="100"
-                android:valueTo="1"
-                android:valueType="floatType"/>
-            <objectAnimator
-                android:propertyName="scaleY"
-                android:duration="100"
-                android:valueTo="1"
-                android:valueType="floatType"/>
-            <objectAnimator
-                android:propertyName="alpha"
-                android:duration="100"
-                android:valueTo="1"
+                android:valueTo="0.98"
                 android:valueType="floatType"/>
         </set>
     </item>
     <item>
         <set>
             <objectAnimator
-                android:propertyName="translationZ"
+                android:propertyName="cardElevation"
                 android:duration="100"
-                android:valueTo="0dp"
+                android:valueTo="8dp"
                 android:valueType="floatType"/>
             <objectAnimator
                 android:propertyName="scaleX"
                 android:duration="100"
-                android:valueTo="0.90"
+                android:valueTo="1"
                 android:valueType="floatType"/>
             <objectAnimator
                 android:propertyName="scaleY"
                 android:duration="100"
-                android:valueTo="0.90"
-                android:valueType="floatType"/>
-            <objectAnimator
-                android:propertyName="alpha"
-                android:duration="100"
-                android:valueTo="0.8"
+                android:valueTo="1"
                 android:valueType="floatType"/>
         </set>
     </item>

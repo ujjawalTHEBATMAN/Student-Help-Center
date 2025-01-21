@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/activity_main.xml -->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -96,6 +97,7 @@
             android:gravity="center"
             android:useDefaultMargins="true">
 
+            <!-- Coding Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -116,10 +118,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/glow_background">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnProgramming"
+                        android:id="@+id/btnCoding"
                         android:layout_width="72dp"
                         android:layout_height="72dp"
                         app:icon="@drawable/ic_chatbot"
@@ -145,6 +148,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- DevTools Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -165,7 +169,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/glow_background">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnDevTools"
@@ -194,6 +199,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Math Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -214,7 +220,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/glow_background">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnMath"
@@ -243,6 +250,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- AI Models Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -263,10 +271,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/glow_background">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnScience"
+                        android:id="@+id/btnAIModels"
                         android:layout_width="72dp"
                         android:layout_height="72dp"
                         app:icon="@drawable/ic_chatbot"
@@ -284,35 +293,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Science"
+                        android:text="AI Models"
                         android:textSize="16sp"
                         android:textColor="#FFFFFF"
                         android:layout_marginTop="12dp"
                         android:fontFamily="sans-serif-medium"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-        </GridLayout>
-
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Programming"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="16dp"
-            android:fontFamily="sans-serif-medium"/>
-
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="3"
-            android:rowCount="2"
-            android:alignmentMode="alignMargins"
-            android:gravity="center"
-            android:useDefaultMargins="true">
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
@@ -334,10 +321,84 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/glow_background">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/VideoMaterial"
+                        android:id="@+id/PersonalStorage"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        app:icon="@drawable/ic_chatbot"
+                        app:iconSize="36dp"
+                        app:cornerRadius="20dp"
+                        android:insetLeft="0dp"
+                        android:insetTop="0dp"
+                        android:insetRight="0dp"
+                        android:insetBottom="0dp"
+                        app:rippleColor="#80FFFFFF"
+                        android:backgroundTint="#3C3C3C"
+                        app:strokeColor="#4D4D4D"
+                        app:strokeWidth="1dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Storage"
+                        android:textSize="16sp"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="12dp"
+                        android:fontFamily="sans-serif-medium"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </GridLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="College Support"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="sans-serif-medium"/>
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:rowCount="1"
+            android:alignmentMode="alignMargins"
+            android:gravity="center"
+            android:useDefaultMargins="true">
+
+            <!-- Videos Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                android:layout_margin="8dp"
+                app:cardBackgroundColor="#2C2C2C"
+                app:strokeColor="#3D3D3D"
+                app:strokeWidth="1dp"
+                android:stateListAnimator="@animator/button_state_animator_card"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:background="@drawable/glow_background">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnVideos"
                         android:layout_width="72dp"
                         android:layout_height="72dp"
                         app:icon="@drawable/ic_chatbot"
@@ -359,10 +420,11 @@
                         android:textSize="16sp"
                         android:textColor="#FFFFFF"
                         android:layout_marginTop="12dp"
-                        android:fontFamily="sans-serif-medium"/>
+                    android:fontFamily="sans-serif-medium"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Quizzes Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -383,10 +445,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/glow_background">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/Quizes"
+                        android:id="@+id/btnQuizzes"
                         android:layout_width="72dp"
                         android:layout_height="72dp"
                         app:icon="@drawable/ic_chatbot"
@@ -404,7 +467,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Quizes"
+                        android:text="Quizzes"
                         android:textSize="16sp"
                         android:textColor="#FFFFFF"
                         android:layout_marginTop="12dp"
@@ -412,6 +475,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Old Papers Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -432,10 +496,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:background="@drawable/glow_background">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/oldpaper"
+                        android:id="@+id/btnOldPapers"
                         android:layout_width="72dp"
                         android:layout_height="72dp"
                         app:icon="@drawable/ic_chatbot"
@@ -453,15 +518,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="old paper"
+                        android:text="Old Papers"
                         android:textSize="16sp"
                         android:textColor="#FFFFFF"
                         android:layout_marginTop="12dp"
                         android:fontFamily="sans-serif-medium"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-
 
         </GridLayout>
     </LinearLayout>

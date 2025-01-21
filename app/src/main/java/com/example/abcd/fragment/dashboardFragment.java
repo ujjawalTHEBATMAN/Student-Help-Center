@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
+
+import com.example.abcd.storage;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.example.abcd.R;
@@ -19,24 +21,40 @@ import com.example.abcd.SemestersActivity;
 
 public class dashboardFragment extends Fragment {
     private MaterialButton lastClickedButton = null;
+    private ValueAnimator glowAnimator;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dashboard2, container, false);
 
-        // Initialize buttons
-        setupButton(view, R.id.VideoMaterial, com.example.abcd.videoplayers1.MainActivity.class);
-            setupButton(view, R.id.Quizes, QuizActivity.class);
-            setupButton(view, R.id.oldpaper, SemestersActivity.class);
+        // Initialize College Support buttons
+        setupButton(view, R.id.btnVideos, com.example.abcd.videoplayers1.MainActivity.class);
+        setupButton(view, R.id.btnQuizzes, QuizActivity.class);
+        setupButton(view, R.id.btnOldPapers, SemestersActivity.class);
+        setupButton(view, R.id.PersonalStorage, storage.class);
 
-        // Initialize programming section buttons
-        setupProgrammingButton(view, R.id.btnProgramming);
+        // Initialize Programming section buttons
+        setupProgrammingButton(view, R.id.btnCoding);
         setupProgrammingButton(view, R.id.btnDevTools);
         setupProgrammingButton(view, R.id.btnMath);
+        setupProgrammingButton(view, R.id.btnAIModels);
 
+        // Setup profile button
+        setupProfileButton(view);
+
+        // Initialize glow animation
+        initGlowAnimation();
 
         return view;
+    }
+
+    private void setupProfileButton(View view) {
+        MaterialButton profileButton = view.findViewById(R.id.profileButton);
+        profileButton.setOnClickListener(v -> {
+            // Add profile button click handling here
+            animateButtonClick(profileButton, null);
+        });
     }
 
     private void setupButton(View view, int buttonId, Class<?> activityClass) {
@@ -51,6 +69,9 @@ public class dashboardFragment extends Fragment {
             Intent intent = new Intent(getActivity(), activityClass);
             startActivity(intent);
         });
+
+        // Add glow effect to card
+        addGlowEffect(cardView);
     }
 
     private void setupProgrammingButton(View view, int buttonId) {
@@ -59,7 +80,7 @@ public class dashboardFragment extends Fragment {
 
         button.setOnClickListener(v -> {
             // Reset previous button if exists
-            if (lastClickedButton != null) {
+            if (lastClickedButton != null && lastClickedButton != button) {
                 resetButtonAnimation(lastClickedButton);
             }
 
@@ -67,6 +88,33 @@ public class dashboardFragment extends Fragment {
             animateButtonClick(button, cardView);
             lastClickedButton = button;
         });
+
+        // Add glow effect to card
+        addGlowEffect(cardView);
+    }
+
+    private void initGlowAnimation() {
+        glowAnimator = ValueAnimator.ofFloat(0f, 1f);
+        glowAnimator.setDuration(2000);
+        glowAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        glowAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        glowAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+    }
+
+    private void addGlowEffect(MaterialCardView cardView) {
+        ValueAnimator glowAnim = ValueAnimator.ofFloat(1f, 1.05f);
+        glowAnim.setDuration(1500);
+        glowAnim.setRepeatCount(ValueAnimator.INFINITE);
+        glowAnim.setRepeatMode(ValueAnimator.REVERSE);
+        glowAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+
+        glowAnim.addUpdateListener(animation -> {
+            float scale = (float) animation.getAnimatedValue();
+            cardView.setScaleX(scale);
+            cardView.setScaleY(scale);
+        });
+
+        glowAnim.start();
     }
 
     private void animateButtonClick(MaterialButton button, MaterialCardView cardView) {
@@ -74,7 +122,7 @@ public class dashboardFragment extends Fragment {
         ValueAnimator colorAnimation = ValueAnimator.ofObject(
                 new ArgbEvaluator(),
                 Color.parseColor("#3C3C3C"),
-                Color.parseColor("#FFFFFF")
+                Color.parseColor("#4F8EFF")
         );
 
         colorAnimation.setDuration(300);
@@ -84,12 +132,24 @@ public class dashboardFragment extends Fragment {
                 ))
         );
 
-        // Card elevation animation
-        cardView.animate()
-                .translationZ(16f)
-                .setDuration(300)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
-                .start();
+        // Card elevation and scale animation if cardView exists
+        if (cardView != null) {
+            cardView.animate()
+                    .translationZ(24f)
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(300)
+                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                    .withEndAction(() -> {
+                        cardView.animate()
+                                .translationZ(8f)
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(300)
+                                .start();
+                    })
+                    .start();
+        }
 
         colorAnimation.start();
     }
@@ -97,7 +157,7 @@ public class dashboardFragment extends Fragment {
     private void resetButtonAnimation(MaterialButton button) {
         ValueAnimator colorAnimation = ValueAnimator.ofObject(
                 new ArgbEvaluator(),
-                Color.parseColor("#FFFFFF"),
+                Color.parseColor("#4F8EFF"),
                 Color.parseColor("#3C3C3C")
         );
 
@@ -109,5 +169,13 @@ public class dashboardFragment extends Fragment {
         );
 
         colorAnimation.start();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (glowAnimator != null) {
+            glowAnimator.cancel();
+        }
     }
 }
