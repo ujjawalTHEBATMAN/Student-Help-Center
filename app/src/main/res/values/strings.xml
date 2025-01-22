@@ -52,4 +52,11 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="TreatMe">"Treat Me "</string>
     <string name="title_profile">Profile</string>
+    <string-array name="equation_operations">
+        <item>Simplify</item>
+        <item>Factor</item>
+        <item>Derive</item>
+        <item>Integrate</item>
+        <item>Find Zeroes</item>
+    </string-array>
 </resources>
