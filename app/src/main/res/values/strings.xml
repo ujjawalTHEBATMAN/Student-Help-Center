@@ -59,4 +59,18 @@
         <item>Integrate</item>
         <item>Find Zeroes</item>
     </string-array>
+    <string name="subject_number">Subject %d</string>
+
+        <string-array name="compression_formats">
+            <item>JPEG</item>
+            <item>PNG</item>
+            <item>WEBP</item>
+        </string-array>
+
+        <string-array name="compression_methods">
+            <item>Quality Reduction</item>
+            <item>Size Scaling</item>
+            <item>Smart Compression</item>
+        </string-array>
+
 </resources>

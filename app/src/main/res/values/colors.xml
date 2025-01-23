@@ -6,8 +6,9 @@
     <color name="gradient_end">#03DAC6</color>
   <!-- Replace with your desired color -->
     <color name="ic_launcher_background">#3F51B5</color>
-
-
+    <color name="green">#138808</color>
+    <color name="light_blue">#E3F2FD</color>
+    <color name="white">#FFFFFF</color><color name="saffron">#FFD445</color>
     <!-- Primary colors -->
     <color name="primary">#006C51</color>
     <color name="on_primary">#FFFFFF</color>

@@ -16,7 +16,7 @@ import com.example.abcd.R;
 
 public class MathFeatures extends AppCompatActivity {
 
-    Button e1;
+    Button e1,e2;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,13 @@ public class MathFeatures extends AppCompatActivity {
                 startActivity(new Intent(MathFeatures.this,EquationSolver.class));
             }
         });
-
+        e2=findViewById(R.id.cgpacalculator);
+        e2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MathFeatures.this,CGPACalculatorActivity.class));
+            }
+        });
 
 
     }

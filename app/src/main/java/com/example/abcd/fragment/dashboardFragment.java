@@ -12,6 +12,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import androidx.fragment.app.Fragment;
 
 import com.example.abcd.MathFeature.MathFeatures;
+import com.example.abcd.imagesizecompresor;
 import com.example.abcd.storage;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -33,10 +34,10 @@ public class dashboardFragment extends Fragment {
         setupButton(view, R.id.btnQuizzes, QuizActivity.class);
         setupButton(view, R.id.btnOldPapers, SemestersActivity.class);
         setupButton(view, R.id.PersonalStorage, storage.class);
-
+        setupButton(view,R.id.btnCoding, imagesizecompresor.class);
         setupButton(view,R.id.btnMath, MathFeatures.class);
         // Initialize Programming section buttons
-        setupProgrammingButton(view, R.id.btnCoding);
+
         setupProgrammingButton(view, R.id.btnDevTools);
 
         setupProgrammingButton(view, R.id.btnAIModels);
