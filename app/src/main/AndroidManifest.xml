@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA"
+        tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +17,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Abcd"
         tools:targetApi="31">
+        <activity
+            android:name=".ocrcapture.ocrcapture"
+            android:exported="false" />
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="ocr" />
         <activity
             android:name=".imagesizecompresor"
             android:exported="false" />
@@ -45,9 +53,8 @@
         <activity
             android:name=".selectChatModel"
             android:exported="false" />
-        <activity
-            android:name=".MathFeature.FeedbackActivity"
-            android:exported="false" />
+
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -55,8 +62,9 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths1"/>
+                android:resource="@xml/file_paths1" />
         </provider>
+
         <activity
             android:name=".chataiwithdistilgpt2"
             android:exported="false" />
