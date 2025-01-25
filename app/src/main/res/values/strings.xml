@@ -61,6 +61,11 @@
     </string-array>
     <string name="subject_number">Subject %d</string>
 
+    <string name="admin_access_required">🔒 Admin Access Required</string>
+    <string name="admin_access_message">This premium feature requires administrator privileges. Contact your system administrator for access.</string>
+    <string name="learn_more">Learn More</string>
+    <string name="ok">Got It!</string>
+
     <string-array name="compression_formats">
         <item>JPEG</item>
         <item>PNG</item>
