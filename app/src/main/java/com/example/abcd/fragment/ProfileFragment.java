@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -70,7 +71,7 @@ public class ProfileFragment extends Fragment {
     private DatabaseReference userRef;
     private ValueEventListener userDataListener;
     private View rootView;
-
+    private com.google.android.material.card.MaterialCardView imageButtonCard;
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int PERMISSION_REQUEST_CODE = 2;
     private Uri selectedImageUri;
@@ -130,16 +131,27 @@ public class ProfileFragment extends Fragment {
         // Validate and load user data
         validateAndLoadUserData();
 
+        // Check if viewing another user's profile
+        String currentUserEmail = sessionManager.getEmail();
+        if (currentUserEmail != null && !currentUserEmail.equals(email)) {
+            // Hide buttons for other users
+            btnLogout.setVisibility(View.GONE);
+            imageButton.setVisibility(View.GONE);
+            imageButtonCard.setVisibility(View.GONE);
+
+        } else {
+            // Show buttons for current user
+            btnLogout.setVisibility(View.VISIBLE);
+            imageButton.setVisibility(View.VISIBLE);
+            imageButtonCard.setVisibility(View.VISIBLE);
+        }
+
         // Setup click listeners
         setupClickListeners();
 
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getContext(), storage.class));
-            }
-        });
-
+        imageButton.setOnClickListener(v ->
+                startActivity(new Intent(getContext(), storage.class))
+        );
     }
 
     @SuppressLint("WrongViewCast")
@@ -157,6 +169,7 @@ public class ProfileFragment extends Fragment {
         tvFollowersCount = rootView.findViewById(R.id.tvFollowersCount);
         tvFollowingCount = rootView.findViewById(R.id.tvFollowingCount);
         btnLogout = rootView.findViewById(R.id.btnLogout);
+        imageButtonCard = rootView.findViewById(R.id.imagebuttonv);
     }
 
     private void setupToolbar() {
@@ -177,25 +190,28 @@ public class ProfileFragment extends Fragment {
                     .getReference("users")
                     .child(sanitizedEmail);
 
-            userRef.child("imageSend").addListenerForSingleValueEvent(new ValueEventListener() {
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (isAdded() && getContext() != null) {
-                        String imageUrl = dataSnapshot.getValue(String.class);
+                    if (dataSnapshot.exists()) {
+                        // Handle profile image
+                        String imageUrl = dataSnapshot.child("imageSend").getValue(String.class);
                         if (imageUrl != null && !imageUrl.isEmpty()) {
-                            // Clear Glide cache for this image
-                            Glide.get(requireContext()).clearMemory();
-                            // Load image using Glide
                             Glide.with(requireContext())
                                     .load(imageUrl)
                                     .placeholder(R.drawable.ic_default_profile)
                                     .error(R.drawable.ic_default_profile)
-                                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                    .skipMemoryCache(true)
                                     .into(profileImage);
                         } else {
-                            // Set default image if no URL is found
                             profileImage.setImageResource(R.drawable.ic_default_profile);
+                        }
+
+                        // Handle stats
+                        UserStats stats = dataSnapshot.child("stats").getValue(UserStats.class);
+                        if (stats != null) {
+                            tvPostsCount.setText(String.valueOf(stats.getTotalQuizzes()));
+                            tvFollowersCount.setText(String.valueOf(stats.getEarnedPoints()));
+                            tvFollowingCount.setText(String.valueOf(stats.getTotalPoints()));
                         }
                     }
                 }
@@ -220,11 +236,19 @@ public class ProfileFragment extends Fragment {
     }
 
     private void validateAndLoadUserData() {
+        // Check if we have an email from arguments (search result)
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("USER_EMAIL")) {
+            email = args.getString("USER_EMAIL");
+        } else {
+            // Otherwise use session email
+            email = sessionManager.getEmail();
+        }
+
         if (email != null) {
             setupLiveUserDataListener(email);
         } else {
-            // If no email is found in session, prompt user to log in
-            Toast.makeText(requireContext(), "Please log in to view your profile.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Please log in to view profile", Toast.LENGTH_SHORT).show();
             redirectToLogin();
         }
     }

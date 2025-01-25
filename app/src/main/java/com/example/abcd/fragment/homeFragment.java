@@ -19,6 +19,7 @@ import com.example.abcd.SendLiveMessageActivity;
 import com.example.abcd.chataiwithdistilgpt2;
 import com.example.abcd.models.Message;
 import com.example.abcd.selectChatModel;
+import com.example.abcd.userSearch.userSearchingActivity;
 import com.example.abcd.utils.SessionManager;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
 import com.google.firebase.database.DataSnapshot;
@@ -62,7 +63,11 @@ public class homeFragment extends Fragment {
                 startActivity(intent);
             }
         });
-
+        ImageButton searchButton = view.findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(v -> {
+            Intent searchIntent = new Intent(getActivity(), userSearchingActivity.class);
+            startActivity(searchIntent);
+        });
 
 
         // Initialize SessionManager

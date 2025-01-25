@@ -8,7 +8,7 @@ public class HelperClassPOJO {
     private String password;
     private String userRole;
     private UserStats stats;
-
+    private String imageSend;
     public HelperClassPOJO() {
         // Default constructor required for Firebase
     }
@@ -19,6 +19,7 @@ public class HelperClassPOJO {
         this.password = password;
         this.userRole = userRole;
         this.stats = new UserStats(0, 0, 0);
+        this.imageSend = "";  // <--- ADD THIS LINE HERE
     }
 
     // Getters and Setters
@@ -61,4 +62,7 @@ public class HelperClassPOJO {
     public void setStats(UserStats stats) {
         this.stats = stats;
     }
+
+    public String getImageSend() { return imageSend; }
+    public void setImageSend(String imageSend) { this.imageSend = imageSend; }
 }
