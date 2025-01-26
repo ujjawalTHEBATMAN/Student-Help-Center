@@ -155,9 +155,9 @@ public class storage extends AppCompatActivity implements StorageAdapter.DeleteL
     private void initCloudinary() {
         try {
             Map<String, String> config = new HashMap<>();
-            config.put("cloud_name", "dqlhjvblv");
-            config.put("api_key", "965822312279393");
-            config.put("api_secret", "OhXXmqN1MluEb5uX0gPYbNPnfd0");
+            config.put("cloud_name", "duwe90vxo");
+            config.put("api_key", "576518288148562");
+            config.put("api_secret", "2nLupAXa6lUAXSvXNcczq0EQbxk");
             config.put("secure", "true");
             MediaManager.init(this, config);
         } catch (IllegalStateException e) {

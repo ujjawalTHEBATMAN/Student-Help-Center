@@ -21,9 +21,25 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
         void onItemClick(HelperClassPOJO user);
     }
 
-    public UserSearchAdapter(List<HelperClassPOJO> userList, OnItemClickListener listener) {
+
+
+
+
+    private final OnDeleteClickListener deleteListener;
+
+    public interface OnDeleteClickListener {
+        void onDeleteClick(HelperClassPOJO user);
+    }
+
+
+
+    public UserSearchAdapter(List<HelperClassPOJO> userList,
+                             OnItemClickListener listener,
+                             OnDeleteClickListener deleteListener) {
+        // Update constructor
         this.userList = userList;
         this.listener = listener;
+        this.deleteListener = deleteListener;
     }
 
     @NonNull
@@ -38,6 +54,11 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         HelperClassPOJO user = userList.get(position);
 
+        holder.ivDelete.setOnClickListener(v -> {
+            if (deleteListener != null) {
+                deleteListener.onDeleteClick(user);
+            }
+        });
         // Load profile image
         if (user.getImageSend() != null && !user.getImageSend().isEmpty()) {
             Glide.with(holder.itemView.getContext())
@@ -63,7 +84,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
     }
 
     static class UserViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivUserProfile;
+        ImageView ivUserProfile,ivDelete;
         TextView tvUserName, tvUserEmail;
 
         public UserViewHolder(@NonNull View itemView) {
@@ -71,6 +92,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
             ivUserProfile = itemView.findViewById(R.id.ivUserProfile);
             tvUserName = itemView.findViewById(R.id.tvUserName);
             tvUserEmail = itemView.findViewById(R.id.tvUserEmail);
+            ivDelete = itemView.findViewById(R.id.ivDelete);
         }
     }
 }

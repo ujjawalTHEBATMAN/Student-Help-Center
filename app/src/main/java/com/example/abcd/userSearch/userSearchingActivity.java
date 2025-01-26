@@ -3,6 +3,7 @@ package com.example.abcd.userSearch;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,12 +33,27 @@ public class userSearchingActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewUsers);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         userList = new ArrayList<>();
-        adapter = new UserSearchAdapter(userList, user -> {
-            // Launch profile activity with selected user's email
-            Intent intent = new Intent(this, UserProfileActivity.class);
-            intent.putExtra("USER_EMAIL", user.getEmail());
-            startActivity(intent);
-        });
+        adapter = new UserSearchAdapter(userList,
+                user -> {
+                    // Existing click handler
+                    Intent intent = new Intent(this, UserProfileActivity.class);
+                    intent.putExtra("USER_EMAIL", user.getEmail());
+                    startActivity(intent);
+                },
+                user -> {
+                    // New delete handler
+                    FirebaseDatabase.getInstance().getReference("users")
+                            .child(user.getEmail().replace(".", ",")) // Assuming email is the node key
+                            .removeValue()
+                            .addOnSuccessListener(aVoid -> {
+                                // Optional: Show confirmation toast
+                                Toast.makeText(this, "User deleted", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Delete failed: " + e.getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            });
+                });
         recyclerView.setAdapter(adapter);
 
         SearchView searchView = findViewById(R.id.searchView);
