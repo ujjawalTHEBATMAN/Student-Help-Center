@@ -8,6 +8,8 @@
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
     android:alpha="0.95"
+    android:clickable="true"
+    android:focusable="true"
     app:cardBackgroundColor="#F5F5F5">
 
     <LinearLayout

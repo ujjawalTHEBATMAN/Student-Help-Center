@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -22,10 +23,26 @@ import java.util.List;
 public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     private List<Message> messagesList;
     private DatabaseReference messagesRef;
+    private boolean isAdmin;
+    private OnItemLongClickListener longClickListener;
 
-    public HomeAdapter(List<Message> messagesList) {
+    public interface OnItemLongClickListener {
+        void onEditClicked(int position);
+        void onDeleteClicked(int position);
+    }
+
+    public HomeAdapter(List<Message> messagesList, boolean isAdmin) {
         this.messagesList = messagesList;
+        this.isAdmin = isAdmin;
         this.messagesRef = FirebaseDatabase.getInstance().getReference("messages");
+    }
+
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.longClickListener = listener;
     }
 
     @NonNull
@@ -39,81 +56,95 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Message message = messagesList.get(position);
-        
-        // Set basic message info
+
         holder.textUserName.setText(message.getUserName());
         holder.textMessage.setText(message.getMessageText());
         holder.textTimestamp.setText(message.getFormattedTime());
 
-        // Handle image loading
         String imageUrl = message.getImageURL();
         if (imageUrl != null && !imageUrl.isEmpty()) {
             holder.messageImage.setVisibility(View.VISIBLE);
             Glide.with(holder.itemView.getContext())
-                .load(imageUrl)
-                .placeholder(R.drawable.image_placeholder)
-                .error(R.drawable.image_error)
-                .into(holder.messageImage);
+                    .load(imageUrl)
+                    .placeholder(R.drawable.image_placeholder)
+                    .error(R.drawable.image_error)
+                    .into(holder.messageImage);
         } else {
             holder.messageImage.setVisibility(View.GONE);
         }
-        
-        // Get current user's email
+
         SessionManager sessionManager = new SessionManager(holder.itemView.getContext());
         String currentUserEmail = sessionManager.getEmail();
-        
+
         if (currentUserEmail == null) {
             holder.btnLike.setEnabled(false);
-            Toast.makeText(holder.itemView.getContext(), 
-                "Please sign in to like messages", Toast.LENGTH_SHORT).show();
+            Toast.makeText(holder.itemView.getContext(),
+                    "Please sign in to like messages", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Update like count and button state
         updateLikeUI(holder, message, currentUserEmail);
-        
-        // Set like button click listener
         holder.btnLike.setOnClickListener(v -> handleLikeClick(holder, message, currentUserEmail));
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (isAdmin) {
+                showPopupMenu(v, position);
+                return true;
+            }
+            return false;
+        });
     }
 
+    private void showPopupMenu(View view, int position) {
+        PopupMenu popup = new PopupMenu(view.getContext(), view);
+        popup.inflate(R.menu.context_menu_admin);
+        popup.setOnMenuItemClickListener(item -> {
+            if (longClickListener != null) {
+                int id = item.getItemId();
+                if (id == R.id.menu_edit) {
+                    longClickListener.onEditClicked(position);
+                    return true;
+                } else if (id == R.id.menu_delete) {
+                    longClickListener.onDeleteClicked(position);
+                    return true;
+                }
+            }
+            return false;
+        });
+        popup.show();
+    }
+
+    // Rest of the existing methods (updateLikeUI, handleLikeClick, getItemCount, ViewHolder)
+    // ... [Keep all existing methods unchanged from original code] ...
+
     private void updateLikeUI(ViewHolder holder, Message message, String userEmail) {
-        // Update like count
         int likeCount = message.getTotalLikes();
         holder.textLikes.setText(String.valueOf(likeCount));
-        
-        // Update like button appearance
+
         boolean isLiked = message.isLikedByUser(userEmail);
         holder.btnLike.setImageResource(isLiked ? R.drawable.ic_liked : R.drawable.ic_like);
-        
-        // Add ripple effect
+
         TypedArray typedArray = holder.itemView.getContext().obtainStyledAttributes(new int[]{android.R.attr.selectableItemBackgroundBorderless});
         holder.btnLike.setBackground(typedArray.getDrawable(0));
         typedArray.recycle();
     }
 
     private void handleLikeClick(ViewHolder holder, Message message, String userEmail) {
-        // Toggle like state
         boolean isNowLiked = message.toggleLike(userEmail);
-        
-        // Update UI immediately for better user experience
         updateLikeUI(holder, message, userEmail);
-        
-        // Update in Firebase
+
         String messageId = String.valueOf(message.getTimestamp());
         DatabaseReference messageRef = messagesRef.child(messageId);
-        
+
         messageRef.child("likedBy").setValue(message.getLikedBy())
-            .addOnSuccessListener(aVoid -> {
-                // Like updated successfully
-            })
-            .addOnFailureListener(e -> {
-                // Revert the UI change on failure
-                message.toggleLike(userEmail); // Revert the like
-                updateLikeUI(holder, message, userEmail);
-                Toast.makeText(holder.itemView.getContext(),
-                    "Failed to update like", Toast.LENGTH_SHORT).show();
-            });
-        
+                .addOnSuccessListener(aVoid -> {})
+                .addOnFailureListener(e -> {
+                    message.toggleLike(userEmail);
+                    updateLikeUI(holder, message, userEmail);
+                    Toast.makeText(holder.itemView.getContext(),
+                            "Failed to update like", Toast.LENGTH_SHORT).show();
+                });
+
         messageRef.child("totalLikes").setValue(message.getTotalLikes());
     }
 

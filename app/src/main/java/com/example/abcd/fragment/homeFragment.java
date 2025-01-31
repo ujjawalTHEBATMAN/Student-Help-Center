@@ -1,25 +1,23 @@
 package com.example.abcd.fragment;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.content.Intent;
 import android.view.HapticFeedbackConstants;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.Toast;
-import android.util.Log;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.example.abcd.R;
 import com.example.abcd.SendLiveMessageActivity;
+import com.example.abcd.adminfeature.MessageEditViewAdmin;
 import com.example.abcd.availableAdminPage;
 import com.example.abcd.models.Message;
 import com.example.abcd.notificationSection.NotifictionActivity;
@@ -28,19 +26,16 @@ import com.example.abcd.userSearch.userSearchingActivity;
 import com.example.abcd.utils.SessionManager;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-public class homeFragment extends Fragment {
-    private static final String TAG = "homeFragment";
+public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClickListener {
     private RecyclerView recyclerView;
     private String currentUserRole;
     private DatabaseReference messagesRef;
@@ -48,20 +43,11 @@ public class homeFragment extends Fragment {
     private List<Message> messagesList;
     private HomeAdapter adapter;
     private SessionManager sessionManager;
-    private String currentUserName;
-    private FloatingActionButton fab;
-
-    public homeFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-
-
-        // Add this in homeFragment's onCreateView after initializing other buttons
         ImageButton mailButton = view.findViewById(R.id.mailButton);
         mailButton.setOnClickListener(v -> {
             if (sessionManager.getEmail() != null) {
@@ -92,7 +78,6 @@ public class homeFragment extends Fragment {
         });
 
 
-        // Initialize SessionManager
         sessionManager = new SessionManager(requireContext());
         String userEmail = sessionManager.getEmail();
 
@@ -101,21 +86,19 @@ public class homeFragment extends Fragment {
             return view;
         }
 
-        // Initialize views
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         messagesList = new ArrayList<>();
-        adapter = new HomeAdapter(messagesList);
+        adapter = new HomeAdapter(messagesList, false);
+        adapter.setOnItemLongClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        // Initialize Firebase Database references
         messagesRef = FirebaseDatabase.getInstance().getReference("messages");
         String sanitizedEmail = userEmail.replace(".", ",");
         userRef = FirebaseDatabase.getInstance().getReference("users").child(sanitizedEmail);
 
         setupUserData();
 
-        // Listen for new messages
         messagesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -131,17 +114,63 @@ public class homeFragment extends Fragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e(TAG, "Failed to read messages", databaseError.toException());
                 Toast.makeText(getContext(), "Failed to load messages", Toast.LENGTH_SHORT).show();
             }
         });
 
-        fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(v ->
-                startActivity(new Intent(getActivity(), SendLiveMessageActivity.class)));
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(v -> startActivity(new Intent(getActivity(), SendLiveMessageActivity.class)));
 
         return view;
     }
+
+    @Override
+    public void onEditClicked(int position) {
+        Message message = messagesList.get(position);
+        Intent intent = new Intent(getActivity(), MessageEditViewAdmin.class);
+        intent.putExtra("MESSAGE_ID", String.valueOf(message.getTimestamp()));
+        startActivity(intent);
+    }
+
+    @Override
+    public void onDeleteClicked(int position) {
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Delete Message")
+                .setMessage("Are you sure you want to delete this item?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    Message message = messagesList.get(position);
+                    messagesRef.child(String.valueOf(message.getTimestamp())).removeValue()
+                            .addOnSuccessListener(aVoid -> {
+                                messagesList.remove(position);
+                                adapter.notifyItemRemoved(position);
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(), "Delete failed", Toast.LENGTH_SHORT).show());
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void setupUserData() {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    HelperClassPOJO user = dataSnapshot.getValue(HelperClassPOJO.class);
+                    if (user != null) {
+                        currentUserRole = user.getUserRole();
+                        adapter.setAdmin("admin".equals(currentUserRole));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Error loading user data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void showPremiumAlert() {
         View alertView = LayoutInflater.from(getContext()).inflate(R.layout.alert_card_modern, null);
@@ -177,34 +206,4 @@ public class homeFragment extends Fragment {
         }
     }
 
-    private void setupUserData() {
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    HelperClassPOJO user = dataSnapshot.getValue(HelperClassPOJO.class);
-                    if (user != null && user.getUser() != null) {
-                        currentUserName = user.getUser();
-                        currentUserRole = user.getUserRole();
-                    } else {
-                        Log.e(TAG, "Invalid user data");
-                        showDataErrorToast();
-                    }
-                } else {
-                    Log.e(TAG, "User data not found");
-                    showDataErrorToast();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e(TAG, "Database error: " + databaseError.getMessage());
-                showDataErrorToast();
-            }
-
-            private void showDataErrorToast() {
-                Toast.makeText(getContext(), "Error loading user data", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 }
