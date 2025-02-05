@@ -9,6 +9,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -26,6 +29,7 @@ import androidx.fragment.app.Fragment;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
+import com.example.abcd.EditUserActivity;
 import com.example.abcd.R;
 import com.example.abcd.loginActivity1;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
@@ -84,7 +88,7 @@ public class ProfileFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initCloudinary();
-
+        setHasOptionsMenu(true);
 
 
     }
@@ -346,6 +350,26 @@ public class ProfileFragment extends Fragment {
             }
         });
     }
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        // Inflate our menu with the edit item
+        inflater.inflate(R.menu.menu_profile, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        // Handle toolbar menu item clicks
+        if (item.getItemId() == R.id.action_edit) {
+            // Open the EditUserActivity
+            Intent intent = new Intent(getContext(), EditUserActivity.class);
+            // Optionally pass existing user details so they can be pre-filled in the edit form
+            intent.putExtra("USER_EMAIL", email);
+            startActivity(intent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void setupClickListeners() {
         // Set logout click listener
@@ -429,8 +453,8 @@ public class ProfileFragment extends Fragment {
                     public void onProgress(String requestId, long bytes, long totalBytes) {
                         if (getContext() != null) {
                             double progress = (bytes * 100) / totalBytes;
-                            Toast.makeText(requireContext(), 
-                                "Uploading: " + (int)progress + "%", 
+                            Toast.makeText(requireContext(),
+                                "Uploading: " + (int)progress + "%",
                                 Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -443,8 +467,8 @@ public class ProfileFragment extends Fragment {
                                 // Save URL to Firebase
                                 saveImageUrlToFirebase(imageUrl);
                             } else {
-                                Toast.makeText(requireContext(), 
-                                    "Failed to get image URL from Cloudinary", 
+                                Toast.makeText(requireContext(),
+                                    "Failed to get image URL from Cloudinary",
                                     Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -453,8 +477,8 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onError(String requestId, ErrorInfo error) {
                         if (getContext() != null) {
-                            Toast.makeText(requireContext(), 
-                                "Upload error: " + error.getDescription(), 
+                            Toast.makeText(requireContext(),
+                                "Upload error: " + error.getDescription(),
                                 Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -484,16 +508,16 @@ public class ProfileFragment extends Fragment {
                                     .error(R.drawable.ic_default_profile)
                                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                                     .into(profileImage);
-                            
-                            Toast.makeText(requireContext(), 
-                                "Profile image updated successfully", 
+
+                            Toast.makeText(requireContext(),
+                                "Profile image updated successfully",
                                 Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnFailureListener(e -> {
                         if (isAdded() && getContext() != null) {
-                            Toast.makeText(requireContext(), 
-                                "Failed to update profile image: " + e.getMessage(), 
+                            Toast.makeText(requireContext(),
+                                "Failed to update profile image: " + e.getMessage(),
                                 Toast.LENGTH_SHORT).show();
                         }
                     });
