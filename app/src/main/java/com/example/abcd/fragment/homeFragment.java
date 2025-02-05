@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -124,13 +125,74 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
         return view;
     }
 
+
     @Override
     public void onEditClicked(int position) {
         Message message = messagesList.get(position);
-        Intent intent = new Intent(getActivity(), MessageEditViewAdmin.class);
-        intent.putExtra("MESSAGE_ID", String.valueOf(message.getTimestamp()));
-        startActivity(intent);
+
+        // Show a dialog with Edit and Delete options
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Select an Action")
+                .setMessage("Do you want to edit or delete this message?")
+                .setPositiveButton("Edit", (dialog, which) -> showEditDialog(message, position))
+                .setNegativeButton("Delete", (dialog, which) -> deleteMessage(message, position))
+                .setNeutralButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
     }
+
+    private void showEditDialog(Message message, int position) {
+        View editView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_message, null);
+        EditText editMessageText = editView.findViewById(R.id.editMessageText);
+        editMessageText.setText(message.getMessageText());
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
+                .setView(editView)
+                .setTitle("Edit Message")
+                .setPositiveButton("Update", (dialogInterface, i) -> {
+                    String updatedMessage = editMessageText.getText().toString().trim();
+                    if (!updatedMessage.isEmpty()) {
+                        DatabaseReference messageRef = messagesRef.child(String.valueOf(message.getTimestamp()));
+                        messageRef.child("messageText").setValue(updatedMessage)
+                                .addOnSuccessListener(aVoid -> {
+                                    message.setMessageText(updatedMessage);
+                                    adapter.notifyItemChanged(position);
+                                    Toast.makeText(getContext(), "Message updated", Toast.LENGTH_SHORT).show();
+                                })
+                                .addOnFailureListener(e ->
+                                        Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show());
+                    }
+                })
+                .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss())
+                .create();
+
+        dialog.show();
+    }
+    private void deleteMessage(Message message, int position) {
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Delete Message")
+                .setMessage("Are you sure you want to delete this message?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    messagesRef.child(String.valueOf(message.getTimestamp())).removeValue()
+                            .addOnSuccessListener(aVoid -> {
+                                if (position >= 0 && position < messagesList.size()) {
+                                    messagesList.remove(position);
+                                    if (messagesList.isEmpty()) {
+                                        adapter.notifyDataSetChanged();  // Refresh RecyclerView when empty
+                                    } else {
+                                        adapter.notifyItemRemoved(position);
+                                    }
+                                    Toast.makeText(getContext(), "Message deleted successfully", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(getContext(), "Failed to delete message", Toast.LENGTH_SHORT).show());
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+
+
 
     @Override
     public void onDeleteClicked(int position) {

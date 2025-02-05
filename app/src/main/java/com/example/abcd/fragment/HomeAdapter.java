@@ -87,8 +87,8 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
         holder.btnLike.setOnClickListener(v -> handleLikeClick(holder, message, currentUserEmail));
 
         holder.itemView.setOnLongClickListener(v -> {
-            if (isAdmin) {
-                showPopupMenu(v, position);
+            if (longClickListener != null) {
+                longClickListener.onEditClicked(position);
                 return true;
             }
             return false;
