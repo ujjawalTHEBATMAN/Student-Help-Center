@@ -15,6 +15,7 @@ import com.example.abcd.MathFeature.MathFeatures;
 import com.example.abcd.imagesizecompresor;
 import com.example.abcd.ocrcapture.ocrcapture;
 import com.example.abcd.storage;
+import com.example.abcd.userMessaging.userSearchingActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.example.abcd.R;
@@ -38,13 +39,13 @@ public class dashboardFragment extends Fragment {
         setupButton(view,R.id.btnCoding, imagesizecompresor.class);
         setupButton(view,R.id.btnMath, MathFeatures.class);
         setupButton(view,R.id.btnDevTools, ocrcapture.class);
-
+        setupButton(view,R.id.btnAIModels, userSearchingActivity.class);
 
         // Initialize Programming section buttons
 
 
 
-        setupProgrammingButton(view, R.id.btnAIModels);
+
 
         // Setup profile button
         setupProfileButton(view);

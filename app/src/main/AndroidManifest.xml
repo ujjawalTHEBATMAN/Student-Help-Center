@@ -19,6 +19,10 @@
         android:theme="@style/Theme.Abcd"
         tools:targetApi="31">
         <activity
+            android:name=".userMessaging.userSearchingActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".EditUserActivity"
             android:exported="false" />
         <activity
@@ -39,6 +43,8 @@
         <activity
             android:name=".ocrcapture.ocrcapture"
             android:exported="false" />
+        <activity android:name="com.example.abcd.userMessaging.ChatActivity" />
+
 
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
