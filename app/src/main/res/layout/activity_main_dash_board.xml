@@ -15,10 +15,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
+        android:background="#FFFEFE"
         app:elevation="8dp"
-        app:itemIconTint="#000000"
-        app:itemTextColor="#E99696"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="#000000"
         app:menu="@menu/bottom_nav_menu" />
 
 </RelativeLayout>

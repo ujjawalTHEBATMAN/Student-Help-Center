@@ -1,0 +1,6 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/border_gradient_vector">
+    <target
+        android:name="border"
+        android:animation="@anim/gradient_animation" />
+</animated-vector>

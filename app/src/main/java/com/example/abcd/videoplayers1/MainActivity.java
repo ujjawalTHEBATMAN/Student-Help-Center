@@ -7,6 +7,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.abcd.R;
+import com.google.android.material.button.MaterialButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,12 +16,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mainvideoplay);
 
-        Button sem1Button = findViewById(R.id.sem1_button);
-        Button sem2Button = findViewById(R.id.sem2_button);
-        Button sem3Button = findViewById(R.id.sem3_button);
-        Button sem4Button = findViewById(R.id.sem4_button);
-        Button sem5Button = findViewById(R.id.sem5_button);
-        Button sem6Button = findViewById(R.id.sem6_button);
+        MaterialButton sem1Button = findViewById(R.id.sem1_button);
+        MaterialButton sem2Button = findViewById(R.id.sem2_button);
+        MaterialButton sem3Button = findViewById(R.id.sem3_button);
+        MaterialButton sem4Button = findViewById(R.id.sem4_button);
+        MaterialButton sem5Button = findViewById(R.id.sem5_button);
+        MaterialButton sem6Button = findViewById(R.id.sem6_button);
 
         sem1Button.setOnClickListener(v -> navigateToPlaylist("sem1"));
         sem2Button.setOnClickListener(v -> navigateToPlaylist("sem2"));
