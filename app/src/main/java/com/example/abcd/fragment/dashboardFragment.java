@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.example.abcd.MathFeature.MathFeatures;
 import com.example.abcd.imagesizecompresor;
 import com.example.abcd.ocrcapture.ocrcapture;
+import com.example.abcd.selectChatModel;
 import com.example.abcd.storage;
 import com.example.abcd.userMessaging.userSearchingActivity;
 import com.google.android.material.button.MaterialButton;
@@ -39,7 +40,7 @@ public class dashboardFragment extends Fragment {
         setupButton(view,R.id.btnCoding, imagesizecompresor.class);
         setupButton(view,R.id.btnMath, MathFeatures.class);
         setupButton(view,R.id.btnDevTools, ocrcapture.class);
-        setupButton(view,R.id.btnAIModels, userSearchingActivity.class);
+        setupButton(view,R.id.btnAIModels, selectChatModel.class);   //// userSearchingActivity
 
         // Initialize Programming section buttons
 

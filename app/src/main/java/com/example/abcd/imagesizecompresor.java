@@ -14,7 +14,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.exifinterface.media.ExifInterface;
@@ -32,6 +31,7 @@ public class imagesizecompresor extends AppCompatActivity {
     private static final int PICK_IMAGE = 1;
     private ImageView imageView;
     private AutoCompleteTextView formatSpinner;
+    private AutoCompleteTextView methodSpinner; // Added for Compression Method dropdown
     private Slider qualitySeekBar;
     private Slider scaleSeekBar;
     private TextView txtOriginalSize;
@@ -56,6 +56,7 @@ public class imagesizecompresor extends AppCompatActivity {
     private void initializeViews() {
         imageView = findViewById(R.id.imageView);
         formatSpinner = findViewById(R.id.formatSpinner);
+        methodSpinner = findViewById(R.id.methodSpinner); // Initialize methodSpinner
         qualitySeekBar = findViewById(R.id.qualitySeekBar);
         scaleSeekBar = findViewById(R.id.scaleSeekBar);
         txtOriginalSize = findViewById(R.id.txtOriginalSize);
@@ -64,10 +65,17 @@ public class imagesizecompresor extends AppCompatActivity {
     }
 
     private void setupSpinners() {
+        // Setup adapter for Output Format dropdown
         ArrayAdapter<CharSequence> formatAdapter = ArrayAdapter.createFromResource(this,
                 R.array.compression_formats, android.R.layout.simple_spinner_item);
         formatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         formatSpinner.setAdapter(formatAdapter);
+
+        // Setup adapter for Compression Method dropdown
+        ArrayAdapter<CharSequence> methodAdapter = ArrayAdapter.createFromResource(this,
+                R.array.compression_methods, android.R.layout.simple_spinner_item);
+        methodAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        methodSpinner.setAdapter(methodAdapter);
     }
 
     private void setupSliders() {
