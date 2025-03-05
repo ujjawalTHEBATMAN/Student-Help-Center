@@ -224,7 +224,7 @@
                     android:background="@drawable/glow_background">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnMath"
+                        android:id="@+id/btnDevTools"
                         android:layout_width="72dp"
                         android:layout_height="72dp"
                         app:icon="@drawable/ic_chatbot"
