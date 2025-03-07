@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bottom Navigation Menu Style -->
+    <style name="BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="android:background">@drawable/bottom_nav_background</item>
+        <item name="itemIconTint">@color/bottom_nav_item_color</item>
+        <item name="itemTextColor">@color/bottom_nav_item_color</item>
+        <item name="itemRippleColor">#33FFFFFF</item>
+        <item name="itemActiveIndicatorStyle">@style/App.ActiveIndicator</item>
+        <item name="itemBackground">@drawable/menu_item_selector</item>
+        <item name="labelVisibilityMode">labeled</item>
+        <item name="android:elevation">8dp</item>
+    </style>
+
+    <!-- Active Indicator Style for Bottom Navigation -->
+    <style name="App.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">#4A1A237E</item>
+    </style>
+
+    <!-- Profile Menu Item Style -->
+    <style name="ProfileMenuItem" parent="Widget.MaterialComponents.PopupMenu.Overflow">
+        <item name="android:background">@drawable/menu_item_background</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="iconTint">#FFFFFF</item>
+    </style>
+</resources>

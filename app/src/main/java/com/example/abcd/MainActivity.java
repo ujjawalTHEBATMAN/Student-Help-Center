@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.splashscreen.SplashScreen;
 
+import com.example.abcd.AuthenTication.login.loginActivity;
 import com.google.android.material.color.DynamicColors;
 import com.example.abcd.utils.SessionManager;
 
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                 intent = new Intent(MainActivity.this, mainDashBoard.class);
             } else {
 
-                intent = new Intent(MainActivity.this, loginActivity2.class);
+                intent = new Intent(MainActivity.this, loginActivity.class);
             }
             startActivity(intent);
             finish();

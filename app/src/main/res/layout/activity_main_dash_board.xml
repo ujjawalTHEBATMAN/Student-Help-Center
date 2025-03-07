@@ -17,7 +17,7 @@
         android:layout_alignParentBottom="true"
         android:background="#FFFEFE"
         app:elevation="8dp"
-        app:itemIconTint="@color/white"
+        app:itemIconTint="@null"
         app:itemTextColor="#000000"
         app:menu="@menu/bottom_nav_menu" />
 

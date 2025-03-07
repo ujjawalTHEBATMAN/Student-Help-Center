@@ -1,5 +1,6 @@
 package com.example.abcd;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.abcd.AuthenTication.login.loginActivity;
+import com.example.abcd.fragment.adminhomeFragment;
 import com.example.abcd.fragment.dashboardFragment;
 import com.example.abcd.fragment.homeFragment;
 import com.example.abcd.fragment.treatMeWellFragment;
@@ -32,36 +35,115 @@ public class mainDashBoard extends AppCompatActivity {
     private Fragment activeFragment;
     private String email;
     private SessionManager sessionManager;
+    private String userRole = ""; // This will be set after loading from Firebase
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_dash_board);
 
-        // Retrieve email from intent extras or session
         sessionManager = new SessionManager(this);
         validateAndLoadUserData();
-
         initializeViews();
-        // Disable the global icon tint so we can reapply it selectively.
-        bottomNavView.setItemIconTintList(null);
-        setupBottomNavigation();
-        // Manually tint non-profile menu items white.
-        tintOtherMenuIcons();
 
-        // Load the profile image from Firebase and update the profile icon.
+        // Load the user role from Firebase and inflate the corresponding menu
+        loadUserRoleAndInflateMenu();
+
+        // Disable the global icon tint so we can set our own colors.
+        bottomNavView.setItemIconTintList(null);
+
+        setupBottomNavigation();
+        tintOtherMenuIcons();
         loadProfileImageFromDatabase();
 
         if (savedInstanceState == null) {
-            loadFragment(new homeFragment());
+            loadFragment(new homeFragment()); // Default fragment
         }
     }
 
-    /**
-     * Validates and loads the user email.
-     * Checks for USER_EMAIL in the intent extras; otherwise, retrieves from SessionManager.
-     * If no email is found, redirects to the login screen.
-     */
+    // Retrieves the user role from Firebase and inflates the appropriate menu
+    private void loadUserRoleAndInflateMenu() {
+        String sanitizedEmail = email.replace(".", ",");
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(sanitizedEmail);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    userRole = snapshot.child("userRole").getValue(String.class);
+                    bottomNavView.getMenu().clear(); // Clear any existing menu
+                    if ("admin".equalsIgnoreCase(userRole)) {
+                        getMenuInflater().inflate(R.menu.bottom_nav_admin, bottomNavView.getMenu());
+                    } else if ("teacher".equalsIgnoreCase(userRole)) {
+                        getMenuInflater().inflate(R.menu.bottom_nav_teacher, bottomNavView.getMenu());
+                    } else if ("student".equalsIgnoreCase(userRole)) {
+                        getMenuInflater().inflate(R.menu.bottom_nav_student, bottomNavView.getMenu());
+                    } else {
+                        // Fallback or default menu if needed
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(mainDashBoard.this, "Error loading user role", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Sets up the BottomNavigationView with an item selected listener to load the right fragment.
+    // Uses if–else statements instead of switch-case.
+    private void setupBottomNavigation() {
+        bottomNavView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @SuppressLint("NonConstantResourceId")
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                // Store the current item ID to ensure proper selection state
+                int id = item.getItemId();
+                Fragment fragment = null;
+                
+                // Clear any previous selection state
+                for (int i = 0; i < bottomNavView.getMenu().size(); i++) {
+                    MenuItem menuItem = bottomNavView.getMenu().getItem(i);
+                    menuItem.setChecked(menuItem.getItemId() == id);
+                }
+                
+                if ("admin".equalsIgnoreCase(userRole)) {
+                    if (id == R.id.menu_home) {
+                        fragment = new homeFragment();
+                    } else if (id == R.id.menu_admin_home) {
+                        fragment = new adminhomeFragment(); // Ensure this fragment exists
+                    } else if (id == R.id.menu_profile) {
+                        fragment = new ProfileFragment();
+                    }
+                } else if ("teacher".equalsIgnoreCase(userRole)) {
+                    if (id == R.id.menu_home) {
+                        fragment = new homeFragment();
+                    } else if (id == R.id.menu_dashboard) {
+                        fragment = new dashboardFragment();
+                    } else if (id == R.id.menu_profile) {
+                        fragment = new ProfileFragment();
+                    }
+                } else if ("student".equalsIgnoreCase(userRole)) {
+                    if (id == R.id.menu_home) {
+                        fragment = new homeFragment();
+                    } else if (id == R.id.menu_dashboard) {
+                        fragment = new dashboardFragment();
+                    } else if (id == R.id.menu_treatme) {
+                        fragment = new treatMeWellFragment();
+                    } else if (id == R.id.menu_profile) {
+                        fragment = new ProfileFragment();
+                    }
+                }
+                
+                // Ensure only the current item is checked
+                item.setChecked(true);
+                return loadFragment(fragment);
+            }
+        });
+    }
+
+    // Validates and loads the user email from the intent or session.
     private void validateAndLoadUserData() {
         if (getIntent() != null && getIntent().hasExtra("USER_EMAIL")) {
             email = getIntent().getStringExtra("USER_EMAIL");
@@ -74,51 +156,12 @@ public class mainDashBoard extends AppCompatActivity {
         }
     }
 
-    /**
-     * Redirects the user to the login activity.
-     */
-    private void redirectToLogin() {
-        Intent intent = new Intent(this, loginActivity1.class);
-        startActivity(intent);
-        finish();
-    }
-
-    /**
-     * Initializes the BottomNavigationView.
-     */
+    // Initializes the BottomNavigationView.
     private void initializeViews() {
         bottomNavView = findViewById(R.id.bottomNavigation);
     }
 
-    /**
-     * Sets up the BottomNavigationView with a listener to load the appropriate fragment.
-     */
-    private void setupBottomNavigation() {
-        bottomNavView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment fragment = null;
-                int id = item.getItemId();
-                if (id == R.id.navigation_home) {
-                    fragment = new homeFragment();
-                } else if (id == R.id.navigation_dashboard) {
-                    fragment = new dashboardFragment();
-                } else if (id == R.id.treatme) {
-                    fragment = new treatMeWellFragment();
-                } else if (id == R.id.navigation_profile) {
-                    fragment = new ProfileFragment();
-                }
-                return loadFragment(fragment);
-            }
-        });
-    }
-
-    /**
-     * Loads the specified fragment into the fragment container.
-     *
-     * @param fragment The fragment to display.
-     * @return True if the fragment is loaded; false otherwise.
-     */
+    // Loads a fragment into the container.
     private boolean loadFragment(Fragment fragment) {
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
@@ -131,34 +174,31 @@ public class mainDashBoard extends AppCompatActivity {
         return false;
     }
 
-    /**
-     * Iterates over all menu items and applies a white tint to those that are not the profile item.
-     */
+    // Iterates over the menu items in the BottomNavigationView and tints
+    // all icons (except the profile icon) black.
     private void tintOtherMenuIcons() {
         for (int i = 0; i < bottomNavView.getMenu().size(); i++) {
             MenuItem item = bottomNavView.getMenu().getItem(i);
-            if (item.getItemId() != R.id.navigation_profile) {
+            // Skip the profile menu item so its icon remains untinted.
+            if (item.getItemId() != R.id.menu_profile) {
                 Drawable icon = item.getIcon();
                 if (icon != null) {
                     icon = DrawableCompat.wrap(icon);
-                    DrawableCompat.setTint(icon, getResources().getColor(R.color.white));
+                    DrawableCompat.setTint(icon, getResources().getColor(android.R.color.black));
                     item.setIcon(icon);
                 }
             }
         }
     }
 
-    /**
-     * Retrieves the profile image URL from Firebase using the validated email.
-     * The image URL is expected to be stored under the "imageSend" key.
-     */
+    // Loads the profile image URL from Firebase and updates the profile icon.
+    // It uses the "imageSend" field from the user's data.
     private void loadProfileImageFromDatabase() {
         if (email != null && !email.isEmpty()) {
             String sanitizedEmail = email.replace(".", ",");
             DatabaseReference userRef = FirebaseDatabase.getInstance()
                     .getReference("users")
                     .child(sanitizedEmail);
-
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -173,24 +213,17 @@ public class mainDashBoard extends AppCompatActivity {
                         Toast.makeText(mainDashBoard.this, "User not found", Toast.LENGTH_SHORT).show();
                     }
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(mainDashBoard.this,
-                            "Failed to load profile image: " + error.getMessage(),
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mainDashBoard.this, "Failed to load profile image: "
+                            + error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
     }
 
-    /**
-     * Uses Glide to load the image from the provided URL, applies a circular crop,
-     * and sets the resulting Drawable as the icon for the profile item in the BottomNavigationView.
-     * This drawable is not tinted, so it displays with its original colors.
-     *
-     * @param imageUrl The URL of the user's profile image.
-     */
+    // Uses Glide to load the image from the provided URL, applies a circular crop,
+    // and sets the resulting Drawable as the profile icon in the BottomNavigationView.
     private void updateProfileIcon(String imageUrl) {
         Glide.with(this)
                 .load(imageUrl)
@@ -201,23 +234,19 @@ public class mainDashBoard extends AppCompatActivity {
                     @Override
                     public void onResourceReady(@NonNull Drawable resource,
                                                 @Nullable Transition<? super Drawable> transition) {
-                        // Set the profile icon without applying any tint.
-                        bottomNavView.getMenu().findItem(R.id.navigation_profile).setIcon(resource);
+                        bottomNavView.getMenu().findItem(R.id.menu_profile).setIcon(resource);
                     }
-
                     @Override
                     public void onLoadCleared(@Nullable Drawable placeholder) {
-                        bottomNavView.getMenu().findItem(R.id.navigation_profile).setIcon(placeholder);
+                        bottomNavView.getMenu().findItem(R.id.menu_profile).setIcon(placeholder);
                     }
                 });
     }
 
-    @Override
-    public void onBackPressed() {
-        if (!(activeFragment instanceof homeFragment)) {
-            bottomNavView.setSelectedItemId(R.id.navigation_home);
-        } else {
-            super.onBackPressed();
-        }
+    // Redirects the user to the login screen if their session is invalid or missing.
+    private void redirectToLogin() {
+        Intent intent = new Intent(this, loginActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

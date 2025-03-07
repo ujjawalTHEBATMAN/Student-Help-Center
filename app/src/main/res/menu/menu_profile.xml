@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/action_edit"
         android:title="Edit"
-        android:icon="@drawable/ic_chat"
-        android:showAsAction="ifRoom"/>
+        android:icon="@drawable/ic_add"
+        app:showAsAction="ifRoom"
+        android:contentDescription="Edit profile"/>
+    
+    <item
+        android:id="@+id/action_settings"
+        android:title="Settings"
+        android:icon="@drawable/ic_settings"
+        app:showAsAction="ifRoom"
+        android:contentDescription="Profile settings"/>
 </menu>

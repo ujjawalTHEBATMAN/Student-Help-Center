@@ -20,7 +20,6 @@ import com.example.abcd.userMessaging.userSearchingActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.example.abcd.R;
-import com.example.abcd.QuizActivity;
 import com.example.abcd.SemestersActivity;
 
 public class dashboardFragment extends Fragment {
@@ -34,7 +33,7 @@ public class dashboardFragment extends Fragment {
 
         // Initialize College Support buttons
         setupButton(view, R.id.btnVideos, com.example.abcd.videoplayers1.MainActivity.class);
-        setupButton(view, R.id.btnQuizzes, QuizActivity.class);
+        // Quiz feature removed
         setupButton(view, R.id.btnOldPapers, SemestersActivity.class);
         setupButton(view, R.id.PersonalStorage, storage.class);
         setupButton(view,R.id.btnCoding, imagesizecompresor.class);
@@ -43,7 +42,6 @@ public class dashboardFragment extends Fragment {
         setupButton(view,R.id.btnAIModels, selectChatModel.class);   //// userSearchingActivity
 
         // Initialize Programming section buttons
-
 
 
 
@@ -101,88 +99,65 @@ public class dashboardFragment extends Fragment {
         addGlowEffect(cardView);
     }
 
-    private void initGlowAnimation() {
-        glowAnimator = ValueAnimator.ofFloat(0f, 1f);
-        glowAnimator.setDuration(2000);
-        glowAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        glowAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        glowAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-    }
-
-    private void addGlowEffect(MaterialCardView cardView) {
-        ValueAnimator glowAnim = ValueAnimator.ofFloat(1f, 1.05f);
-        glowAnim.setDuration(1500);
-        glowAnim.setRepeatCount(ValueAnimator.INFINITE);
-        glowAnim.setRepeatMode(ValueAnimator.REVERSE);
-        glowAnim.setInterpolator(new AccelerateDecelerateInterpolator());
-
-        glowAnim.addUpdateListener(animation -> {
-            float scale = (float) animation.getAnimatedValue();
-            cardView.setScaleX(scale);
-            cardView.setScaleY(scale);
-        });
-
-        glowAnim.start();
-    }
-
     private void animateButtonClick(MaterialButton button, MaterialCardView cardView) {
-        // Button color animation
-        ValueAnimator colorAnimation = ValueAnimator.ofObject(
-                new ArgbEvaluator(),
-                Color.parseColor("#3C3C3C"),
-                Color.parseColor("#4F8EFF")
-        );
+        // Scale animation for button
+        button.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .setDuration(100)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .withEndAction(() -> {
+                    button.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(100)
+                            .setInterpolator(new AccelerateDecelerateInterpolator())
+                            .start();
+                })
+                .start();
 
-        colorAnimation.setDuration(300);
-        colorAnimation.addUpdateListener(animator ->
-                button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
-                        (Integer) animator.getAnimatedValue()
-                ))
-        );
-
-        // Card elevation and scale animation if cardView exists
+        // Glow animation for card if available
         if (cardView != null) {
-            cardView.animate()
-                    .translationZ(24f)
-                    .scaleX(0.95f)
-                    .scaleY(0.95f)
-                    .setDuration(300)
-                    .setInterpolator(new AccelerateDecelerateInterpolator())
-                    .withEndAction(() -> {
-                        cardView.animate()
-                                .translationZ(8f)
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(300)
-                                .start();
-                    })
-                    .start();
-        }
+            ValueAnimator colorAnimator = ValueAnimator.ofObject(
+                    new ArgbEvaluator(),
+                    Color.parseColor("#3C3C3C"),
+                    Color.parseColor("#6200EE"));
 
-        colorAnimation.start();
+            colorAnimator.setDuration(300);
+            colorAnimator.addUpdateListener(animator -> {
+                cardView.setStrokeColor((int) animator.getAnimatedValue());
+            });
+
+            colorAnimator.start();
+        }
     }
 
     private void resetButtonAnimation(MaterialButton button) {
-        ValueAnimator colorAnimation = ValueAnimator.ofObject(
+        button.setScaleX(1f);
+        button.setScaleY(1f);
+    }
+
+    private void addGlowEffect(MaterialCardView cardView) {
+        cardView.setStrokeWidth(2);
+        cardView.setStrokeColor(Color.parseColor("#3C3C3C"));
+    }
+
+    private void initGlowAnimation() {
+        glowAnimator = ValueAnimator.ofObject(
                 new ArgbEvaluator(),
-                Color.parseColor("#4F8EFF"),
-                Color.parseColor("#3C3C3C")
-        );
+                Color.parseColor("#3C3C3C"),
+                Color.parseColor("#6200EE"),
+                Color.parseColor("#3C3C3C"));
 
-        colorAnimation.setDuration(300);
-        colorAnimation.addUpdateListener(animator ->
-                button.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
-                        (Integer) animator.getAnimatedValue()
-                ))
-        );
-
-        colorAnimation.start();
+        glowAnimator.setDuration(2000);
+        glowAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        glowAnimator.setRepeatMode(ValueAnimator.RESTART);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (glowAnimator != null) {
+    public void onPause() {
+        super.onPause();
+        if (glowAnimator != null && glowAnimator.isRunning()) {
             glowAnimator.cancel();
         }
     }

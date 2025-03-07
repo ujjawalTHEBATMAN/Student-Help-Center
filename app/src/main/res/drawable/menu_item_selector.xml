@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Selected state -->
+    <item android:state_checked="true">
+        <layer-list>
+            <!-- Background glow effect -->
+            <item>
+                <shape android:shape="rectangle">
+                    <corners android:radius="8dp" />
+                    <gradient
+                        android:startColor="#331A237E"
+                        android:endColor="#336A1B9A"
+                        android:angle="0" />
+                </shape>
+            </item>
+            <!-- Indicator line at bottom -->
+            <item android:bottom="0dp" android:left="12dp" android:right="12dp" android:top="28dp">
+                <shape android:shape="rectangle">
+                    <corners android:radius="2dp" />
+                    <gradient
+                        android:startColor="#1A237E"
+                        android:endColor="#6A1B9A"
+                        android:angle="0" />
+                    <size android:height="2dp" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <!-- Default state -->
+    <item android:state_checked="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</selector>

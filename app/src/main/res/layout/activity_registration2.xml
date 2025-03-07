@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Registration Info display -->
+        <TextView
+            android:id="@+id/tvRegistrationInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Collage Selection"
+            android:textStyle="bold"
+            android:textColor="#0E0E0E"
+            android:textSize="18sp"/>
+
+        <!-- RecyclerView to display colleges -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewColleges"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+        <!-- Next Button -->
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Next"
+            android:enabled="false"
+            android:layout_marginTop="8dp"/>
+    </LinearLayout>
+
+    <!-- FAB for admin-only new college addition -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddCollege"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher_foreground"
+        app:layout_anchor="@id/recyclerViewColleges"
+        app:layout_anchorGravity="bottom|end"
+        android:layout_margin="16dp"
+        android:visibility="gone"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

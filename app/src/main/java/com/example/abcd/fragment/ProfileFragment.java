@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
+import com.example.abcd.AuthenTication.login.loginActivity;
 import com.example.abcd.EditUserActivity;
 import com.example.abcd.R;
 import com.example.abcd.loginActivity1;
@@ -526,7 +527,7 @@ public class ProfileFragment extends Fragment {
 
     private void redirectToLogin() {
         if (getActivity() != null) {
-            startActivity(new Intent(requireActivity(), loginActivity1.class));
+            startActivity(new Intent(requireActivity(), loginActivity.class));
             getActivity().finish();
         }
     }
