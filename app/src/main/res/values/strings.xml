@@ -78,4 +78,15 @@
         <item>Smart Compression</item>
     </string-array>
 
+    <string-array name="result_view_options">
+        <item>Email</item>
+        <item>Advance Result View</item>
+    </string-array>
+    <string name="duration_format">Duration: %d mins</string>
+    <string name="questions_format">Questions: %d</string>
+    <string name="expired_red">#FF0000</string>
+    <string name="active_green">#00FF00</string>
+    <string name="upcoming_blue">#0000FF</string>
+
+
 </resources>

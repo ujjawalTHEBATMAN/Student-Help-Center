@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import androidx.fragment.app.Fragment;
 
+import com.example.abcd.ExamQuizes.examQuizesMainActivity;
 import com.example.abcd.MathFeature.MathFeatures;
 import com.example.abcd.imagesizecompresor;
 import com.example.abcd.ocrcapture.ocrcapture;
@@ -33,7 +34,7 @@ public class dashboardFragment extends Fragment {
 
         // Initialize College Support buttons
         setupButton(view, R.id.btnVideos, com.example.abcd.videoplayers1.MainActivity.class);
-        // Quiz feature removed
+        setupButton(view,R.id.btnQuizzes, examQuizesMainActivity.class);
         setupButton(view, R.id.btnOldPapers, SemestersActivity.class);
         setupButton(view, R.id.PersonalStorage, storage.class);
         setupButton(view,R.id.btnCoding, imagesizecompresor.class);

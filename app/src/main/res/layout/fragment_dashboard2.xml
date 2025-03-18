@@ -439,7 +439,7 @@
                 android:stateListAnimator="@animator/button_state_animator_card"
                 android:clickable="true"
                 android:focusable="true">
-                android:focusable="true">
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -464,13 +464,12 @@
                         android:backgroundTint="#3C3C3C"
                         app:strokeColor="#4D4D4D"
                         app:strokeWidth="1dp"
-                        android:visibility="gone"/>
+                        />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Quizzes"
-                        android:visibility="gone"
                         android:textSize="16sp"
                         android:textColor="#FFFFFF"
                         android:layout_marginTop="12dp"

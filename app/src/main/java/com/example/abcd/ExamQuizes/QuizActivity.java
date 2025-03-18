@@ -1,4 +1,4 @@
-package com.example.abcd;
+package com.example.abcd.ExamQuizes;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
