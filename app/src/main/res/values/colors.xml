@@ -87,4 +87,55 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
 
+
+    <color name="colorPrimary">#6200EA</color>
+    <color name="colorPrimaryLight">#B388FF</color>
+    <color name="colorPrimaryDark">#4A148C</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+
+    <!-- Accent Colors -->
+    <color name="colorAccent">#00BCD4</color>
+    <color name="colorAccentLight">#80DEEA</color>
+    <color name="colorAccentDark">#0097A7</color>
+    <color name="colorOnAccent">#FFFFFF</color>
+
+    <!-- Status/Feedback Colors -->
+    <color name="colorSuccess">#00C853</color>
+    <color name="colorOnSuccess">#FFFFFF</color>
+    <color name="colorError">#F44336</color>
+    <color name="colorOnError">#FFFFFF</color>
+    <color name="colorWarning">#FFC107</color>
+    <color name="colorOnWarning">#333333</color>
+    <color name="colorInfo">#2196F3</color>
+    <color name="colorOnInfo">#FFFFFF</color>
+
+    <!-- Text Colors -->
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#757575</color>
+    <color name="textDisabled">#9E9E9E</color>
+    <color name="textOnDark">#FFFFFF</color>
+    <color name="textOnPrimary">#FFFFFF</color>
+
+    <!-- Background Colors -->
+    <color name="backgroundColor">#F5F5F5</color>
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="questionCardBackground">#FFFFFF</color>
+    <color name="optionCardBackground">#FAFAFA</color>
+    <color name="explanationCardBackground">#E1F5FE</color>
+    <color name="dividerColor">#E0E0E0</color>
+
+    <!-- Gradient Colors -->
+    <color name="gradientStart">#F5F5F5</color>
+    <color name="gradientCenter">#EEEEEE</color>
+    <color name="gradientEnd">#E0E0E0</color>
+
+    <!-- Specific UI Element Colors -->
+    <color name="selectedOptionBackground">#E8E0FF</color>
+    <color name="correctOptionBackground">#E0F2F1</color>
+    <color name="incorrectOptionBackground">#FFEBEE</color>
+    <color name="timerWarningColor">#FF9800</color>
+    <color name="timerCriticalColor">#F44336</color>
+    <color name="pointsBadgeBackground">#E8F5E9</color>
+    <color name="pointsBadgeText">#2E7D32</color>
+
 </resources>

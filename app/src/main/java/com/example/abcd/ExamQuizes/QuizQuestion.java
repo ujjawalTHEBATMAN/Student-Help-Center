@@ -26,7 +26,7 @@ public class QuizQuestion implements Parcelable {
         this.correctAnswerIndex = correctAnswerIndex;
     }
 
-    // Keep existing Parcelable implementation
+    // Parcelable implementation
     protected QuizQuestion(Parcel in) {
         question = in.readString();
         option1 = in.readString();
@@ -48,7 +48,7 @@ public class QuizQuestion implements Parcelable {
         }
     };
 
-    // Rest of your existing getters
+    // Getters
     public String getQuestion() { return question; }
     public String getOption1() { return option1; }
     public String getOption2() { return option2; }
@@ -56,8 +56,20 @@ public class QuizQuestion implements Parcelable {
     public String getOption4() { return option4; }
     public int getCorrectAnswerIndex() { return correctAnswerIndex; }
 
+    // Setters (if needed)
+    public void setQuestion(String question) { this.question = question; }
+    public void setOption1(String option1) { this.option1 = option1; }
+    public void setOption2(String option2) { this.option2 = option2; }
+    public void setOption3(String option3) { this.option3 = option3; }
+    public void setOption4(String option4) { this.option4 = option4; }
+    public void setCorrectAnswerIndex(int correctAnswerIndex) {
+        this.correctAnswerIndex = correctAnswerIndex;
+    }
+
     @Override
-    public int describeContents() { return 0; }
+    public int describeContents() {
+        return 0;
+    }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {

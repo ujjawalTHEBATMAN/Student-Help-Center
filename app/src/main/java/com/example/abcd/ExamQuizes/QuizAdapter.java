@@ -48,8 +48,11 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
         holder.binding.tvSubject.setText(quiz.getSubject());
         holder.binding.tvDuration.setText(context.getString(
                 R.string.duration_format, quiz.getDurationMinutes()));
+
+        // Fix: Check if questions is null before using .size()
+        int questionCount = (quiz.getQuestions() != null) ? quiz.getQuestions().size() : 0;
         holder.binding.tvQuestions.setText(context.getString(
-                R.string.questions_format, quiz.getQuestions().size()));
+                R.string.questions_format, questionCount));
 
         updateQuizStatusUI(holder, quiz, context);
         setupClickListeners(holder, quiz, context);
@@ -58,7 +61,7 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     private void updateQuizStatusUI(QuizViewHolder holder, Quiz quiz, Context context) {
         long currentTime = System.currentTimeMillis();
         if (currentTime > quiz.getEndingTime()) {
-            setStatus(holder, "Expired", R.color.red);
+            setStatus(holder, "Expire", R.color.red);
         } else if (currentTime >= quiz.getStartingTime()) {
             setStatus(holder, "Active", R.color.green);
         } else {

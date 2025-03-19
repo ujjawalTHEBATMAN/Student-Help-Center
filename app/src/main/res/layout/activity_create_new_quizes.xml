@@ -13,6 +13,7 @@
         android:padding="16dp"
         tools:context=".ExamQuizes.CreateNewQuizes">
 
+        <!-- Title -->
         <TextView
             android:id="@+id/titleTextView"
             android:layout_width="wrap_content"
@@ -23,15 +24,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/subjectEditText"
+        <!-- Semester Spinner -->
+        <Spinner
+            android:id="@+id/semesterSpinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Subject Name"
-            android:inputType="text"
             app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
+        <!-- Subject Spinner -->
+        <Spinner
+            android:id="@+id/subjectSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/semesterSpinner" />
+
+        <!-- TextView acting as button to add questions -->
         <TextView
             android:id="@+id/numberOfQuestionsTextView"
             android:layout_width="match_parent"
@@ -41,8 +50,9 @@
             android:gravity="center"
             android:hint="Click to Add Questions"
             android:padding="12dp"
-            app:layout_constraintTop_toBottomOf="@+id/subjectEditText" />
+            app:layout_constraintTop_toBottomOf="@+id/subjectSpinner" />
 
+        <!-- Saved Questions Count -->
         <TextView
             android:id="@+id/savedQuestionsCountTextView"
             android:layout_width="wrap_content"
@@ -52,6 +62,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/numberOfQuestionsTextView" />
 
+        <!-- Marks Configuration -->
         <TextView
             android:id="@+id/marksSection"
             android:layout_width="wrap_content"
@@ -81,6 +92,7 @@
             android:inputType="numberDecimal"
             app:layout_constraintTop_toBottomOf="@+id/marksPerQuestionEditText" />
 
+        <!-- Schedule -->
         <TextView
             android:id="@+id/scheduleSection"
             android:layout_width="wrap_content"
@@ -125,6 +137,7 @@
             android:inputType="number"
             app:layout_constraintTop_toBottomOf="@+id/dateEditText" />
 
+        <!-- Result View Options -->
         <TextView
             android:id="@+id/resultSection"
             android:layout_width="wrap_content"
@@ -151,5 +164,88 @@
             android:text="Save Quiz"
             app:layout_constraintTop_toBottomOf="@+id/resultViewSpinner" />
 
+        <!-- CardView for Question Options and Advanced Quiz Size Input -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/optionsCardView"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:visibility="gone"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Title for Options -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Select Option"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="8dp"
+                    android:background="#DDD" />
+
+                <!-- Two option buttons -->
+                <Button
+                    android:id="@+id/btnExistingQuizzes"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Get From Available Quizzes"
+                    android:textAllCaps="false" />
+
+                <Button
+                    android:id="@+id/btnAddNew"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Insert into Database"
+                    android:textAllCaps="false" />
+
+                <!-- New UI elements for quiz size input (hidden by default) -->
+                <EditText
+                    android:id="@+id/quizSizeEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Total Quizes Size"
+                    android:inputType="number"
+                    android:visibility="gone"
+                    android:layout_marginTop="12dp"/>
+
+                <Button
+                    android:id="@+id/confirmQuizSizeButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Confirm"
+                    android:visibility="gone"
+                    android:layout_marginTop="8dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ProgressBar inside the CardView -->
+        <ProgressBar
+            android:id="@+id/cardProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/optionsCardView"
+            app:layout_constraintEnd_toEndOf="@+id/optionsCardView"
+            app:layout_constraintStart_toStartOf="@+id/optionsCardView"
+            app:layout_constraintTop_toTopOf="@+id/optionsCardView" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

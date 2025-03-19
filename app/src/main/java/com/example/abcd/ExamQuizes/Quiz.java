@@ -11,23 +11,23 @@ import java.util.Map;
 
 @IgnoreExtraProperties
 public class Quiz implements Parcelable {
-
     private String quizId;
     private String subject;
     private long startingTime;
     private int durationMinutes;
     private float marksPerQuestion;
     private float negativeMarking;
-    private List<QuizQuestion> questions;
+    private ArrayList<Question> questions = new ArrayList<>(); // Change from List<Question> to List<QuizQuestion>
+
     private String resultViewType;
     private long endingTime;
 
     // Empty constructor required for Firebase
-    public Quiz() {}
+    public Quiz() {questions = new ArrayList<>();}
 
     public Quiz(String subject, long startingTime, int durationMinutes,
                 float marksPerQuestion, float negativeMarking,
-                List<QuizQuestion> questions, String resultViewType) {
+                ArrayList<Question> questions, String resultViewType) {
         this.subject = subject;
         this.startingTime = startingTime;
         this.durationMinutes = durationMinutes;
@@ -38,7 +38,6 @@ public class Quiz implements Parcelable {
         this.endingTime = startingTime + (durationMinutes * 60 * 1000L);
     }
 
-    // Parcelable implementation
     protected Quiz(Parcel in) {
         quizId = in.readString();
         subject = in.readString();
@@ -46,7 +45,7 @@ public class Quiz implements Parcelable {
         durationMinutes = in.readInt();
         marksPerQuestion = in.readFloat();
         negativeMarking = in.readFloat();
-        questions = in.createTypedArrayList(QuizQuestion.CREATOR);
+        questions = in.createTypedArrayList(Question.CREATOR);
         resultViewType = in.readString();
         endingTime = in.readLong();
     }
@@ -81,47 +80,50 @@ public class Quiz implements Parcelable {
         dest.writeLong(endingTime);
     }
 
-    // Firebase mapping
+    // Updated toMap method with an additional JSON output for questions
     @Exclude
     public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         result.put("quizId", quizId);
         result.put("subject", subject);
         result.put("startingTime", startingTime);
         result.put("durationMinutes", durationMinutes);
         result.put("marksPerQuestion", marksPerQuestion);
         result.put("negativeMarking", negativeMarking);
-        result.put("questions", questions);
         result.put("resultViewType", resultViewType);
         result.put("endingTime", endingTime);
+        result.put("questions", questions);
+
+        // Extra JSON representation for questions
+        List<Map<String, Object>> questionsJson = new ArrayList<>();
+        for (Question q : questions) {
+            Map<String, Object> qMap = new HashMap<>();
+            qMap.put("text", q.getText());
+            qMap.put("options", q.getOptions());
+            qMap.put("correctAnswerIndex", q.getCorrectAnswerIndex());
+            questionsJson.add(qMap);
+        }
+        result.put("questionsJson", questionsJson);
         return result;
     }
 
     // Getters and setters
     public String getQuizId() { return quizId; }
     public void setQuizId(String quizId) { this.quizId = quizId; }
-
     public String getSubject() { return subject; }
     public void setSubject(String subject) { this.subject = subject; }
-
     public long getStartingTime() { return startingTime; }
     public void setStartingTime(long startingTime) { this.startingTime = startingTime; }
-
     public int getDurationMinutes() { return durationMinutes; }
     public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
-
     public float getMarksPerQuestion() { return marksPerQuestion; }
     public void setMarksPerQuestion(float marksPerQuestion) { this.marksPerQuestion = marksPerQuestion; }
-
     public float getNegativeMarking() { return negativeMarking; }
     public void setNegativeMarking(float negativeMarking) { this.negativeMarking = negativeMarking; }
-
-    public List<QuizQuestion> getQuestions() { return questions; }
-    public void setQuestions(List<QuizQuestion> questions) { this.questions = questions; }
-
+    public List<Question> getQuestions() { return questions; }
+    public void setQuestions(ArrayList<Question> questions) { this.questions = questions; }
     public String getResultViewType() { return resultViewType; }
     public void setResultViewType(String resultViewType) { this.resultViewType = resultViewType; }
-
     public long getEndingTime() { return endingTime; }
     public void setEndingTime(long endingTime) { this.endingTime = endingTime; }
 }

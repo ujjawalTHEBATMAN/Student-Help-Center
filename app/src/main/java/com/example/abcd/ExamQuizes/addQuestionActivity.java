@@ -3,17 +3,16 @@ package com.example.abcd.ExamQuizes;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +23,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.abcd.R;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class addQuestionActivity extends AppCompatActivity {
     private CardView questionCardView;
@@ -39,9 +39,10 @@ public class addQuestionActivity extends AppCompatActivity {
     private TextView questionNumberTextView;
     private LinearLayout questionNavigationLayout;
     private RadioGroup correctAnswerRadioGroup;
-    private int currentQuestionNumber = 1;
-    private int totalQuestions = 0;
-    private ArrayList<QuizQuestion> savedQuestions;
+
+    // Firebase reference for the question bank node
+    private DatabaseReference questionBankRef;
+    private String subjectName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +55,22 @@ public class addQuestionActivity extends AppCompatActivity {
             return insets;
         });
 
-        savedQuestions = new ArrayList<>();
+        // Get subject name from intent extras
+        subjectName = getIntent().getStringExtra("subject_name");
+        if (subjectName == null || subjectName.isEmpty()) {
+            Toast.makeText(this, "Subject not specified", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        // Initialize Firebase reference under "Questionbank" -> subjectName
+        questionBankRef = FirebaseDatabase.getInstance().getReference("Questionbank").child(subjectName);
+
         initializeViews();
 
         saveQuestionButton.setOnClickListener(v -> saveCurrentQuestion());
-        nextQuestionButton.setOnClickListener(v -> moveToNextQuestion());
-        backButton.setOnClickListener(v -> finishWithResult());
+        // “Next Question” just clears the inputs for a new entry
+        nextQuestionButton.setOnClickListener(v -> clearInputs());
+        // “Finish Quiz” closes the activity
+        backButton.setOnClickListener(v -> finish());
     }
 
     private void initializeViews() {
@@ -75,88 +86,70 @@ public class addQuestionActivity extends AppCompatActivity {
         questionNumberTextView = findViewById(R.id.questionNumberTextView);
         questionNavigationLayout = findViewById(R.id.questionNavigationLayout);
         correctAnswerRadioGroup = findViewById(R.id.correctAnswerRadioGroup);
-        
-        updateQuestionNumberDisplay();
-        setupQuestionNavigation();
     }
 
     private void saveCurrentQuestion() {
-        if (validateQuestionInputs()) {
-            int selectedAnswerIndex = getSelectedAnswerIndex();
-            if (selectedAnswerIndex == -1) {
-                Toast.makeText(this, "Please select the correct answer", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            QuizQuestion question = new QuizQuestion(
-                questionEditText.getText().toString(),
-                option1EditText.getText().toString(),
-                option2EditText.getText().toString(),
-                option3EditText.getText().toString(),
-                option4EditText.getText().toString(),
-                selectedAnswerIndex
-            );
-            
-            if (currentQuestionNumber <= savedQuestions.size()) {
-                savedQuestions.set(currentQuestionNumber - 1, question);
-            } else {
-                savedQuestions.add(question);
-            }
-            
-            Toast.makeText(this, "Question saved!", Toast.LENGTH_SHORT).show();
+        if (!validateQuestionInputs()) {
+            return;
         }
+
+        int selectedAnswerIndex = getSelectedAnswerIndex();
+        if (selectedAnswerIndex == -1) {
+            Toast.makeText(this, "Please select the correct answer", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String questionText = questionEditText.getText().toString().trim();
+        String option1 = option1EditText.getText().toString().trim();
+        String option2 = option2EditText.getText().toString().trim();
+        String option3 = option3EditText.getText().toString().trim();
+        String option4 = option4EditText.getText().toString().trim();
+
+        // Create a map for the options
+        Map<String, String> optionsMap = new HashMap<>();
+        optionsMap.put("option1", option1);
+        optionsMap.put("option2", option2);
+        optionsMap.put("option3", option3);
+        optionsMap.put("option4", option4);
+
+        // Create a map for the question details
+        Map<String, Object> questionData = new HashMap<>();
+        questionData.put("options", optionsMap);
+        questionData.put("correctAnswer", selectedAnswerIndex);
+
+        // Save the question to Firebase under "Questionbank" -> subjectName -> questionText
+        questionBankRef.child(questionText).setValue(questionData)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(addQuestionActivity.this, "Question added to database!", Toast.LENGTH_SHORT).show();
+                        clearInputs();
+                    } else {
+                        Toast.makeText(addQuestionActivity.this, "Failed to add question: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    private void updateQuestionNumberDisplay() {
-        questionNumberTextView.setText("Question " + currentQuestionNumber);
+    private boolean validateQuestionInputs() {
+        if (questionEditText.getText().toString().trim().isEmpty() ||
+                option1EditText.getText().toString().trim().isEmpty() ||
+                option2EditText.getText().toString().trim().isEmpty() ||
+                option3EditText.getText().toString().trim().isEmpty() ||
+                option4EditText.getText().toString().trim().isEmpty()) {
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
-    private void setupQuestionNavigation() {
-        if (questionNavigationLayout == null) return;
-        questionNavigationLayout.removeAllViews();
-        if (savedQuestions == null) savedQuestions = new ArrayList<>();
-        for (int i = 0; i < Math.max(savedQuestions.size(), currentQuestionNumber); i++) {
-            MaterialButton questionButton = new MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
-            questionButton.setText(String.valueOf(i + 1));
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(8, 0, 8, 0);
-            questionButton.setLayoutParams(params);
-            
-            // Highlight current question
-            if (i + 1 == currentQuestionNumber) {
-                questionButton.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.error)));
-                questionButton.setTextColor(Color.WHITE);
-            }
-
-            final int questionIndex = i;
-            questionButton.setOnClickListener(v -> loadQuestion(questionIndex + 1));
-
-            questionNavigationLayout.addView(questionButton);
-        }
-    }
-
-    private void loadQuestion(int questionNumber) {
-        saveCurrentQuestion(); // Save current question before loading new one
-        currentQuestionNumber = questionNumber;
-        updateQuestionNumberDisplay();
-
-        if (questionNumber <= savedQuestions.size()) {
-            QuizQuestion question = savedQuestions.get(questionNumber - 1);
-            questionEditText.setText(question.getQuestion());
-            option1EditText.setText(question.getOption1());
-            option2EditText.setText(question.getOption2());
-            option3EditText.setText(question.getOption3());
-            option4EditText.setText(question.getOption4());
-            
-            // Set the correct answer radio button
-            if (question.getCorrectAnswerIndex() >= 0) {
-                ((RadioButton) correctAnswerRadioGroup.getChildAt(question.getCorrectAnswerIndex())).setChecked(true);
-            }
-        } else {
-            clearInputs();
-        }
+    // Updated method to correctly determine the answer index
+    private int getSelectedAnswerIndex() {
+        int radioButtonId = correctAnswerRadioGroup.getCheckedRadioButtonId();
+        if (radioButtonId == -1) return -1;
+        if (radioButtonId == R.id.option1RadioButton) return 0;
+        if (radioButtonId == R.id.option2RadioButton) return 1;
+        if (radioButtonId == R.id.option3RadioButton) return 2;
+        if (radioButtonId == R.id.option4RadioButton) return 3;
+        return -1;
     }
 
     private void clearInputs() {
@@ -166,41 +159,5 @@ public class addQuestionActivity extends AppCompatActivity {
         option3EditText.setText("");
         option4EditText.setText("");
         correctAnswerRadioGroup.clearCheck();
-    }
-
-    private boolean validateQuestionInputs() {
-        if (questionEditText.getText().toString().trim().isEmpty() ||
-            option1EditText.getText().toString().trim().isEmpty() ||
-            option2EditText.getText().toString().trim().isEmpty() ||
-            option3EditText.getText().toString().trim().isEmpty() ||
-            option4EditText.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        return true;
-    }
-
-    private int getSelectedAnswerIndex() {
-        int radioButtonId = correctAnswerRadioGroup.getCheckedRadioButtonId();
-        if (radioButtonId == -1) return -1;
-        View radioButton = correctAnswerRadioGroup.findViewById(radioButtonId);
-        return correctAnswerRadioGroup.indexOfChild(radioButton);
-    }
-
-    private void moveToNextQuestion() {
-        saveCurrentQuestion();
-        currentQuestionNumber++;
-        updateQuestionNumberDisplay();
-        setupQuestionNavigation();
-        clearInputs();
-    }
-
-    // Modify finishWithResult
-    private void finishWithResult() {
-        Intent resultIntent = new Intent();
-        resultIntent.putParcelableArrayListExtra("questions", savedQuestions);
-        resultIntent.putExtra("savedQuestionsCount", savedQuestions.size());
-        setResult(RESULT_OK, resultIntent);
-        finish();
     }
 }
