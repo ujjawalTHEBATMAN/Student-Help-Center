@@ -12,7 +12,7 @@ public class College {
     public College(String id, String name, String ignoredImage) {
         this.id = id;
         this.name = name;
-        this.image = "collageimage.png";
+        this.image = "images.png";
     }
 
     public String getId() {

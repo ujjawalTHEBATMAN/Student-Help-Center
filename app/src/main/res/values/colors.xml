@@ -74,8 +74,15 @@
     <color name="correct_green">#4CAF50</color>
     <color name="incorrect_red">#F44336</color>
     <color name="orange">#FF9800</color>
-
+    <color name="strength_red">#FF0202</color>
+    <color name="strength_light_red">#F57070</color>
+    <color name="strength_yellow">#FFFA20</color>
+    <color name="strength_green">#30FF02</color>
+    <color name="strength_gray">#CCCCCC</color>
     <color name="black">#000000</color>
+    <color name="admin_bg">#FFE874</color>
+    <color name="teacher_bg">#68FFE3</color>
+    <color name="student_bg">#FFFFFF</color>
 
     <color name="flagged_amber">#FFC107</color>
     <color name="answered_blue">#2196F3</color>
