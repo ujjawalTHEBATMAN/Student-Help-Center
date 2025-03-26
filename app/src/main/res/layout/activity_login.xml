@@ -64,15 +64,17 @@
                 android:id="@+id/tilUser"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColorHint="@color/black"
                 android:hint="Email or Username"
-                app:startIconDrawable="@drawable/ic_chatbot"
-                app:startIconTint="@color/primary"
+                app:startIconDrawable="@drawable/ic_person"
+                app:startIconTint="@color/blue"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etUser"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColorHint="@color/black"
                     android:inputType="textEmailAddress"
                     android:textColor="#000000"
                     android:maxLines="1"/>
@@ -84,6 +86,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColorHint="@color/black"
                 android:hint="Password"
                 app:startIconDrawable="@drawable/ic_lock"
                 app:startIconTint="@color/ic_launcher_background"
@@ -94,6 +97,7 @@
                     android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColorHint="@color/black"
                     android:inputType="textPassword"
                     android:textColor="#000000"
                     android:maxLines="1"/>
