@@ -24,9 +24,7 @@ public class examQuizesMainActivity extends AppCompatActivity
     private QuizAdapter quizAdapter;
     private final List<Quiz> quizList = new ArrayList<>();
     private static final String TAG = "QuizMainActivity";
-
-    // Hold the user's role fetched from Firebase
-    private String userRole = "";
+    private String userRole = "";  // Hold user's role from Firebase
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,13 +32,15 @@ public class examQuizesMainActivity extends AppCompatActivity
         binding = ActivityExamQuizesMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        setupToolbar();
         setupRecyclerView();
         setupFirebaseListener();
         setupFab();
 
-        // Get user email from the session and then fetch the user role from Firebase.
+        // Fetch user email from session and retrieve the user role
         SessionManager sessionManager = new SessionManager(this);
         String userEmail = sessionManager.getEmail();
+
         if (userEmail != null) {
             fetchUserRole(userEmail);
         } else {
@@ -48,12 +48,29 @@ public class examQuizesMainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Set up the toolbar with a back button.
+     */
+    private void setupToolbar() {
+        setSupportActionBar(binding.toolbar);
+        binding.toolbar.setNavigationOnClickListener(v -> {
+            // Go back to the previous activity
+            onBackPressed();
+        });
+    }
+
+    /**
+     * Initialize the RecyclerView with adapter and layout manager.
+     */
     private void setupRecyclerView() {
         quizAdapter = new QuizAdapter(quizList, this);
         binding.quizzesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.quizzesRecyclerView.setAdapter(quizAdapter);
     }
 
+    /**
+     * Set up Firebase listener to fetch quizzes.
+     */
     private void setupFirebaseListener() {
         FirebaseDatabase.getInstance().getReference("quizzes")
                 .addValueEventListener(new ValueEventListener() {
@@ -83,13 +100,16 @@ public class examQuizesMainActivity extends AppCompatActivity
                 });
     }
 
+    /**
+     * Floating Action Button to create a new quiz.
+     */
     private void setupFab() {
         binding.fabCreateQuiz.setOnClickListener(v ->
                 startActivity(new Intent(this, CreateNewQuizes.class)));
     }
 
     /**
-     * Fetches the user role from the Firebase realtime database based on the user's email.
+     * Fetches the user's role from Firebase based on email.
      */
     private void fetchUserRole(String email) {
         FirebaseDatabase.getInstance().getReference("users")
@@ -97,7 +117,6 @@ public class examQuizesMainActivity extends AppCompatActivity
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        // Assuming email is unique, fetch the userRole from the first matching record.
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                             String role = userSnapshot.child("userRole").getValue(String.class);
                             if (role != null) {
@@ -126,13 +145,8 @@ public class examQuizesMainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Called when an expired quiz card is clicked.
-     * Only admin or teacher can delete the quiz from Firebase.
-     */
     @Override
     public void onExpiredQuizClicked(String quizId) {
-        // Check if the current user is allowed to delete expired quizzes.
         if ("admin".equalsIgnoreCase(userRole) || "teacher".equalsIgnoreCase(userRole)) {
             FirebaseDatabase.getInstance().getReference("quizzes")
                     .child(quizId)
@@ -150,9 +164,6 @@ public class examQuizesMainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Helper method to remove a quiz from the local list and notify the adapter.
-     */
     private void removeQuizFromList(String quizId) {
         for (int i = 0; i < quizList.size(); i++) {
             if (quizList.get(i).getQuizId().equals(quizId)) {
@@ -163,9 +174,6 @@ public class examQuizesMainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Checks if the quiz is active based on the current system time.
-     */
     private boolean isQuizActive(Quiz quiz) {
         long currentTime = System.currentTimeMillis();
         return currentTime >= quiz.getStartingTime() &&

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#000000">
+    android:background="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -83,7 +83,7 @@
             android:text="Programming"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
+            android:textColor="#0F0E0E"
             android:layout_marginBottom="16dp"
             android:fontFamily="sans-serif-medium"/>
 
@@ -355,7 +355,7 @@
             android:text="College Support"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
+            android:textColor="#0B0A0A"
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp"
             android:fontFamily="sans-serif-medium"/>

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import com.example.abcd.R;
 import com.google.android.material.button.MaterialButton;
@@ -31,6 +32,13 @@ public class CGPACalculatorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cgpacalculator);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if(getSupportActionBar()!=null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        toolbar.setNavigationOnClickListener(v -> finish());
+        /* bhai, above set back btn, dekh le */
 
         initializeViews();
         setupButtonClickListeners();
@@ -42,17 +50,18 @@ public class CGPACalculatorActivity extends AppCompatActivity {
         resultsCard = findViewById(R.id.results_card);
         cgpaProgress = findViewById(R.id.cgpa_progress);
         cgpaProgress.setMax(100);
+        /* initializing sab views, mast work hai */
     }
 
     private void setupButtonClickListeners() {
         findViewById(R.id.btn_add_subject).setOnClickListener(v -> addSubjectInput());
         findViewById(R.id.btn_calculate).setOnClickListener(v -> calculateCGPA());
+        /* button click set, simple sa kaam hai yaar */
     }
 
     private void addSubjectInput() {
         MaterialCardView subjectCard = (MaterialCardView) getLayoutInflater().inflate(R.layout.subject_input, null);
         inputContainer.addView(subjectCard);
-
         SubjectInput subjectInput = new SubjectInput(
                 subjectCard.findViewById(R.id.et_subject_name),
                 subjectCard.findViewById(R.id.slider_credits),
@@ -63,14 +72,11 @@ public class CGPACalculatorActivity extends AppCompatActivity {
                 subjectCard.findViewById(R.id.marks_progress),
                 subjectCard
         );
-
         int subjectNumber = subjectInputs.size() + 1;
         subjectInput.tvSubjectNumber.setText(getString(R.string.subject_number, subjectNumber));
-
         setupRemoveButton(subjectInput);
         setupCreditsSlider(subjectInput);
         setupMarksWatchers(subjectInput);
-
         subjectInputs.add(subjectInput);
     }
 
@@ -84,24 +90,23 @@ public class CGPACalculatorActivity extends AppCompatActivity {
 
     private void setupCreditsSlider(SubjectInput subjectInput) {
         subjectInput.sliderCredits.addOnChangeListener((slider, value, fromUser) -> {
-            // You can add additional credit-related logic here if needed
+            // no extra logic, simple slider
         });
     }
 
     private void setupMarksWatchers(SubjectInput subjectInput) {
         TextWatcher marksWatcher = new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
 
             @Override
             public void afterTextChanged(Editable s) {
                 updateMarksProgress(subjectInput);
             }
         };
-
         subjectInput.etTotalMarks.addTextChangedListener(marksWatcher);
         subjectInput.etObtainedMarks.addTextChangedListener(marksWatcher);
     }
@@ -110,20 +115,16 @@ public class CGPACalculatorActivity extends AppCompatActivity {
         try {
             String totalStr = subjectInput.etTotalMarks.getText().toString().trim();
             String obtainedStr = subjectInput.etObtainedMarks.getText().toString().trim();
-
-            if (totalStr.isEmpty() || obtainedStr.isEmpty()) {
+            if(totalStr.isEmpty() || obtainedStr.isEmpty()){
                 subjectInput.marksProgress.setProgress(0);
                 return;
             }
-
             double total = Double.parseDouble(totalStr);
             double obtained = Double.parseDouble(obtainedStr);
-
-            if (total <= 0) {
+            if(total <= 0){
                 subjectInput.marksProgress.setProgress(0);
                 return;
             }
-
             int progress = (int) ((obtained / total) * 100);
             subjectInput.marksProgress.setProgress(Math.min(progress, 100));
         } catch (NumberFormatException e) {
@@ -143,48 +144,38 @@ public class CGPACalculatorActivity extends AppCompatActivity {
             resultsCard.setVisibility(View.VISIBLE);
             subjectResults.removeAllViews();
             cgpaProgress.setVisibility(View.VISIBLE);
-
             double totalWeightedPoints = 0;
             int totalCredits = 0;
             int validSubjects = 0;
-
             for (SubjectInput input : subjectInputs) {
                 String subjectName = input.etSubjectName.getText().toString().trim();
                 int credits = (int) input.sliderCredits.getValue();
                 String totalStr = input.etTotalMarks.getText().toString().trim();
                 String obtainedStr = input.etObtainedMarks.getText().toString().trim();
-
-                if (subjectName.isEmpty() || totalStr.isEmpty() || obtainedStr.isEmpty()) continue;
-
+                if(subjectName.isEmpty() || totalStr.isEmpty() || obtainedStr.isEmpty()) continue;
                 double totalMarks = Double.parseDouble(totalStr);
                 double obtainedMarks = Double.parseDouble(obtainedStr);
-
-                if (totalMarks <= 0) {
+                if(totalMarks <= 0){
                     throw new IllegalArgumentException("Total marks must be greater than 0");
                 }
-                if (obtainedMarks < 0 || obtainedMarks > totalMarks) {
+                if(obtainedMarks < 0 || obtainedMarks > totalMarks){
                     throw new IllegalArgumentException("Obtained marks must be 0-" + totalMarks);
                 }
-
                 double percentage = (obtainedMarks / totalMarks) * 100;
                 double subjectCGPA = calculateSubjectCGPA(percentage);
-
                 addSubjectResultView(subjectName, credits, subjectCGPA);
                 totalWeightedPoints += subjectCGPA * credits;
                 totalCredits += credits;
                 validSubjects++;
             }
-
-            if (validSubjects == 0) {
-                showError("Please fill at least one complete subject");
+            if(validSubjects == 0){
+                showError("Please fill atleast one complete subject");
                 return;
             }
-
             double overallCGPA = totalWeightedPoints / totalCredits;
             displayOverallCGPA(overallCGPA);
-
         } catch (NumberFormatException e) {
-            showError("Please enter valid numbers in all fields");
+            showError("Please enter valid numbrs in all fields");
         } catch (IllegalArgumentException e) {
             showError(e.getMessage());
         } finally {
@@ -193,12 +184,12 @@ public class CGPACalculatorActivity extends AppCompatActivity {
     }
 
     private double calculateSubjectCGPA(double percentage) {
-        if (percentage >= 90) return 10.0;
-        if (percentage >= 80) return 9.0;
-        if (percentage >= 70) return 8.0;
-        if (percentage >= 60) return 7.0;
-        if (percentage >= 50) return 6.0;
-        if (percentage >= 40) return 5.0;
+        if(percentage >= 90) return 10.0;
+        if(percentage >= 80) return 9.0;
+        if(percentage >= 70) return 8.0;
+        if(percentage >= 60) return 7.0;
+        if(percentage >= 50) return 6.0;
+        if(percentage >= 40) return 5.0;
         return 0.0;
     }
 
@@ -207,7 +198,7 @@ public class CGPACalculatorActivity extends AppCompatActivity {
         tv.setText(String.format("%s (%d credits): %.2f/10", subjectName, credits, cgpa));
         tv.setTextColor(ContextCompat.getColor(this, R.color.primary));
         tv.setTextSize(16);
-        tv.setPadding(0, 8, 0, 8);
+        tv.setPadding(0,8,0,8);
         subjectResults.addView(tv);
     }
 
@@ -215,7 +206,7 @@ public class CGPACalculatorActivity extends AppCompatActivity {
         TextView tvOverall = findViewById(R.id.tv_overall_cgpa);
         tvOverall.setText(String.format("Overall CGPA: %.2f/10", overallCGPA));
         tvOverall.setTextColor(ContextCompat.getColor(this, R.color.primary));
-        cgpaProgress.setProgress((int) (overallCGPA * 10));
+        cgpaProgress.setProgress((int)(overallCGPA*10));
     }
 
     private void showError(String message) {
@@ -234,7 +225,6 @@ public class CGPACalculatorActivity extends AppCompatActivity {
         final TextView tvSubjectNumber;
         final LinearProgressIndicator marksProgress;
         final MaterialCardView cardView;
-
         SubjectInput(TextInputEditText etSubjectName,
                      Slider sliderCredits,
                      TextInputEditText etTotalMarks,

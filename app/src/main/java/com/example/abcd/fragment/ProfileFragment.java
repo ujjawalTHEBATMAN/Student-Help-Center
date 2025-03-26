@@ -269,30 +269,50 @@ public class ProfileFragment extends Fragment {
         userDataListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (isAdded() && getContext() != null) {
+                // Additional null and isAdded() checks
+                if (getActivity() == null || !isAdded()) {
+                    // Fragment is not attached or is detached, do not proceed
+                    return;
+                }
+
+                try {
                     if (dataSnapshot.exists()) {
                         HelperClassPOJO user = dataSnapshot.getValue(HelperClassPOJO.class);
                         if (user != null) {
-                            // Update user profile information in real-time
-                            updateUserProfileUI(user);
+                            // Ensure UI updates happen on the main thread
+                            requireActivity().runOnUiThread(() -> {
+                                // Update user profile information in real-time
+                                updateUserProfileUI(user);
+                            });
                         } else {
-                            Toast.makeText(requireContext(), "User data not found.", Toast.LENGTH_SHORT).show();
+                            showToast("User data not found.");
                             redirectToLogin();
                         }
                     } else {
-                        Toast.makeText(requireContext(), "User not found in database.", Toast.LENGTH_SHORT).show();
+                        showToast("User not found in database.");
                         redirectToLogin();
                     }
+                } catch (IllegalStateException e) {
+                    // Log the error or handle it appropriately
+
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                if (isAdded() && getContext() != null) {
-                    Toast.makeText(requireContext(),
-                            "Failed to load user data: " + databaseError.getMessage(),
-                            Toast.LENGTH_SHORT).show();
-                    redirectToLogin();
+                // Additional null and isAdded() checks
+                if (getActivity() == null || !isAdded()) {
+                    return;
+                }
+
+                showToast("Failed to load user data: " + databaseError.getMessage());
+                redirectToLogin();
+            }
+
+            // Helper method to show toast safely
+            private void showToast(String message) {
+                if (getContext() != null) {
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -538,6 +558,7 @@ public class ProfileFragment extends Fragment {
         // Remove the listener to prevent memory leaks
         if (userRef != null && userDataListener != null) {
             userRef.removeEventListener(userDataListener);
+            userDataListener = null;
         }
     }
 }
