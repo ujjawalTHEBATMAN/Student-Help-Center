@@ -16,16 +16,16 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
-
-import com.example.abcd.R;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
+import com.example.abcd.R;
 import java.io.File;
 import java.io.IOException;
 
@@ -33,6 +33,7 @@ public class ocrcapture extends AppCompatActivity {
 
     private ShapeableImageView scannedImageView;
     private MaterialTextView resultTextView;
+    private MaterialButton copyButton;
     private ProgressBar progressBar;
     private Uri imageUri;
 
@@ -63,17 +64,23 @@ public class ocrcapture extends AppCompatActivity {
 
         initializeViews();
         setupClickListeners();
+
+        // Set navigation click on the toolbar (back button)
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 
     private void initializeViews() {
         scannedImageView = findViewById(R.id.scannedImage);
         resultTextView = findViewById(R.id.resultText);
+        copyButton = findViewById(R.id.copyButton);
         progressBar = findViewById(R.id.progressBar);
     }
 
     private void setupClickListeners() {
         findViewById(R.id.scanButton).setOnClickListener(v -> checkCameraPermission());
-        resultTextView.setOnClickListener(v -> handleTextCopy());
+        resultTextView.setOnClickListener(v -> copyOCRText());
+        copyButton.setOnClickListener(v -> copyOCRText());
     }
 
     private void checkCameraPermission() {
@@ -93,7 +100,6 @@ public class ocrcapture extends AppCompatActivity {
             imageUri = FileProvider.getUriForFile(this,
                     getApplicationContext().getPackageName() + ".provider",
                     file);
-
             intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             cameraLauncher.launch(intent);
         } catch (IOException e) {
@@ -130,7 +136,6 @@ public class ocrcapture extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         InputImage image = InputImage.fromBitmap(bitmap, 0);
         TextRecognizer recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-
         recognizer.process(image)
                 .addOnSuccessListener(visionText -> {
                     progressBar.setVisibility(View.GONE);
@@ -145,21 +150,18 @@ public class ocrcapture extends AppCompatActivity {
     private void displayOCRResults(String text) {
         resultTextView.setText(text);
         resultTextView.setVisibility(View.VISIBLE);
-        findViewById(R.id.imageCard).setVisibility(View.VISIBLE);
+        copyButton.setVisibility(View.VISIBLE);
+        findViewById(R.id.resultCard).setVisibility(View.VISIBLE);
     }
 
-    private void handleTextCopy() {
+    private void copyOCRText() {
         String text = resultTextView.getText().toString();
         if (!text.isEmpty()) {
-            copyToClipboard(text);
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("OCR Result", text);
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void copyToClipboard(String text) {
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("OCR Result", text);
-        clipboard.setPrimaryClip(clip);
-        Toast.makeText(this, "Text copied to clipboard", Toast.LENGTH_SHORT).show();
     }
 
     private void showError(String message) {

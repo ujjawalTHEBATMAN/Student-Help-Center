@@ -5,19 +5,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
-import android.content.Intent;
-import android.net.Uri;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.example.abcd.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,6 +32,7 @@ public class EquationSolver extends AppCompatActivity {
     private TextView tvError, tvOperationResult, tvExpressionResult, tvFinalResult;
     private MaterialCardView resultContainer, statusCard;
     private MaterialButton btnSolve, btnReset;
+    private MaterialButton btnShare;
 
     // API Service
     private NewtonApiService apiService;
@@ -41,6 +41,11 @@ public class EquationSolver extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_equation_solver);
+
+        // Setup AppBar with back navigation
+        Toolbar toolbar = findViewById(R.id.topAppBar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         // Initialize Views
         spinnerOperation = findViewById(R.id.spinnerOperation);
@@ -54,7 +59,9 @@ public class EquationSolver extends AppCompatActivity {
         tvOperationResult = findViewById(R.id.tvOperationResult);
         tvExpressionResult = findViewById(R.id.tvExpressionResult);
         tvFinalResult = findViewById(R.id.tvFinalResult);
-        MaterialButton btnShare = findViewById(R.id.btnShare);
+        btnShare = findViewById(R.id.btnShare);
+
+        // Setup Share Button Listener
         btnShare.setOnClickListener(v -> {
             if (resultContainer.getVisibility() == View.VISIBLE) {
                 shareResult();
@@ -63,8 +70,6 @@ public class EquationSolver extends AppCompatActivity {
                         "Solve an equation first!", Snackbar.LENGTH_SHORT).show();
             }
         });
-
-
 
         // Setup Spinner
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
@@ -117,7 +122,7 @@ public class EquationSolver extends AppCompatActivity {
             }
         });
     }
-    // Add this method to the class
+
     private void shareResult() {
         try {
             String operation = tvOperationResult.getText().toString().replace("Operation: ", "");

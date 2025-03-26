@@ -27,13 +27,15 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <ImageView
-                    android:id="@+id/themeIcon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_liked"
+                <TextView
+                    android:id="@+id/titleTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Live Chat"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
                     android:layout_marginStart="16dp"
-                    android:contentDescription="Theme"/>
+                    android:fontFamily="sans-serif-medium"/>
 
                 <Space
                     android:layout_width="0dp"

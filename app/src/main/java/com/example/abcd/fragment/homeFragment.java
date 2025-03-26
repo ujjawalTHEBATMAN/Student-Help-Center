@@ -46,8 +46,7 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
     private SessionManager sessionManager;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         ImageButton mailButton = view.findViewById(R.id.mailButton);
         mailButton.setOnClickListener(v -> {
@@ -59,8 +58,6 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
                 Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
             }
         });
-
-
         ImageButton searchButton = view.findViewById(R.id.searchButton);
         searchButton.setOnClickListener(v -> {
             if (currentUserRole != null && currentUserRole.equals("admin")) {
@@ -77,29 +74,22 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
                 showPremiumAlert();
             }
         });
-
-
         sessionManager = new SessionManager(requireContext());
         String userEmail = sessionManager.getEmail();
-
         if (userEmail == null || userEmail.isEmpty()) {
             Toast.makeText(getContext(), "Please sign in to continue", Toast.LENGTH_LONG).show();
             return view;
         }
-
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         messagesList = new ArrayList<>();
         adapter = new HomeAdapter(messagesList, false);
         adapter.setOnItemLongClickListener(this);
         recyclerView.setAdapter(adapter);
-
         messagesRef = FirebaseDatabase.getInstance().getReference("messages");
         String sanitizedEmail = userEmail.replace(".", ",");
         userRef = FirebaseDatabase.getInstance().getReference("users").child(sanitizedEmail);
-
         setupUserData();
-
         messagesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -109,28 +99,28 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
                     if (message != null) messagesList.add(message);
                 }
                 adapter.notifyDataSetChanged();
-                if (!messagesList.isEmpty())
-                    recyclerView.smoothScrollToPosition(messagesList.size() - 1);
+                if (!messagesList.isEmpty()) recyclerView.smoothScrollToPosition(messagesList.size() - 1);
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(getContext(), "Failed to load messages", Toast.LENGTH_SHORT).show();
             }
         });
-
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(v -> startActivity(new Intent(getActivity(), SendLiveMessageActivity.class)));
-
         return view;
     }
-
 
     @Override
     public void onEditClicked(int position) {
         Message message = messagesList.get(position);
-
-        // Show a dialog with Edit and Delete options
+        String currentUserEmail = sessionManager.getEmail();
+        boolean isAdmin = "admin".equals(currentUserRole);
+        boolean isOwner = currentUserEmail != null && currentUserEmail.equals(message.getUserName());
+        if (!isAdmin && !isOwner) {
+            Toast.makeText(getContext(), "Action not allowed", Toast.LENGTH_SHORT).show();
+            return;
+        }
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Select an Action")
                 .setMessage("Do you want to edit or delete this message?")
@@ -144,7 +134,6 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
         View editView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_edit_message, null);
         EditText editMessageText = editView.findViewById(R.id.editMessageText);
         editMessageText.setText(message.getMessageText());
-
         AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setView(editView)
                 .setTitle("Edit Message")
@@ -152,62 +141,57 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
                     String updatedMessage = editMessageText.getText().toString().trim();
                     if (!updatedMessage.isEmpty()) {
                         DatabaseReference messageRef = messagesRef.child(String.valueOf(message.getTimestamp()));
-                        messageRef.child("messageText").setValue(updatedMessage)
-                                .addOnSuccessListener(aVoid -> {
-                                    message.setMessageText(updatedMessage);
-                                    adapter.notifyItemChanged(position);
-                                    Toast.makeText(getContext(), "Message updated", Toast.LENGTH_SHORT).show();
-                                })
-                                .addOnFailureListener(e ->
-                                        Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show());
+                        messageRef.child("messageText").setValue(updatedMessage).addOnSuccessListener(aVoid -> {
+                            message.setMessageText(updatedMessage);
+                            adapter.notifyItemChanged(position);
+                            Toast.makeText(getContext(), "Message updated", Toast.LENGTH_SHORT).show();
+                        }).addOnFailureListener(e -> Toast.makeText(getContext(), "Update failed", Toast.LENGTH_SHORT).show());
                     }
                 })
                 .setNegativeButton("Cancel", (dialogInterface, i) -> dialogInterface.dismiss())
                 .create();
-
         dialog.show();
     }
+
     private void deleteMessage(Message message, int position) {
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Delete Message")
                 .setMessage("Are you sure you want to delete this message?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    messagesRef.child(String.valueOf(message.getTimestamp())).removeValue()
-                            .addOnSuccessListener(aVoid -> {
-                                if (position >= 0 && position < messagesList.size()) {
-                                    messagesList.remove(position);
-                                    if (messagesList.isEmpty()) {
-                                        adapter.notifyDataSetChanged();  // Refresh RecyclerView when empty
-                                    } else {
-                                        adapter.notifyItemRemoved(position);
-                                    }
-                                    Toast.makeText(getContext(), "Message deleted successfully", Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(getContext(), "Failed to delete message", Toast.LENGTH_SHORT).show());
+                    messagesRef.child(String.valueOf(message.getTimestamp())).removeValue().addOnSuccessListener(aVoid -> {
+                        if (position >= 0 && position < messagesList.size()) {
+                            messagesList.remove(position);
+                            if (messagesList.isEmpty()) {
+                                adapter.notifyDataSetChanged();
+                            } else {
+                                adapter.notifyItemRemoved(position);
+                            }
+                            Toast.makeText(getContext(), "Message deleted successfully", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to delete message", Toast.LENGTH_SHORT).show());
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
-
-
-
     @Override
     public void onDeleteClicked(int position) {
+        Message message = messagesList.get(position);
+        String currentUserEmail = sessionManager.getEmail();
+        boolean isAdmin = "admin".equals(currentUserRole);
+        boolean isOwner = currentUserEmail != null && currentUserEmail.equals(message.getUserName());
+        if (!isAdmin && !isOwner) {
+            Toast.makeText(getContext(), "Action not allowed", Toast.LENGTH_SHORT).show();
+            return;
+        }
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Delete Message")
                 .setMessage("Are you sure you want to delete this item?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    Message message = messagesList.get(position);
-                    messagesRef.child(String.valueOf(message.getTimestamp())).removeValue()
-                            .addOnSuccessListener(aVoid -> {
-                                messagesList.remove(position);
-                                adapter.notifyItemRemoved(position);
-                            })
-                            .addOnFailureListener(e ->
-                                    Toast.makeText(getContext(), "Delete failed", Toast.LENGTH_SHORT).show());
+                    messagesRef.child(String.valueOf(message.getTimestamp())).removeValue().addOnSuccessListener(aVoid -> {
+                        messagesList.remove(position);
+                        adapter.notifyItemRemoved(position);
+                    }).addOnFailureListener(e -> Toast.makeText(getContext(), "Delete failed", Toast.LENGTH_SHORT).show());
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -225,7 +209,6 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
                     }
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(getContext(), "Error loading user data", Toast.LENGTH_SHORT).show();
@@ -233,31 +216,22 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
         });
     }
 
-
     private void showPremiumAlert() {
         View alertView = LayoutInflater.from(getContext()).inflate(R.layout.alert_card_modern, null);
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
-                .setView(alertView)
-                .setCancelable(true);
-
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext()).setView(alertView).setCancelable(true);
         AlertDialog dialog = builder.create();
         dialog.show();
-
         alertView.findViewById(R.id.btnClose).setOnClickListener(v -> {
             performHapticFeedback();
             dialog.dismiss();
         });
-
         alertView.findViewById(R.id.btnLearnMore).setOnClickListener(v -> {
             performHapticFeedback();
             startActivity(new Intent(requireContext(), availableAdminPage.class));
             dialog.dismiss();
         });
-
         Window window = dialog.getWindow();
-        if (window != null) {
-            window.setWindowAnimations(R.style.DialogAnimation);
-        }
+        if (window != null) window.setWindowAnimations(R.style.DialogAnimation);
     }
 
     private void performHapticFeedback() {
@@ -267,5 +241,4 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
             requireView().performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
         }
     }
-
 }

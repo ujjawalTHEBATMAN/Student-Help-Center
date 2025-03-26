@@ -12,6 +12,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import androidx.fragment.app.Fragment;
 
 import com.example.abcd.ExamQuizes.examQuizesMainActivity;
+import com.example.abcd.MathFeature.CGPACalculatorActivity;
+import com.example.abcd.MathFeature.EquationSolver;
 import com.example.abcd.MathFeature.MathFeatures;
 import com.example.abcd.imagesizecompresor;
 import com.example.abcd.ocrcapture.ocrcapture;
@@ -36,17 +38,13 @@ public class dashboardFragment extends Fragment {
         setupButton(view, R.id.btnVideos, com.example.abcd.videoplayers1.MainActivity.class);
         setupButton(view,R.id.btnQuizzes, examQuizesMainActivity.class);
         setupButton(view, R.id.btnOldPapers, SemestersActivity.class);
-        setupButton(view, R.id.PersonalStorage, storage.class);
+        setupButton(view, R.id.PersonalStorage, CGPACalculatorActivity.class);
         setupButton(view,R.id.btnCoding, imagesizecompresor.class);
-        setupButton(view,R.id.btnMath, MathFeatures.class);
-        setupButton(view,R.id.btnDevTools, ocrcapture.class);
+        setupButton(view,R.id.btnMath, EquationSolver.class);   ///update
+        setupButton(view,R.id.btnDevTools, ocrcapture.class);  /// updated
         setupButton(view,R.id.btnAIModels, selectChatModel.class);   //// userSearchingActivity
 
         // Initialize Programming section buttons
-
-
-
-
         // Setup profile button
         setupProfileButton(view);
 

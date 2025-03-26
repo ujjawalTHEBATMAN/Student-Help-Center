@@ -1,98 +1,111 @@
 package com.example.abcd;
 
-import android.content.Context;
-import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.SearchView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
+import com.example.abcd.firebaseLogin.HelperClassPOJO;
+import com.example.abcd.userMessaging.ChatActivity;
+import com.example.abcd.userMessaging.UserSearchAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class selectChatModel extends AppCompatActivity {
 
-    private List<Model> models;
+    private RecyclerView recyclerView;
+    private UserSearchAdapter adapter;
+    private List<HelperClassPOJO> userList;
+    private String currentUserEmail = "current.user@example.com";  // Replace with the actual logged-in user email
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_chat_model);
+        setContentView(R.layout.activity_user_searching);  // Ensure you use the correct layout file
 
-        //chatgpt button click on listener
-        Button bchatgpt=findViewById(R.id.button_chatgpt);
-        bchatgpt.setOnClickListener(new View.OnClickListener() {
+        // Initialize RecyclerView
+        recyclerView = findViewById(R.id.recyclerViewUsers);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        userList = new ArrayList<>();
+
+        // Initialize Adapter with Click and Delete Handlers
+        adapter = new UserSearchAdapter(userList,
+                user -> {
+                    // Navigate to ChatActivity when a user is clicked
+                    Intent intent = new Intent(selectChatModel.this, ChatActivity.class);
+                    intent.putExtra("currentUser", currentUserEmail);
+                    intent.putExtra("chatUser", user.getEmail());
+                    startActivity(intent);
+                },
+                user -> {
+                    // Delete user handler
+                    FirebaseDatabase.getInstance().getReference("users")
+                            .child(user.getEmail().replace(".", ","))
+                            .removeValue()
+                            .addOnSuccessListener(aVoid ->
+                                    Toast.makeText(selectChatModel.this, "User deleted", Toast.LENGTH_SHORT).show()
+                            )
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(selectChatModel.this, "Delete failed: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                            );
+                });
+
+        recyclerView.setAdapter(adapter);
+
+        // Search View Implementation
+        SearchView searchView = findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onClick(View v) {
-                startActivity(new Intent(selectChatModel.this,Chatgpt.class));
+            public boolean onQueryTextSubmit(String query) {
+                return false;  // No action on submit
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchUsers(newText);
+                return true;
             }
         });
 
-        // gemini button click on listener
-        Button bchatgpt1=findViewById(R.id.button_gemini);
-        bchatgpt1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(selectChatModel.this,gemini.class));
-            }
-        });
-
-        Button bchatgpt2=findViewById(R.id.button_midjourney);
-        bchatgpt2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(selectChatModel.this,midjourney.class));
-            }
-        });
-
-        // Initialize models
-        models = new ArrayList<>();
-        models.add(new Model("Mistral-7B", "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"));
-        models.add(new Model("Phi-3-mini", "https://api-inference.huggingface.co/models/microsoft/Phi-3-mini-4k-instruct"));
-        models.add(new Model("gemma-2-2b", "https://api-inference.huggingface.co/models/google/gemma-2-2b-it"));
-        models.add(new Model("distilgpt2", "https://api-inference.huggingface.co/models/distilgpt2"));
-        models.add(new Model("blenderbot_small-90M", "https://api-inference.huggingface.co/models/facebook/blenderbot_small-90M"));
-        models.add(new Model("DialoGPT-small", "https://api-inference.huggingface.co/models/microsoft/DialoGPT-small"));
-        models.add(new Model("Gpt2Medium","https://api-inference.huggingface.co/models/openai-community/gpt2-medium"));
-        // Find buttons and set click listeners
-        MaterialCardView buttonMistral = findViewById(R.id.button_mistral);
-        MaterialCardView  buttonPhi = findViewById(R.id.button_phi);
-        MaterialCardView  buttonGemma = findViewById(R.id.button_gemma);
-        MaterialCardView  buttonDistilGPT2 = findViewById(R.id.button_distilgpt2);
-        MaterialCardView  buttonBlenderBot = findViewById(R.id.button_blenderbot);
-        MaterialCardView  buttonDialoGPT = findViewById(R.id.button_dialogpt);
-        MaterialCardView buttonGpt2Medium=findViewById(R.id.button_gpt2Midium);
-
-        // Set onClick listeners for each button
-        setOnClickListener(buttonMistral, 0);
-        setOnClickListener(buttonPhi, 1);
-        setOnClickListener(buttonGemma, 2);
-        setOnClickListener(buttonDistilGPT2, 3);
-        setOnClickListener(buttonBlenderBot, 4);
-        setOnClickListener(buttonDialoGPT, 5);
-        setOnClickListener(buttonGpt2Medium,6);
+        // Load all users initially
+        searchUsers("");
     }
 
-    private void setOnClickListener(final MaterialCardView  button, final int index) {
-        button.setOnClickListener(new View.OnClickListener() {
+    // Firebase Query to Search Users
+    private void searchUsers(String searchText) {
+        Query query = FirebaseDatabase.getInstance().getReference("users")
+                .orderByChild("user")
+                .startAt(searchText)
+                .endAt(searchText + "\uf8ff");
+
+        query.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onClick(View v) {
-                Model selectedModel = models.get(index);
-                // Start chatting activity and pass the API URL
-                Intent intent = new Intent(selectChatModel.this, chataiwithdistilgpt2.class);
-                intent.putExtra("API_URL", selectedModel.getApiUrl());
-                startActivity(intent);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                userList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    HelperClassPOJO user = snapshot.getValue(HelperClassPOJO.class);
+                    if (user != null) {
+                        userList.add(user);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(selectChatModel.this, "Failed to load data", Toast.LENGTH_SHORT).show();
             }
         });
     }
