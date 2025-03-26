@@ -29,12 +29,7 @@ public class MathFeatures extends AppCompatActivity {
             return insets;
         });
          e1=findViewById(R.id.EquationSolver);
-        e1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MathFeatures.this,EquationSolver.class));
-            }
-        });
+
         e2=findViewById(R.id.cgpacalculator);
         e2.setOnClickListener(new View.OnClickListener() {
             @Override

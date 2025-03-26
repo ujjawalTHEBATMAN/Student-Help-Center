@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.abcd.R;
@@ -19,6 +22,8 @@ public class Registration3 extends AppCompatActivity {
 
     private Button btnRegister;
     private String regName, regEmail, regPassword, regRole, images;
+    private String selectedDepartment;
+    private String selectedSemester;
     private DatabaseReference usersRef;
 
     @SuppressLint("MissingInflatedId")
@@ -38,6 +43,48 @@ public class Registration3 extends AppCompatActivity {
         images = intent.getStringExtra("imagess");
 
         usersRef = FirebaseDatabase.getInstance().getReference("users");
+        Spinner spinnerDepartment = findViewById(R.id.spinnerDepartment);
+        String[] departments = {"BCA", "BCOM", "BSC"};
+        ArrayAdapter<String> departmentAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, departments);
+        departmentAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerDepartment.setAdapter(departmentAdapter);
+        spinnerDepartment.setSelection(0); // Default to first item
+        selectedDepartment = departments[0]; // Initialize with default
+
+        // Semester Spinner Setup
+        Spinner spinnerSemester = findViewById(R.id.spinnerSemester);
+        String[] semesters = {"1", "2", "3", "4", "5", "6"};
+        ArrayAdapter<String> semesterAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, semesters);
+        semesterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSemester.setAdapter(semesterAdapter);
+        spinnerSemester.setSelection(0); // Default to first item
+        selectedSemester = semesters[0]; // Initialize with default
+
+        // Department Spinner Listener
+        spinnerDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedDepartment = departments[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
+
+        // Semester Spinner Listener
+        spinnerSemester.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedSemester = semesters[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,7 +106,8 @@ public class Registration3 extends AppCompatActivity {
                 stats.put("totalPoints", 0);
                 stats.put("totalQuizzes", 0);
                 userData.put("stats", stats);
-
+                userData.put("department", selectedDepartment); // Add department
+                userData.put("semester", selectedSemester);     // Add semester
                 userData.put("user", regName);
                 userData.put("userRole", regRole);
 
