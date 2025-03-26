@@ -8,7 +8,6 @@
     tools:context=".ExamQuizes.examQuizesMainActivity"
     android:background="@color/white">
 
-    <!-- Toolbar with back button and title -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
@@ -22,7 +21,6 @@
         app:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ic_arrow_back" />
 
-    <!-- RecyclerView with card design -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/quizzesRecyclerView"
         android:layout_width="0dp"
@@ -36,7 +34,6 @@
         android:scrollbarStyle="insideOverlay"
         tools:listitem="@layout/item_quiz" />
 
-    <!-- Floating Action Button for adding quizzes -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_create_quiz"
         android:layout_width="wrap_content"

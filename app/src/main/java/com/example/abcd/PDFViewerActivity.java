@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.abcd.utils.PDFStorageManager;
 import com.example.abcd.utils.FileUtils;
+import com.example.abcd.utils.SessionManager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
@@ -55,15 +57,29 @@ public class PDFViewerActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private ValueEventListener valueEventListener;
     private static final int STORAGE_PERMISSION_CODE = 1001;
+    private SessionManager sessionManager;
+    private String userRole = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf_viewer);
 
+        sessionManager = new SessionManager(this);
+
+        FloatingActionButton fabAddPdf = findViewById(R.id.fabAddPdf);
+        fabAddPdf.setVisibility(View.GONE);
+
+        String userEmail = sessionManager.getEmail();
+        if (userEmail != null) {
+            fetchUserRole(userEmail);
+        } else {
+            Toast.makeText(this, "User email not found", Toast.LENGTH_SHORT).show();
+        }
+
         selectedSemester = getIntent().getStringExtra("SEMESTER");
         selectedSubject = getIntent().getStringExtra("SUBJECT");
-        
+
         if (selectedSemester == null || selectedSubject == null) {
             finish();
             return;
@@ -72,30 +88,56 @@ public class PDFViewerActivity extends AppCompatActivity {
         pdfStorageManager = new PDFStorageManager(this);
         firebasePdfList = new ArrayList<>();
 
-        // Initialize Firebase Database
         databaseReference = FirebaseDatabase.getInstance().getReference("pdfUrls");
 
-        // Initialize views
         pdfRecyclerView = findViewById(R.id.pdfRecyclerView);
         pdfRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        
-        // Initialize PDF files list and adapter
+
         pdfFiles = new ArrayList<>();
-        adapter = new PDFAdapter(pdfFiles, firebasePdfList);
+        adapter = new PDFAdapter(pdfFiles, firebasePdfList, false);
         pdfRecyclerView.setAdapter(adapter);
 
-        // Set title
         TextView titleTextView = findViewById(R.id.titleTextView);
         titleTextView.setText(selectedSubject + " Question Papers");
 
-        // Setup FAB
-        findViewById(R.id.fabAddPdf).setOnClickListener(v -> {
-            adapter.showAddUrlDialog(this);
+        fabAddPdf.setOnClickListener(v -> {
+            if ("teacher".equalsIgnoreCase(userRole)) {
+                adapter.showAddUrlDialog(this);
+            } else {
+                Toast.makeText(this, "You do not have permission to add PDFs", Toast.LENGTH_SHORT).show();
+            }
         });
 
-        // Load PDFs
         loadPDFs();
         retrievePdfUrls();
+    }
+
+    private void fetchUserRole(String email) {
+        FirebaseDatabase.getInstance().getReference("users")
+                .orderByChild("email").equalTo(email)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            String role = userSnapshot.child("userRole").getValue(String.class);
+                            if (role != null) {
+                                userRole = role.toLowerCase();
+                                adapter.setIsTeacher("teacher".equals(userRole));
+                                updateFabVisibility();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("PDFViewer", "Role fetch error: " + error.getMessage());
+                    }
+                });
+    }
+
+    private void updateFabVisibility() {
+        FloatingActionButton fab = findViewById(R.id.fabAddPdf);
+        fab.setVisibility("teacher".equalsIgnoreCase(userRole) ? View.VISIBLE : View.GONE);
     }
 
     private void loadPDFs() {
@@ -118,20 +160,16 @@ public class PDFViewerActivity extends AppCompatActivity {
             if (data != null) {
                 Uri uri = data.getData();
                 if (uri != null) {
-                    // Take persistable URI permission
                     final int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
                     getContentResolver().takePersistableUriPermission(uri, takeFlags);
-                    
-                    // Get the filename from the URI
+
                     String fileName = com.example.abcd.utils.FileUtils.getFileName(PDFViewerActivity.this, uri);
                     if (fileName == null) {
                         fileName = "document_" + System.currentTimeMillis() + ".pdf";
                     }
-                    
-                    // Save the PDF file
+
                     pdfStorageManager.savePDF(uri, selectedSemester, selectedSubject, fileName);
-                    
-                    // Reload the list
+
                     loadPDFs();
                 }
             }
@@ -141,10 +179,17 @@ public class PDFViewerActivity extends AppCompatActivity {
     private class PDFAdapter extends RecyclerView.Adapter<PDFViewHolder> {
         private final List<PDFStorageManager.PDFFile> localPdfFiles;
         private final List<PDF> firebasePdfFiles;
+        private boolean isTeacher;
 
-        public PDFAdapter(List<PDFStorageManager.PDFFile> localPdfFiles, List<PDF> firebasePdfFiles) {
+        public PDFAdapter(List<PDFStorageManager.PDFFile> localPdfFiles, List<PDF> firebasePdfFiles, boolean isTeacher) {
             this.localPdfFiles = localPdfFiles;
             this.firebasePdfFiles = firebasePdfFiles;
+            this.isTeacher = isTeacher;
+        }
+
+        public void setIsTeacher(boolean isTeacher) {
+            this.isTeacher = isTeacher;
+            notifyDataSetChanged();
         }
 
         @NonNull
@@ -166,10 +211,18 @@ public class PDFViewerActivity extends AppCompatActivity {
 
         private void bindLocalPdf(PDFViewHolder holder, PDFStorageManager.PDFFile pdfFile) {
             holder.pdfNameTextView.setText(pdfFile.getName());
-            holder.deleteButton.setVisibility(View.VISIBLE);
-            holder.renameButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setVisibility(isTeacher ? View.VISIBLE : View.GONE);
+            holder.renameButton.setVisibility(isTeacher ? View.VISIBLE : View.GONE);
             holder.downloadButton.setVisibility(View.GONE);
             holder.viewButton.setVisibility(View.VISIBLE);
+
+            if (isTeacher) {
+                holder.deleteButton.setOnClickListener(v -> showDeleteDialog(pdfFile, holder.getAdapterPosition()));
+                holder.renameButton.setOnClickListener(v -> showRenameDialog(pdfFile));
+            } else {
+                holder.deleteButton.setOnClickListener(null);
+                holder.renameButton.setOnClickListener(null);
+            }
 
             holder.viewButton.setOnClickListener(v -> {
                 Uri fileUri = pdfStorageManager.getPDFUri(selectedSemester, selectedSubject, pdfFile.getName());
@@ -179,31 +232,23 @@ public class PDFViewerActivity extends AppCompatActivity {
                     Toast.makeText(PDFViewerActivity.this, "Error: Cannot open PDF", Toast.LENGTH_SHORT).show();
                 }
             });
-
-            holder.deleteButton.setOnClickListener(v -> showDeleteDialog(pdfFile, holder.getAdapterPosition()));
-            holder.renameButton.setOnClickListener(v -> showRenameDialog(pdfFile));
         }
 
         private void bindFirebasePdf(PDFViewHolder holder, PDF pdf) {
             holder.pdfNameTextView.setText(pdf.getName());
-            holder.deleteButton.setVisibility(View.VISIBLE);
-            holder.renameButton.setVisibility(View.VISIBLE);
+            holder.deleteButton.setVisibility(isTeacher ? View.VISIBLE : View.GONE);
+            holder.renameButton.setVisibility(isTeacher ? View.VISIBLE : View.GONE);
             holder.downloadButton.setVisibility(View.VISIBLE);
             holder.viewButton.setVisibility(View.VISIBLE);
 
-            // View button click
-            holder.viewButton.setOnClickListener(v -> {
-                if (pdf.getUrl() != null && !pdf.getUrl().isEmpty()) {
-                    Intent intent = new Intent(PDFViewerActivity.this, PDFWebViewActivity.class);
-                    intent.putExtra("PDF_URL", pdf.getUrl());
-                    intent.putExtra("PDF_NAME", pdf.getName());
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(PDFViewerActivity.this, "Invalid PDF URL", Toast.LENGTH_SHORT).show();
-                }
-            });
+            if (isTeacher) {
+                holder.deleteButton.setOnClickListener(v -> showDeleteFirebasePdfDialog(pdf));
+                holder.renameButton.setOnClickListener(v -> showEditFirebasePdfDialog(pdf));
+            } else {
+                holder.deleteButton.setOnClickListener(null);
+                holder.renameButton.setOnClickListener(null);
+            }
 
-            // Download button click
             holder.downloadButton.setOnClickListener(v -> {
                 if (pdf.getUrl() != null && !pdf.getUrl().isEmpty()) {
                     if (checkStoragePermission()) {
@@ -216,13 +261,16 @@ public class PDFViewerActivity extends AppCompatActivity {
                 }
             });
 
-            // Delete button click
-            holder.deleteButton.setOnClickListener(v -> {
-                showDeleteFirebasePdfDialog(pdf);
+            holder.viewButton.setOnClickListener(v -> {
+                if (pdf.getUrl() != null && !pdf.getUrl().isEmpty()) {
+                    Intent intent = new Intent(PDFViewerActivity.this, PDFWebViewActivity.class);
+                    intent.putExtra("PDF_URL", pdf.getUrl());
+                    intent.putExtra("PDF_NAME", pdf.getName());
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(PDFViewerActivity.this, "Invalid PDF URL", Toast.LENGTH_SHORT).show();
+                }
             });
-
-            // Edit Firebase PDF data
-            holder.renameButton.setOnClickListener(v -> showEditFirebasePdfDialog(pdf));
         }
 
         private void showDeleteDialog(PDFStorageManager.PDFFile pdfFile, int position) {
@@ -245,13 +293,12 @@ public class PDFViewerActivity extends AppCompatActivity {
         private void showRenameDialog(PDFStorageManager.PDFFile pdfFile) {
             View dialogView = LayoutInflater.from(PDFViewerActivity.this).inflate(R.layout.dialog_rename, null);
             EditText renameEditText = dialogView.findViewById(R.id.renameEditText);
-            
+
             String currentName = pdfFile.getName();
-            // Remove .pdf extension for editing
-            String nameWithoutExtension = currentName.toLowerCase().endsWith(".pdf") 
-                ? currentName.substring(0, currentName.length() - 4) 
-                : currentName;
-            
+            String nameWithoutExtension = currentName.toLowerCase().endsWith(".pdf")
+                    ? currentName.substring(0, currentName.length() - 4)
+                    : currentName;
+
             renameEditText.setText(nameWithoutExtension);
             renameEditText.setSelection(nameWithoutExtension.length());
 
@@ -264,25 +311,21 @@ public class PDFViewerActivity extends AppCompatActivity {
                             Toast.makeText(PDFViewerActivity.this, "Name cannot be empty", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        
-                        // Ensure the extension is .pdf
+
                         if (!newName.toLowerCase().endsWith(".pdf")) {
                             newName += ".pdf";
                         }
-                        
-                        // Validate filename
+
                         if (!isValidFileName(newName)) {
                             Toast.makeText(PDFViewerActivity.this, "Invalid filename. Avoid special characters", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        // Check if the new name is different from the current name
                         if (newName.equals(currentName)) {
                             Toast.makeText(PDFViewerActivity.this, "New name is same as current name", Toast.LENGTH_SHORT).show();
                             return;
                         }
 
-                        // Update the file
                         if (pdfStorageManager.updatePDFName(selectedSemester, selectedSubject, currentName, newName)) {
                             Toast.makeText(PDFViewerActivity.this, "File renamed successfully", Toast.LENGTH_SHORT).show();
                             loadPDFs();
@@ -318,23 +361,23 @@ public class PDFViewerActivity extends AppCompatActivity {
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 snapshot.getRef().removeValue()
                                         .addOnSuccessListener(aVoid -> {
-                                            Toast.makeText(PDFViewerActivity.this, 
-                                                "PDF deleted successfully", Toast.LENGTH_SHORT).show();
-                                            retrievePdfUrls(); // Refresh the list
+                                            Toast.makeText(PDFViewerActivity.this,
+                                                    "PDF deleted successfully", Toast.LENGTH_SHORT).show();
+                                            retrievePdfUrls();
                                         })
-                                        .addOnFailureListener(e -> 
-                                            Toast.makeText(PDFViewerActivity.this, 
-                                                "Failed to delete PDF: " + e.getMessage(), 
-                                                Toast.LENGTH_SHORT).show());
-                                break; // Delete only the first matching entry
+                                        .addOnFailureListener(e ->
+                                                Toast.makeText(PDFViewerActivity.this,
+                                                        "Failed to delete PDF: " + e.getMessage(),
+                                                        Toast.LENGTH_SHORT).show());
+                                break;
                             }
                         }
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-                            Toast.makeText(PDFViewerActivity.this, 
-                                "Error: " + databaseError.getMessage(), 
-                                Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PDFViewerActivity.this,
+                                    "Error: " + databaseError.getMessage(),
+                                    Toast.LENGTH_SHORT).show();
                         }
                     });
         }
@@ -347,27 +390,26 @@ public class PDFViewerActivity extends AppCompatActivity {
         public void showAddUrlDialog(Context context) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_pdf_url, null);
-            
+
             EditText urlInput = dialogView.findViewById(R.id.urlInput);
             EditText fileNameInput = dialogView.findViewById(R.id.fileNameInput);
-            
+
             builder.setView(dialogView)
                     .setTitle("Add PDF URL")
                     .setPositiveButton("Add", (dialog, which) -> {
                         String url = urlInput.getText().toString().trim();
                         String fileName = fileNameInput.getText().toString().trim();
-                        
+
                         if (url.isEmpty() || fileName.isEmpty()) {
                             Toast.makeText(context, "Please enter both URL and file name", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        
-                        // Create a unique key for the PDF entry
+
                         String key = databaseReference.child(selectedSemester)
                                 .child(selectedSubject)
                                 .push()
                                 .getKey();
-                        
+
                         if (key != null) {
                             PDF pdfData = new PDF(fileName, url);
                             databaseReference.child(selectedSemester)
@@ -376,10 +418,10 @@ public class PDFViewerActivity extends AppCompatActivity {
                                     .setValue(pdfData)
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(context, "PDF URL added successfully", Toast.LENGTH_SHORT).show();
-                                        retrievePdfUrls(); // Refresh the list
+                                        retrievePdfUrls();
                                     })
                                     .addOnFailureListener(e -> {
-                                        Toast.makeText(context, "Failed to add PDF URL: " + e.getMessage(), 
+                                        Toast.makeText(context, "Failed to add PDF URL: " + e.getMessage(),
                                                 Toast.LENGTH_SHORT).show();
                                     });
                         }
@@ -411,8 +453,7 @@ public class PDFViewerActivity extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(uri, "application/pdf");
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            
-            // Verify if there's an app that can handle PDF viewing
+
             if (intent.resolveActivity(getPackageManager()) != null) {
                 startActivity(intent);
             } else {
@@ -427,27 +468,27 @@ public class PDFViewerActivity extends AppCompatActivity {
         if (!url.isEmpty()) {
             String fileName = com.example.abcd.utils.FileUtils.getFileNameFromUrl(url);
             PDF pdfData = new PDF(url, fileName);
-            
+
             String key = databaseReference
-                .child(selectedSemester)
-                .child(selectedSubject)
-                .push()
-                .getKey();
+                    .child(selectedSemester)
+                    .child(selectedSubject)
+                    .push()
+                    .getKey();
 
             if (key != null) {
                 databaseReference
-                    .child(selectedSemester)
-                    .child(selectedSubject)
-                    .child(key)
-                    .setValue(pdfData)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "PDF URL saved successfully", Toast.LENGTH_SHORT).show();
-                        Log.d("Firebase", "PDF URL stored: " + url);
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Failed to save PDF URL", Toast.LENGTH_SHORT).show();
-                        Log.e("Firebase", "Error storing PDF URL: " + e.getMessage());
-                    });
+                        .child(selectedSemester)
+                        .child(selectedSubject)
+                        .child(key)
+                        .setValue(pdfData)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(this, "PDF URL saved successfully", Toast.LENGTH_SHORT).show();
+                            Log.d("Firebase", "PDF URL stored: " + url);
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(this, "Failed to save PDF URL", Toast.LENGTH_SHORT).show();
+                            Log.e("Firebase", "Error storing PDF URL: " + e.getMessage());
+                        });
             }
         }
     }
@@ -474,8 +515,8 @@ public class PDFViewerActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        Toast.makeText(PDFViewerActivity.this, 
-                                "Failed to load PDFs: " + error.getMessage(), 
+                        Toast.makeText(PDFViewerActivity.this,
+                                "Failed to load PDFs: " + error.getMessage(),
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -489,10 +530,10 @@ public class PDFViewerActivity extends AppCompatActivity {
 
     private void savePdfFromUrl(String url, Context context) {
         AlertDialog progressDialog = new AlertDialog.Builder(context)
-            .setView(LayoutInflater.from(context).inflate(R.layout.progress_dialog, null))
-            .setCancelable(false)
-            .create();
-        
+                .setView(LayoutInflater.from(context).inflate(R.layout.progress_dialog, null))
+                .setCancelable(false)
+                .create();
+
         progressDialog.show();
 
         new Thread(() -> {
@@ -523,12 +564,11 @@ public class PDFViewerActivity extends AppCompatActivity {
                 File finalTempFile = tempFile;
                 runOnUiThread(() -> {
                     try {
-                        // Save the PDF using PDFStorageManager
                         boolean isSaved = pdfStorageManager.savePDF(
-                            Uri.fromFile(finalTempFile), 
-                            selectedSemester, 
-                            selectedSubject, 
-                            com.example.abcd.utils.FileUtils.getFileNameFromUrl(url)
+                                Uri.fromFile(finalTempFile),
+                                selectedSemester,
+                                selectedSubject,
+                                com.example.abcd.utils.FileUtils.getFileNameFromUrl(url)
                         );
 
                         if (isSaved) {
@@ -577,38 +617,38 @@ public class PDFViewerActivity extends AppCompatActivity {
 
     private boolean checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return true; // Android 10 and above don't need storage permission for Downloads folder
+            return true;
         }
-        return ContextCompat.checkSelfPermission(this, 
-            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestStoragePermission(String pdfUrl) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 new AlertDialog.Builder(this)
-                    .setTitle("Permission needed")
-                    .setMessage("This permission is needed to download PDFs to your device")
-                    .setPositiveButton("OK", (dialog, which) -> {
-                        ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            STORAGE_PERMISSION_CODE);
-                    })
-                    .setNegativeButton("Cancel", (dialog, which) -> 
-                        dialog.dismiss())
-                    .create()
-                    .show();
+                        .setTitle("Permission needed")
+                        .setMessage("This permission is needed to download PDFs to your device")
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            ActivityCompat.requestPermissions(this,
+                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    STORAGE_PERMISSION_CODE);
+                        })
+                        .setNegativeButton("Cancel", (dialog, which) ->
+                                dialog.dismiss())
+                        .create()
+                        .show();
             } else {
                 ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    STORAGE_PERMISSION_CODE);
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        STORAGE_PERMISSION_CODE);
             }
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                         @NonNull int[] grantResults) {
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == STORAGE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -628,19 +668,16 @@ public class PDFViewerActivity extends AppCompatActivity {
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
 
-                // Get file name from URL or use timestamp
                 String fileName = pdfUrl.substring(pdfUrl.lastIndexOf('/') + 1);
                 if (!fileName.toLowerCase().endsWith(".pdf")) {
                     fileName = "document_" + System.currentTimeMillis() + ".pdf";
                 }
 
-                // Create downloads directory if it doesn't exist
                 File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                 if (!downloadsDir.exists()) {
                     downloadsDir.mkdirs();
                 }
 
-                // Create the file in downloads directory
                 File outputFile = new File(downloadsDir, fileName);
                 FileOutputStream fos = new FileOutputStream(outputFile);
                 InputStream is = connection.getInputStream();
@@ -654,7 +691,6 @@ public class PDFViewerActivity extends AppCompatActivity {
                 fos.close();
                 is.close();
 
-                // Show success message on UI thread
                 runOnUiThread(() -> {
                     Toast.makeText(this, "PDF downloaded to Downloads folder", Toast.LENGTH_LONG).show();
                 });
@@ -688,12 +724,10 @@ public class PDFViewerActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // Ensure the name has .pdf extension
                     if (!newName.toLowerCase().endsWith(".pdf")) {
                         newName += ".pdf";
                     }
 
-                    // Update in Firebase
                     updatePdfInFirebase(pdf, newName, newUrl);
                 })
                 .setNegativeButton("Cancel", null)
@@ -705,7 +739,6 @@ public class PDFViewerActivity extends AppCompatActivity {
                 .child(selectedSemester)
                 .child(selectedSubject);
 
-        // Query to find the PDF entry
         pdfRef.orderByChild("url").equalTo(oldPdf.getUrl())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -714,23 +747,23 @@ public class PDFViewerActivity extends AppCompatActivity {
                             PDF pdf = new PDF(newUrl, newName);
                             snapshot.getRef().setValue(pdf)
                                     .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(PDFViewerActivity.this, 
-                                            "PDF details updated successfully", Toast.LENGTH_SHORT).show();
-                                        loadPDFs(); // Refresh the list
+                                        Toast.makeText(PDFViewerActivity.this,
+                                                "PDF details updated successfully", Toast.LENGTH_SHORT).show();
+                                        loadPDFs();
                                     })
-                                    .addOnFailureListener(e -> 
-                                        Toast.makeText(PDFViewerActivity.this, 
-                                            "Failed to update PDF: " + e.getMessage(), 
-                                            Toast.LENGTH_SHORT).show());
-                            break; // Update only the first matching entry
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(PDFViewerActivity.this,
+                                                    "Failed to update PDF: " + e.getMessage(),
+                                                    Toast.LENGTH_SHORT).show());
+                            break;
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Toast.makeText(PDFViewerActivity.this, 
-                            "Error: " + databaseError.getMessage(), 
-                            Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PDFViewerActivity.this,
+                                "Error: " + databaseError.getMessage(),
+                                Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -738,17 +771,16 @@ public class PDFViewerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Remove Firebase listeners to prevent memory leaks
         if (databaseReference != null && valueEventListener != null) {
             databaseReference.removeEventListener(valueEventListener);
         }
     }
 
     public static class PDF {
-        public String url;  // Make fields public
-        public String name; // Make fields public
+        public String url;
+        public String name;
 
-        public PDF() {} // Default constructor required for calls to DataSnapshot.getValue(PDF.class)
+        public PDF() {}
 
         public PDF(String url, String name) {
             this.url = url;
@@ -779,11 +811,9 @@ public class PDFViewerActivity extends AppCompatActivity {
     private static class FileUtils {
         public static String getFileNameFromUrl(String url) {
             String fileName = url.substring(url.lastIndexOf('/') + 1);
-            // Remove query parameters if any
             if (fileName.contains("?")) {
                 fileName = fileName.substring(0, fileName.indexOf("?"));
             }
-            // Decode URL-encoded characters
             fileName = Uri.decode(fileName);
             return fileName;
         }

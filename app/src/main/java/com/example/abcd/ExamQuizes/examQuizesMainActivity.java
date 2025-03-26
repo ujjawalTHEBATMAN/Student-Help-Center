@@ -3,6 +3,7 @@ package com.example.abcd.ExamQuizes;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +25,7 @@ public class examQuizesMainActivity extends AppCompatActivity
     private QuizAdapter quizAdapter;
     private final List<Quiz> quizList = new ArrayList<>();
     private static final String TAG = "QuizMainActivity";
-    private String userRole = "";  // Hold user's role from Firebase
+    private String userRole = "";  // Store user role
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +36,9 @@ public class examQuizesMainActivity extends AppCompatActivity
         setupToolbar();
         setupRecyclerView();
         setupFirebaseListener();
-        setupFab();
+
+        // Hide the FAB initially until the role is verified
+        binding.fabCreateQuiz.setVisibility(View.GONE);
 
         // Fetch user email from session and retrieve the user role
         SessionManager sessionManager = new SessionManager(this);
@@ -46,31 +49,21 @@ public class examQuizesMainActivity extends AppCompatActivity
         } else {
             Toast.makeText(this, "User email not found in session", Toast.LENGTH_SHORT).show();
         }
+
+        setupFab();
     }
 
-    /**
-     * Set up the toolbar with a back button.
-     */
     private void setupToolbar() {
         setSupportActionBar(binding.toolbar);
-        binding.toolbar.setNavigationOnClickListener(v -> {
-            // Go back to the previous activity
-            onBackPressed();
-        });
+        binding.toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 
-    /**
-     * Initialize the RecyclerView with adapter and layout manager.
-     */
     private void setupRecyclerView() {
         quizAdapter = new QuizAdapter(quizList, this);
         binding.quizzesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         binding.quizzesRecyclerView.setAdapter(quizAdapter);
     }
 
-    /**
-     * Set up Firebase listener to fetch quizzes.
-     */
     private void setupFirebaseListener() {
         FirebaseDatabase.getInstance().getReference("quizzes")
                 .addValueEventListener(new ValueEventListener() {
@@ -100,17 +93,16 @@ public class examQuizesMainActivity extends AppCompatActivity
                 });
     }
 
-    /**
-     * Floating Action Button to create a new quiz.
-     */
     private void setupFab() {
-        binding.fabCreateQuiz.setOnClickListener(v ->
-                startActivity(new Intent(this, CreateNewQuizes.class)));
+        binding.fabCreateQuiz.setOnClickListener(v -> {
+            if ("teacher".equals(userRole)) {
+                startActivity(new Intent(this, CreateNewQuizes.class));
+            } else {
+                Toast.makeText(this, "Only teachers can create quizzes", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    /**
-     * Fetches the user's role from Firebase based on email.
-     */
     private void fetchUserRole(String email) {
         FirebaseDatabase.getInstance().getReference("users")
                 .orderByChild("email").equalTo(email)
@@ -120,13 +112,17 @@ public class examQuizesMainActivity extends AppCompatActivity
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                             String role = userSnapshot.child("userRole").getValue(String.class);
                             if (role != null) {
-                                userRole = role;
+                                userRole = role.toLowerCase();
                                 Log.d(TAG, "User role: " + userRole);
+                                if ("teacher".equals(userRole)) {
+                                    binding.fabCreateQuiz.setVisibility(View.VISIBLE);
+                                } else {
+                                    binding.fabCreateQuiz.setVisibility(View.GONE);
+                                }
                                 break;
                             }
                         }
                     }
-
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         Log.e(TAG, "Error fetching user role: " + error.getMessage());
@@ -136,18 +132,24 @@ public class examQuizesMainActivity extends AppCompatActivity
 
     @Override
     public void onActiveQuizClicked(Quiz quiz) {
-        if (isQuizActive(quiz)) {
-            Intent intent = new Intent(this, QuizActivity.class);
-            intent.putExtra("SELECTED_QUIZ", quiz);
-            startActivity(intent);
-        } else {
+        if (!isQuizActive(quiz)) {
             Toast.makeText(this, "Quiz is no longer available", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        if (!"student".equals(userRole)) {
+            Toast.makeText(this, "Only students can participate in quizzes", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent intent = new Intent(this, QuizActivity.class);
+        intent.putExtra("SELECTED_QUIZ", quiz);
+        startActivity(intent);
     }
 
     @Override
     public void onExpiredQuizClicked(String quizId) {
-        if ("admin".equalsIgnoreCase(userRole) || "teacher".equalsIgnoreCase(userRole)) {
+        if ("admin".equals(userRole) || "teacher".equals(userRole)) {
             FirebaseDatabase.getInstance().getReference("quizzes")
                     .child(quizId)
                     .removeValue()
