@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -17,9 +16,6 @@ import com.example.abcd.gemini;
 import com.example.abcd.midjourney;
 import com.example.abcd.R;
 import com.google.android.material.card.MaterialCardView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +33,15 @@ public class treatMeWellFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Button Click Listeners
-        Button btnChatGPT = view.findViewById(R.id.button_chatgpt);
-        btnChatGPT.setOnClickListener(v -> startActivity(new Intent(requireActivity(), Chatgpt.class)));
+        // MaterialCardView Click Listeners for top cards
+        MaterialCardView cardChatGPT = view.findViewById(R.id.card_chatgpt);
+        cardChatGPT.setOnClickListener(v -> startActivity(new Intent(requireActivity(), Chatgpt.class)));
 
-        Button btnGemini = view.findViewById(R.id.button_gemini);
-        btnGemini.setOnClickListener(v -> startActivity(new Intent(requireActivity(), gemini.class)));
+        MaterialCardView cardGemini = view.findViewById(R.id.card_gemini);
+        cardGemini.setOnClickListener(v -> startActivity(new Intent(requireActivity(), gemini.class)));
 
-        Button btnMidjourney = view.findViewById(R.id.button_midjourney);
-        btnMidjourney.setOnClickListener(v -> startActivity(new Intent(requireActivity(), midjourney.class)));
+        MaterialCardView cardMidjourney = view.findViewById(R.id.card_midjourney);
+        cardMidjourney.setOnClickListener(v -> startActivity(new Intent(requireActivity(), midjourney.class)));
 
         // Initialize Models
         models = new ArrayList<>();
@@ -57,7 +53,7 @@ public class treatMeWellFragment extends Fragment {
         models.add(new Model("DialoGPT-small", "https://api-inference.huggingface.co/models/microsoft/DialoGPT-small"));
         models.add(new Model("Gpt2Medium", "https://api-inference.huggingface.co/models/openai-community/gpt2-medium"));
 
-        // Setup MaterialCardView Click Listeners
+        // Setup MaterialCardView Click Listeners for grid cards
         setupCardClick(view, R.id.button_mistral, 0);
         setupCardClick(view, R.id.button_phi, 1);
         setupCardClick(view, R.id.button_gemma, 2);
