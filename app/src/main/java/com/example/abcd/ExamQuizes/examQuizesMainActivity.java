@@ -31,11 +31,13 @@ public class examQuizesMainActivity extends AppCompatActivity
     private final List<Quiz> quizList = new ArrayList<>();
     private static final String TAG = "QuizMainActivity";
     private String userRole = "";
+    private String userEmail = "";
     private CardView resultsCardView;
     private RecyclerView resultsRecyclerView;
     private Button sendNotificationButton, closeButton;
     private ResultsAdapter resultsAdapter;
     private List<QuizResult> currentResults = new ArrayList<>();
+    private List<QuizAttempt> currentAttempts = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +54,7 @@ public class examQuizesMainActivity extends AppCompatActivity
         resultsRecyclerView = binding.resultsRecyclerView;
         sendNotificationButton = binding.sendNotificationButton;
         closeButton = binding.closeButton;
-        resultsAdapter = new ResultsAdapter(currentResults);
+        resultsAdapter = new ResultsAdapter(currentResults, currentAttempts, userRole);
         resultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         resultsRecyclerView.setAdapter(resultsAdapter);
 
@@ -63,7 +65,7 @@ public class examQuizesMainActivity extends AppCompatActivity
         });
         closeButton.setOnClickListener(v -> {
             resultsCardView.setVisibility(View.GONE);
-            binding.fabCreateQuiz.setVisibility(View.VISIBLE);
+            binding.fabCreateQuiz.setVisibility("teacher".equals(userRole) ? View.VISIBLE : View.GONE);
         });
 
         // Hide the FAB initially until the role is verified
@@ -71,7 +73,7 @@ public class examQuizesMainActivity extends AppCompatActivity
 
         // Fetch user email from session and retrieve the user role
         SessionManager sessionManager = new SessionManager(this);
-        String userEmail = sessionManager.getEmail();
+        userEmail = sessionManager.getEmail();
 
         if (userEmail != null) {
             fetchUserRole(userEmail);
@@ -163,21 +165,30 @@ public class examQuizesMainActivity extends AppCompatActivity
     public void onQuizClicked(Quiz quiz) {
         long currentTime = System.currentTimeMillis();
         if ("student".equals(userRole)) {
-            if (isQuizActive(quiz)) {
-                Intent intent = new Intent(this, QuizActivity.class);
-                intent.putExtra("SELECTED_QUIZ", quiz);
-                startActivity(intent);
+            if (currentTime < quiz.getStartingTime()) {
+                Toast.makeText(this, "Quiz has not started yet", Toast.LENGTH_SHORT).show();
+            } else if (isQuizActive(quiz)) {
+                checkStudentAttempt(quiz);
             } else {
-                Toast.makeText(this, "Quiz has expired", Toast.LENGTH_SHORT).show();
+                showStudentPreviousAttempt(quiz);
             }
         } else if ("teacher".equals(userRole) || "admin".equals(userRole)) {
-            showQuizResults(quiz);
+            if (currentTime < quiz.getStartingTime()) {
+                binding.resultsTitle.setText("Quiz not started: " + quiz.getSubject());
+                currentResults.clear();
+                currentAttempts.clear();
+                resultsAdapter.notifyDataSetChanged();
+                resultsCardView.setVisibility(View.VISIBLE);
+                binding.fabCreateQuiz.setVisibility(View.GONE);
+            } else {
+                showQuizResults(quiz);
+            }
         }
     }
 
     @Override
     public void onQuizLongClicked(Quiz quiz) {
-        if (("teacher".equals(userRole) || "admin".equals(userRole)) && !isQuizActive(quiz)) {
+        if (("teacher".equals(userRole) || "admin".equals(userRole)) && !isQuizActive(quiz) && System.currentTimeMillis() >= quiz.getStartingTime()) {
             new AlertDialog.Builder(this)
                     .setTitle("Remove Quiz")
                     .setMessage("Are you sure you want to remove this expired quiz?")
@@ -199,6 +210,91 @@ public class examQuizesMainActivity extends AppCompatActivity
         }
     }
 
+    private void checkStudentAttempt(Quiz quiz) {
+        DatabaseReference attemptsRef = FirebaseDatabase.getInstance().getReference("quizzesResultAnalysesData");
+        attemptsRef.orderByChild("email").equalTo(userEmail)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean hasAttempted = false;
+                        for (DataSnapshot attemptSnapshot : snapshot.getChildren()) {
+                            String subject = attemptSnapshot.child("subject").getValue(String.class);
+                            if (subject != null && subject.equals(quiz.getSubject())) {
+                                hasAttempted = true;
+                                showStudentPreviousAttempt(quiz);
+                                break;
+                            }
+                        }
+                        if (!hasAttempted) {
+                            Intent intent = new Intent(examQuizesMainActivity.this, QuizActivity.class);
+                            intent.putExtra("SELECTED_QUIZ", quiz);
+                            startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(examQuizesMainActivity.this,
+                                "Error checking attempt: " + error.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void showStudentPreviousAttempt(Quiz quiz) {
+        DatabaseReference attemptsRef = FirebaseDatabase.getInstance().getReference("quizzesResultAnalysesData");
+        attemptsRef.orderByChild("email").equalTo(userEmail)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        currentAttempts.clear();
+                        currentResults.clear();
+                        for (DataSnapshot attemptSnapshot : snapshot.getChildren()) {
+                            String subject = attemptSnapshot.child("subject").getValue(String.class);
+                            if (subject != null && subject.equals(quiz.getSubject())) {
+                                QuizAttempt attempt = attemptSnapshot.getValue(QuizAttempt.class);
+                                if (attempt != null) {
+                                    attempt.setAttemptId(attemptSnapshot.getKey());
+                                    currentAttempts.add(attempt);
+                                }
+                            }
+                        }
+                        DatabaseReference resultsRef = FirebaseDatabase.getInstance().getReference("quiz_results");
+                        resultsRef.orderByChild("userEmail").equalTo(userEmail)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        for (DataSnapshot resultSnapshot : snapshot.getChildren()) {
+                                            QuizResult result = resultSnapshot.getValue(QuizResult.class);
+                                            if (result != null && result.getSubject().equals(quiz.getSubject())) {
+                                                currentResults.add(result);
+                                            }
+                                        }
+                                        binding.resultsTitle.setText("Your Previous Attempt: " + quiz.getSubject());
+                                        resultsAdapter.notifyDataSetChanged();
+                                        resultsCardView.setVisibility(View.VISIBLE);
+                                        binding.fabCreateQuiz.setVisibility(View.GONE);
+                                        sendNotificationButton.setVisibility(View.GONE);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        Toast.makeText(examQuizesMainActivity.this,
+                                                "Error loading results: " + error.getMessage(),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(examQuizesMainActivity.this,
+                                "Error loading attempt: " + error.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     private void showQuizResults(Quiz quiz) {
         DatabaseReference resultsRef = FirebaseDatabase.getInstance().getReference("quiz_results");
         resultsRef.orderByChild("subject").equalTo(quiz.getSubject())
@@ -206,6 +302,7 @@ public class examQuizesMainActivity extends AppCompatActivity
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         currentResults.clear();
+                        currentAttempts.clear();
                         for (DataSnapshot resultSnapshot : snapshot.getChildren()) {
                             QuizResult result = resultSnapshot.getValue(QuizResult.class);
                             if (result != null) {
@@ -220,6 +317,7 @@ public class examQuizesMainActivity extends AppCompatActivity
                         resultsAdapter.notifyDataSetChanged();
                         resultsCardView.setVisibility(View.VISIBLE);
                         binding.fabCreateQuiz.setVisibility(View.GONE);
+                        sendNotificationButton.setVisibility(View.VISIBLE);
                     }
 
                     @Override

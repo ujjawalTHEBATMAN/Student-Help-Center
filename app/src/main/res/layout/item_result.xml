@@ -1,28 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:layout_marginBottom="12dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardBackgroundColor="#FFFFFF">
 
-    <TextView
-        android:id="@+id/tvUserEmail"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="User Email"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tvMarks"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Obtained / Total" />
+        <!-- Header Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/tvTimestamp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Timestamp" />
+            <TextView
+                android:id="@+id/tvUserEmailLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Student: "
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#495057" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/tvUserEmail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="user@example.com"
+                android:textSize="16sp"
+                android:textColor="#212529" />
+        </LinearLayout>
+
+        <!-- Marks Section (for teachers) -->
+        <LinearLayout
+            android:id="@+id/marksContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Marks: "
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#495057" />
+
+            <TextView
+                android:id="@+id/tvMarks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0 / 0.0"
+                android:textSize="14sp"
+                android:textColor="#212529" />
+        </LinearLayout>
+
+        <!-- Timestamp Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date: "
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#495057" />
+
+            <TextView
+                android:id="@+id/tvTimestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Timestamp"
+                android:textSize="14sp"
+                android:textColor="#212529" />
+        </LinearLayout>
+
+        <!-- Attempt Details Section (for students) -->
+        <TextView
+            android:id="@+id/tvAttemptDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:textColor="#343A40"
+            android:layout_marginTop="8dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

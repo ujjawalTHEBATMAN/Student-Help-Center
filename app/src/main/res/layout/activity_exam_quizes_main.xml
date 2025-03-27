@@ -37,13 +37,16 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/resultsCardView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="500dp"
         app:cardElevation="8dp"
-        app:cardCornerRadius="8dp">
+        app:cardCornerRadius="12dp"
+        app:cardBackgroundColor="#F8F9FA">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -56,30 +59,44 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Quiz Results"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#212529"
+                android:layout_marginBottom="12dp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/resultsRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:maxHeight="350dp"
+                android:scrollbars="vertical"
+                android:layout_marginBottom="12dp" />
 
-            <Button
-                android:id="@+id/sendNotificationButton"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Send Notification"
-                android:layout_gravity="end"
-                android:layout_marginTop="8dp" />
+                android:orientation="horizontal"
+                android:gravity="end">
 
-            <Button
-                android:id="@+id/closeButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Close"
-                android:layout_gravity="end"
-                android:layout_marginTop="8dp" />
+                <Button
+                    android:id="@+id/sendNotificationButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Send Notification"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#007BFF"
+                    android:layout_marginEnd="8dp"
+                    android:padding="8dp" />
+
+                <Button
+                    android:id="@+id/closeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Close"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#6C757D"
+                    android:padding="8dp" />
+            </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
