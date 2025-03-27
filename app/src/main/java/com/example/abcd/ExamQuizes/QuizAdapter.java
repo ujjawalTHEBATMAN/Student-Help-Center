@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,8 +17,8 @@ import java.util.Locale;
 public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder> {
 
     interface QuizInteractionListener {
-        void onActiveQuizClicked(Quiz quiz);
-        void onExpiredQuizClicked(String quizId);
+        void onQuizClicked(Quiz quiz);
+        void onQuizLongClicked(Quiz quiz);
     }
 
     private final List<Quiz> quizList;
@@ -49,7 +48,6 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
         holder.binding.tvDuration.setText(context.getString(
                 R.string.duration_format, quiz.getDurationMinutes()));
 
-        // Fix: Check if questions is null before using .size()
         int questionCount = (quiz.getQuestions() != null) ? quiz.getQuestions().size() : 0;
         holder.binding.tvQuestions.setText(context.getString(
                 R.string.questions_format, questionCount));
@@ -61,7 +59,7 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     private void updateQuizStatusUI(QuizViewHolder holder, Quiz quiz, Context context) {
         long currentTime = System.currentTimeMillis();
         if (currentTime > quiz.getEndingTime()) {
-            setStatus(holder, "Expire", R.color.red);
+            setStatus(holder, "Expired", R.color.red);
         } else if (currentTime >= quiz.getStartingTime()) {
             setStatus(holder, "Active", R.color.green);
         } else {
@@ -77,18 +75,10 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     }
 
     private void setupClickListeners(QuizViewHolder holder, Quiz quiz, Context context) {
-        holder.itemView.setOnClickListener(v -> {
-            long currentTime = System.currentTimeMillis();
-            if (currentTime > quiz.getEndingTime()) {
-                listener.onExpiredQuizClicked(quiz.getQuizId());
-            } else if (currentTime >= quiz.getStartingTime()) {
-                listener.onActiveQuizClicked(quiz);
-            } else {
-                Toast.makeText(context,
-                        "Quiz starts at " + dateFormat.format(
-                                new Date(quiz.getStartingTime())),
-                        Toast.LENGTH_SHORT).show();
-            }
+        holder.itemView.setOnClickListener(v -> listener.onQuizClicked(quiz));
+        holder.itemView.setOnLongClickListener(v -> {
+            listener.onQuizLongClicked(quiz);
+            return true;
         });
     }
 

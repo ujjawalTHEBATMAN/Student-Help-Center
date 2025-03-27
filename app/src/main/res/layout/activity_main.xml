@@ -23,7 +23,7 @@
             android:id="@+id/logoImageView"
             android:layout_width="180dp"
             android:layout_height="180dp"
-            android:src="@drawable/ic_chatbot"
+            android:src="@drawable/profile1"
             android:scaleType="centerCrop"
             android:padding="16dp"/>
 
@@ -64,7 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:indeterminate="true"
-        app:indicatorColor="@android:color/white"
+        app:indicatorColor="#E21818"
         app:trackColor="@android:color/transparent"
         app:indicatorSize="48dp"
         app:trackThickness="4dp"
