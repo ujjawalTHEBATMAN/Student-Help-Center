@@ -3,16 +3,20 @@ package com.example.abcd.ExamQuizes;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.abcd.QuizActivity;
+import com.example.abcd.R;
 import com.example.abcd.databinding.ActivityExamQuizesMainBinding;
 import com.example.abcd.utils.SessionManager;
 import com.google.firebase.database.DataSnapshot;
@@ -35,9 +39,11 @@ public class examQuizesMainActivity extends AppCompatActivity
     private CardView resultsCardView;
     private RecyclerView resultsRecyclerView;
     private Button sendNotificationButton, closeButton;
+    private ImageButton topCloseButton;
     private ResultsAdapter resultsAdapter;
     private List<QuizResult> currentResults = new ArrayList<>();
     private List<QuizAttempt> currentAttempts = new ArrayList<>();
+    private ConstraintLayout mainLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +51,7 @@ public class examQuizesMainActivity extends AppCompatActivity
         binding = ActivityExamQuizesMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        mainLayout = findViewById(R.id.mainLayout);
         setupToolbar();
         setupRecyclerView();
         setupFirebaseListener();
@@ -54,6 +61,7 @@ public class examQuizesMainActivity extends AppCompatActivity
         resultsRecyclerView = binding.resultsRecyclerView;
         sendNotificationButton = binding.sendNotificationButton;
         closeButton = binding.closeButton;
+        topCloseButton = findViewById(R.id.topCloseButton);
         resultsAdapter = new ResultsAdapter(currentResults, currentAttempts, userRole);
         resultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         resultsRecyclerView.setAdapter(resultsAdapter);
@@ -66,6 +74,30 @@ public class examQuizesMainActivity extends AppCompatActivity
         closeButton.setOnClickListener(v -> {
             resultsCardView.setVisibility(View.GONE);
             binding.fabCreateQuiz.setVisibility("teacher".equals(userRole) ? View.VISIBLE : View.GONE);
+        });
+        topCloseButton.setOnClickListener(v -> {
+            resultsCardView.setVisibility(View.GONE);
+            binding.fabCreateQuiz.setVisibility("teacher".equals(userRole) ? View.VISIBLE : View.GONE);
+        });
+
+        // Touch listener to close card when clicking outside (kept as a fallback)
+        mainLayout.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN && resultsCardView.getVisibility() == View.VISIBLE) {
+                int[] location = new int[2];
+                resultsCardView.getLocationOnScreen(location);
+                int left = location[0];
+                int top = location[1];
+                int right = left + resultsCardView.getWidth();
+                int bottom = top + resultsCardView.getHeight();
+
+                if (!(event.getRawX() >= left && event.getRawX() <= right &&
+                        event.getRawY() >= top && event.getRawY() <= bottom)) {
+                    resultsCardView.setVisibility(View.GONE);
+                    binding.fabCreateQuiz.setVisibility("teacher".equals(userRole) ? View.VISIBLE : View.GONE);
+                    return true;
+                }
+            }
+            return false;
         });
 
         // Hide the FAB initially until the role is verified
@@ -84,6 +116,7 @@ public class examQuizesMainActivity extends AppCompatActivity
         setupFab();
     }
 
+    // Rest of the code remains unchanged...
     private void setupToolbar() {
         setSupportActionBar(binding.toolbar);
         binding.toolbar.setNavigationOnClickListener(v -> onBackPressed());

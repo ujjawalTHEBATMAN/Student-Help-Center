@@ -332,7 +332,9 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="8dp"
-                                    android:buttonTint="@color/colorPrimary" />
+                                    android:buttonTint="@color/colorPrimary"
+                                    android:clickable="false"
+                                    android:focusable="false" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -383,7 +385,9 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="8dp"
-                                    android:buttonTint="@color/colorPrimary" />
+                                    android:buttonTint="@color/colorPrimary"
+                                    android:clickable="false"
+                                    android:focusable="false" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -434,7 +438,9 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="8dp"
-                                    android:buttonTint="@color/colorPrimary" />
+                                    android:buttonTint="@color/colorPrimary"
+                                    android:clickable="false"
+                                    android:focusable="false" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -484,7 +490,9 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="8dp"
-                                    android:buttonTint="@color/colorPrimary" />
+                                    android:buttonTint="@color/colorPrimary"
+                                    android:clickable="false"
+                                    android:focusable="false" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
