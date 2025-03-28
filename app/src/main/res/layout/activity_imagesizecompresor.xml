@@ -12,15 +12,17 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/primary"
         android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Image Compressor"
+            android:background="@color/primary"
             app:navigationIcon="@drawable/ic_arrow_back"
-            app:titleTextColor="@color/colorOnPrimary"/>
+            app:title="Image Compressor"
+            app:titleTextColor="@color/on_primary"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -33,13 +35,15 @@
             android:layout_height="wrap_content"
             android:paddingBottom="16dp">
 
+            <!-- Image Selection Card -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/imageSelectionCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -48,12 +52,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Select an Image"
+                        android:textColor="@color/text_primary"
                         android:textAppearance="?attr/textAppearanceHeadline6"/>
 
                     <TextView
@@ -61,6 +66,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="Choose an image from your gallery or take a new photo"
+                        android:textColor="@color/text_secondary"
                         android:textAppearance="?attr/textAppearanceBody2"/>
 
                     <LinearLayout
@@ -72,12 +78,19 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSelect"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_weight="1"
                             android:text="Gallery"
-                            app:icon="@drawable/ic_chat"/>
+                            app:backgroundTint="@color/card_background"
+                            app:iconTint="@color/primary"
+                            app:strokeColor="@color/primary"
+                            app:strokeWidth="1dp"
+                            app:icon="@drawable/ic_image"
+                            app:rippleColor="@color/ripple_color"
+                            android:textColor="@color/primary"/>
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnCamera"
@@ -86,18 +99,25 @@
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
                             android:text="Camera"
-                            app:icon="@drawable/ic_camera"/>
+                            app:backgroundTint="@color/primary"
+                            app:icon="@drawable/ic_camera"
+                            app:iconTint="@color/on_primary"
+                            app:rippleColor="@color/ripple_color"
+                            android:textColor="@color/on_primary"/>
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Image Preview Card -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/imagePreviewCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageSelectionCard">
@@ -120,7 +140,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/default_image"/>
+                            android:src="@drawable/image_compreser"/>
 
                         <ImageView
                             android:id="@+id/imageView"
@@ -134,8 +154,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="bottom"
-                            android:background="#80000000"
-                            android:padding="8dp"
+                            android:background="@color/dialog_background"
+                            android:padding="12dp"
                             android:visibility="gone">
 
                             <LinearLayout
@@ -147,7 +167,7 @@
                                     android:id="@+id/imageNameText"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:textColor="@color/white"
+                                    android:textColor="@color/on_primary"
                                     android:textSize="16sp"
                                     android:textStyle="bold"
                                     tools:text="Image.jpg"/>
@@ -156,7 +176,7 @@
                                     android:id="@+id/imageDimensionsText"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:textColor="@color/white"
+                                    android:textColor="@color/on_primary"
                                     android:textSize="14sp"
                                     tools:text="1920 × 1080 px"/>
 
@@ -164,7 +184,7 @@
                                     android:id="@+id/imageSizeText"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:textColor="@color/white"
+                                    android:textColor="@color/on_primary"
                                     android:textSize="14sp"
                                     tools:text="5.2 MB"/>
                             </LinearLayout>
@@ -175,22 +195,27 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="end|top"
-                            android:layout_margin="8dp"
+                            android:layout_margin="12dp"
                             android:contentDescription="Full screen preview"
-                            android:src="@drawable/ic_chat"
+                            android:src="@drawable/ic_fullscreen_enter"
                             android:visibility="gone"
-                            app:fabSize="mini"/>
+                            app:backgroundTint="@color/colorAccent"
+                            app:fabSize="mini"
+                            app:tint="@color/on_primary"/>
                     </FrameLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Compression Settings Card -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/compressionSettingsCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imagePreviewCard">
@@ -199,12 +224,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Compression Settings"
+                        android:textColor="@color/text_primary"
                         android:textAppearance="?attr/textAppearanceHeadline6"/>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -213,13 +239,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
-                        android:hint="Format">
+                        android:hint="Format"
+                        app:boxStrokeColor="@color/outline"
+                        app:hintTextColor="@color/outline">
 
                         <AutoCompleteTextView
                             android:id="@+id/formatSpinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:inputType="none"/>
+                            android:inputType="none"
+                            android:textColor="@color/text_primary"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
@@ -227,6 +256,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="Quality"
+                        android:textColor="@color/text_primary"
                         android:textAppearance="?attr/textAppearanceSubtitle1"/>
 
                     <com.google.android.material.slider.Slider
@@ -236,27 +266,38 @@
                         android:layout_marginTop="8dp"
                         android:valueFrom="1"
                         android:valueTo="100"
+                        app:haloColor="@color/colorAccent"
                         app:labelBehavior="floating"
-                        app:labelStyle="@style/Widget.Material3.Tooltip"/>
+                        app:labelStyle="@style/Widget.Material3.Tooltip"
+                        app:thumbColor="@color/colorAccent"
+                        app:trackColorActive="@color/colorAccent"
+                        app:trackColorInactive="@color/progress_track"/>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnCompress"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginTop="24dp"
                         android:text="Compress Image"
-                        app:icon="@drawable/ic_chat"/>
+                        app:backgroundTint="@color/primary"
+                        app:icon="@drawable/ic_chat"
+                        app:iconTint="@color/on_primary"
+                        app:rippleColor="@color/ripple_color"
+                        android:textColor="@color/on_primary"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Result Card -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/resultLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
                 android:visibility="gone"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/card_background"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/compressionSettingsCard">
@@ -265,15 +306,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="20dp">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Compression Results"
+                        android:textColor="@color/text_primary"
                         android:textAppearance="?attr/textAppearanceHeadline6"/>
 
-                    <!-- Thumbnails for Original and Compressed Images -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -291,14 +332,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Original"
+                                android:textColor="@color/text_secondary"
                                 android:textAppearance="?attr/textAppearanceSubtitle2"/>
 
                             <androidx.cardview.widget.CardView
                                 android:layout_width="80dp"
                                 android:layout_height="80dp"
                                 android:layout_marginTop="8dp"
-                                app:cardCornerRadius="4dp"
-                                app:cardElevation="2dp">
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="4dp">
 
                                 <ImageView
                                     android:id="@+id/originalThumbnail"
@@ -319,14 +361,15 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Compressed"
+                                android:textColor="@color/text_secondary"
                                 android:textAppearance="?attr/textAppearanceSubtitle2"/>
 
                             <androidx.cardview.widget.CardView
                                 android:layout_width="80dp"
                                 android:layout_height="80dp"
                                 android:layout_marginTop="8dp"
-                                app:cardCornerRadius="4dp"
-                                app:cardElevation="2dp">
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="4dp">
 
                                 <ImageView
                                     android:id="@+id/compressedThumbnail"
@@ -337,16 +380,15 @@
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- New TextView to display detailed comparison info -->
                     <TextView
                         android:id="@+id/comparisonText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="Comparison details will appear here..."
+                        android:textColor="@color/text_secondary"
                         android:textAppearance="?attr/textAppearanceBody1"/>
 
-                    <!-- Share and Save Buttons -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -361,7 +403,13 @@
                             android:layout_marginEnd="8dp"
                             android:layout_weight="1"
                             android:text="Share"
-                            app:icon="@drawable/ic_chat"/>
+                            app:backgroundTint="@color/card_background"
+                            app:icon="@drawable/ic_share"
+                            app:iconTint="@color/primary"
+                            app:rippleColor="@color/ripple_color"
+                            app:strokeColor="@color/primary"
+                            app:strokeWidth="1dp"
+                            android:textColor="@color/primary"/>
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSave"
@@ -370,7 +418,11 @@
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
                             android:text="Save"
-                            app:icon="@drawable/ic_chat"/>
+                            app:backgroundTint="@color/primary"
+                            app:icon="@drawable/ic_save"
+                            app:iconTint="@color/on_primary"
+                            app:rippleColor="@color/ripple_color"
+                            android:textColor="@color/on_primary"/>
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
