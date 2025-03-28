@@ -20,14 +20,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.abcd.ExamQuizes.Question;
 import com.example.abcd.ExamQuizes.Quiz;
 import com.example.abcd.ExamQuizes.QuizResult;
-import com.example.abcd.ExamQuizes.QuizResultsActivity;
 import com.example.abcd.ExamQuizes.examQuizesMainActivity;
 import com.example.abcd.ExamQuizes.quizesAnalyses;
 import com.example.abcd.R;
 import com.example.abcd.utils.SessionManager;
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,17 +47,9 @@ public class QuizActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView tvPointsInfo;
     private TextView tvOption1, tvOption2, tvOption3, tvOption4;
-    private MaterialCardView optionCard1;
-    private MaterialCardView optionCard2;
-    private MaterialCardView optionCard3;
-    private MaterialCardView optionCard4;
-    private RadioButton rbOption1;
-    private RadioButton rbOption2;
-    private RadioButton rbOption3;
-    private RadioButton rbOption4;
-    private Button btnPrevious;
-    private Button btnNext;
-    private Button btnSubmit;
+    private MaterialCardView optionCard1, optionCard2, optionCard3, optionCard4;
+    private RadioButton rbOption1, rbOption2, rbOption3, rbOption4;
+    private Button btnPrevious, btnNext, btnSubmit;
     private Quiz currentQuiz;
     private CountDownTimer quizTimer;
     private int currentQuestionIndex = 0;
@@ -64,11 +58,34 @@ public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private SessionManager sessionManager;
     private DatabaseReference resultsRef;
+    private DatabaseReference usersRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
+
+        initializeViews();
+
+        sessionManager = new SessionManager(this);
+        resultsRef = FirebaseDatabase.getInstance().getReference("quiz_results");
+        usersRef = FirebaseDatabase.getInstance().getReference("users");
+
+        currentQuiz = getIntent().getParcelableExtra("SELECTED_QUIZ");
+        if (currentQuiz == null) {
+            Toast.makeText(this, "Error loading quiz data", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        setupQuiz();
+        setupNavigationButtons();
+        setupTimer();
+        setupOptionCards();
+        loadCurrentQuestion();
+    }
+
+    private void initializeViews() {
         tvPointsInfo = findViewById(R.id.tvPointsInfo);
         tvTimer = findViewById(R.id.tvTimer);
         tvQuestionProgress = findViewById(R.id.tvQuestionProgress);
@@ -89,22 +106,6 @@ public class QuizActivity extends AppCompatActivity {
         tvOption2 = findViewById(R.id.tvOption2);
         tvOption3 = findViewById(R.id.tvOption3);
         tvOption4 = findViewById(R.id.tvOption4);
-
-        sessionManager = new SessionManager(this);
-        resultsRef = FirebaseDatabase.getInstance().getReference("quiz_results");
-
-        currentQuiz = getIntent().getParcelableExtra("SELECTED_QUIZ");
-        if (currentQuiz == null) {
-            Toast.makeText(this, "Error loading quiz data", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
-        setupQuiz();
-        setupNavigationButtons();
-        setupTimer();
-        setupOptionCards();
-        loadCurrentQuestion();
     }
 
     private void setupOptionCards() {
@@ -165,9 +166,8 @@ public class QuizActivity extends AppCompatActivity {
         }
         progressBar.setMax(currentQuiz.getQuestions().size());
 
-        // Set dynamic points text
         float marksPerQuestion = currentQuiz.getMarksPerQuestion();
-        String pointsText = String.format(Locale.getDefault(), "%.1f points", marksPerQuestion);
+        String pointsText = String.format(Locale.getDefault(), "%.1f points per question", marksPerQuestion);
         tvPointsInfo.setText(pointsText);
     }
 
@@ -205,7 +205,6 @@ public class QuizActivity extends AppCompatActivity {
         });
 
         btnNext.setOnClickListener(v -> {
-            // Validation: Ensure an answer is selected before moving to the next question.
             if (selectedAnswers.get(currentQuestionIndex) == -1) {
                 Toast.makeText(QuizActivity.this, "Please select an answer", Toast.LENGTH_SHORT).show();
                 return;
@@ -220,7 +219,6 @@ public class QuizActivity extends AppCompatActivity {
         });
 
         btnSubmit.setOnClickListener(v -> {
-            // Validation: Check if all questions have been answered.
             boolean allAnswered = true;
             for (int answer : selectedAnswers) {
                 if (answer == -1) {
@@ -267,28 +265,14 @@ public class QuizActivity extends AppCompatActivity {
         if (selectedOption != -1) {
             MaterialCardView selectedCard = null;
             switch (selectedOption) {
-                case 0:
-                    selectedCard = optionCard1;
-                    break;
-                case 1:
-                    selectedCard = optionCard2;
-                    break;
-                case 2:
-                    selectedCard = optionCard3;
-                    break;
-                case 3:
-                    selectedCard = optionCard4;
-                    break;
+                case 0: selectedCard = optionCard1; rbOption1.setChecked(true); break;
+                case 1: selectedCard = optionCard2; rbOption2.setChecked(true); break;
+                case 2: selectedCard = optionCard3; rbOption3.setChecked(true); break;
+                case 3: selectedCard = optionCard4; rbOption4.setChecked(true); break;
             }
             if (selectedCard != null) {
                 selectedCard.setCardBackgroundColor(getColor(R.color.selectedOptionBackground));
                 selectedCard.setStrokeWidth(2);
-                switch (selectedOption) {
-                    case 0: rbOption1.setChecked(true); break;
-                    case 1: rbOption2.setChecked(true); break;
-                    case 2: rbOption3.setChecked(true); break;
-                    case 3: rbOption4.setChecked(true); break;
-                }
             }
         }
         updateNavigationControls();
@@ -344,6 +328,7 @@ public class QuizActivity extends AppCompatActivity {
 
         QuizResult result = calculateResult();
         saveResultToFirebase(result);
+        updateUserProfileStats(result);
         saveQuizAnalysisData();
     }
 
@@ -379,6 +364,45 @@ public class QuizActivity extends AppCompatActivity {
         );
     }
 
+    private void updateUserProfileStats(QuizResult result) {
+        String email = sessionManager.getEmail();
+        if (email == null) return;
+
+        String emailKey = email.replace(".", ",");
+        DatabaseReference userRef = usersRef.child(emailKey).child("stats");
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get current values
+                Long earnedPoints = dataSnapshot.child("earnedPoints").getValue(Long.class);
+                Long totalPoints = dataSnapshot.child("totalPoints").getValue(Long.class);
+                Long totalQuizzes = dataSnapshot.child("totalQuizzes").getValue(Long.class);
+
+                // Set default values if null
+                if (earnedPoints == null) earnedPoints = 0L;
+                if (totalPoints == null) totalPoints = 0L;
+                if (totalQuizzes == null) totalQuizzes = 0L;
+
+                // Update values
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("earnedPoints", earnedPoints + (long)result.getObtainedMarks());
+                updates.put("totalPoints", totalPoints + (long)result.getTotalMarks());
+                updates.put("totalQuizzes", totalQuizzes + 1);
+
+                // Save to Firebase
+                userRef.updateChildren(updates)
+                        .addOnSuccessListener(aVoid -> Log.d(TAG, "User stats updated successfully"))
+                        .addOnFailureListener(e -> Log.e(TAG, "Failed to update user stats: " + e.getMessage()));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "Failed to read user stats: " + databaseError.getMessage());
+            }
+        });
+    }
+
     private void saveResultToFirebase(QuizResult result) {
         String resultId = resultsRef.push().getKey();
         if (resultId != null) {
@@ -404,63 +428,10 @@ public class QuizActivity extends AppCompatActivity {
         Intent analysisIntent = new Intent(this, quizesAnalyses.class);
         analysisIntent.putExtra("email", email);
         analysisIntent.putExtra("subject", subject);
+        analysisIntent.putExtra("obtainedMarks", result.getObtainedMarks());
+        analysisIntent.putExtra("totalMarks", result.getTotalMarks());
         startActivity(analysisIntent);
         finish();
-    }
-
-    private boolean sendResultEmail(QuizResult result) {
-        try {
-            String email = sessionManager.getEmail();
-            if (email == null || email.isEmpty()) {
-                return false;
-            }
-            float percentage = (result.getObtainedMarks() / result.getTotalMarks()) * 100;
-            String dateStr = new SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault()).format(new Date());
-            String emailBody = String.format(Locale.getDefault(), "Hello!\n\nYour Quiz Results:\nSubject: %s\nScore: %.1f/%.1f\nPercentage: %.1f%%\n\nDate: %s\n\nThank you for participating!", currentQuiz.getSubject(), result.getObtainedMarks(), result.getTotalMarks(), percentage, dateStr);
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO)
-                    .setData(Uri.parse("mailto:" + email))
-                    .putExtra(Intent.EXTRA_SUBJECT, "Quiz Results: " + currentQuiz.getSubject())
-                    .putExtra(Intent.EXTRA_TEXT, emailBody);
-            if (emailIntent.resolveActivity(getPackageManager()) != null) {
-                startActivity(emailIntent);
-                Intent mainIntent = new Intent(this, examQuizesMainActivity.class);
-                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(mainIntent);
-                finish();
-                return true;
-            }
-            return false;
-        } catch (Exception e) {
-            Log.e(TAG, "Error sending email", e);
-            return false;
-        }
-    }
-
-    private void showResultDialog(QuizResult result) {
-        float percentage = (result.getObtainedMarks() / result.getTotalMarks()) * 100;
-        String dateStr = new SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault()).format(new Date());
-        String resultMessage = String.format(Locale.getDefault(), "Subject: %s\n\nScore: %.1f/%.1f\nPercentage: %.1f%%\n\nDate: %s", currentQuiz.getSubject(), result.getObtainedMarks(), result.getTotalMarks(), percentage, dateStr);
-        new AlertDialog.Builder(this)
-                .setTitle("Quiz Results")
-                .setMessage(resultMessage)
-                .setPositiveButton("Copy Results", (dialog, which) -> {
-                    ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("Quiz Results", resultMessage);
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(this, "Results copied to clipboard", Toast.LENGTH_SHORT).show();
-                    Intent mainIntent = new Intent(this, examQuizesMainActivity.class);
-                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(mainIntent);
-                    finish();
-                })
-                .setNegativeButton("OK", (dialog, which) -> {
-                    Intent mainIntent = new Intent(this, examQuizesMainActivity.class);
-                    mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(mainIntent);
-                    finish();
-                })
-                .setCancelable(false)
-                .show();
     }
 
     private void saveQuizAnalysisData() {

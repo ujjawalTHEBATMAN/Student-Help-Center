@@ -97,7 +97,8 @@
                                 android:layout_height="wrap_content"
                                 android:text="Software Developer"
                                 android:textSize="16sp"
-                                android:textColor="#7C4DFF"
+                                android:fontFamily="@font/product_sans_bold_ttf"
+                                android:textColor="#ffffff"
                                 android:layout_marginTop="6dp"
                                 android:background="@drawable/rounded_background"
                                 android:padding="4dp"/>    </LinearLayout>

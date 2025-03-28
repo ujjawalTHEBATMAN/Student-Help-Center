@@ -25,28 +25,31 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.example.abcd.R;
 import com.example.abcd.SemestersActivity;
+import com.example.abcd.utils.SessionManager;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class dashboardFragment extends Fragment {
     private MaterialButton lastClickedButton = null;
     private ValueAnimator glowAnimator;
+    private SessionManager sessionManager;
+    private DatabaseReference databaseReference;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dashboard2, container, false);
 
-        // Initialize College Support buttons
-        setupButton(view,R.id.btnTimeTableCreation, examTimeTableCreation.class);
-        setupButton(view, R.id.btnVideos, com.example.abcd.videoplayers1.MainActivity.class);
-        setupButton(view,R.id.btnQuizzes, examQuizesMainActivity.class);
-        setupButton(view, R.id.btnOldPapers, SemestersActivity.class);
-        setupButton(view, R.id.PersonalStorage, CGPACalculatorActivity.class);
-        setupButton(view,R.id.btnCoding, imagesizecompresor.class);
-        setupButton(view,R.id.btnMath, EquationSolver.class);   ///update
-        setupButton(view,R.id.btnDevTools, ocrcapture.class);  /// updated
-        setupButton(view,R.id.btnAIModels, selectChatModel.class);   //// userSearchingActivity
+        // Initialize SessionManager and Firebase
+        sessionManager = new SessionManager(getActivity());
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
 
-        // Initialize Programming section buttons
+        // Initialize College Support buttons
+        setupButtonsBasedOnRole(view);
+
         // Setup profile button
         setupProfileButton(view);
 
@@ -56,10 +59,52 @@ public class dashboardFragment extends Fragment {
         return view;
     }
 
+    private void setupButtonsBasedOnRole(View view) {
+        String userEmail = sessionManager.getEmail();
+        if (userEmail != null) {
+            // Sanitize email for Firebase path (replace . with ,)
+            String emailKey = userEmail.replace(".", ",");
+
+            databaseReference.child(emailKey).child("userRole").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String userRole = dataSnapshot.getValue(String.class);
+
+                    // Setup common buttons for all users
+                    setupButton(view, R.id.btnVideos, com.example.abcd.videoplayers1.MainActivity.class);
+                    setupButton(view, R.id.btnQuizzes, examQuizesMainActivity.class);
+                    setupButton(view, R.id.btnOldPapers, SemestersActivity.class);
+                    setupButton(view, R.id.PersonalStorage, CGPACalculatorActivity.class);
+                    setupButton(view, R.id.btnCoding, imagesizecompresor.class);
+                    setupButton(view, R.id.btnMath, EquationSolver.class);
+                    setupButton(view, R.id.btnDevTools, ocrcapture.class);
+                    setupButton(view, R.id.btnAIModels, selectChatModel.class);
+
+                    // Show TimeTableCreation button only for teachers
+                    MaterialCardView timeTableCard = view.findViewById(R.id.btnTimeTableCreation)
+                            .getParent().getParent() instanceof MaterialCardView ?
+                            (MaterialCardView) view.findViewById(R.id.btnTimeTableCreation)
+                                    .getParent().getParent() : null;
+
+                    if ("teacher".equals(userRole) && timeTableCard != null) {
+                        timeTableCard.setVisibility(View.VISIBLE);
+                        setupButton(view, R.id.btnTimeTableCreation, examTimeTableCreation.class);
+                    } else if (timeTableCard != null) {
+                        timeTableCard.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Handle error
+                }
+            });
+        }
+    }
+
     private void setupProfileButton(View view) {
         MaterialButton profileButton = view.findViewById(R.id.profileButton);
         profileButton.setOnClickListener(v -> {
-            // Add profile button click handling here
             animateButtonClick(profileButton, null);
         });
     }
@@ -69,39 +114,15 @@ public class dashboardFragment extends Fragment {
         MaterialCardView cardView = (MaterialCardView) button.getParent().getParent();
 
         button.setOnClickListener(v -> {
-            // Animate button click
             animateButtonClick(button, cardView);
-
-            // Start activity
             Intent intent = new Intent(getActivity(), activityClass);
             startActivity(intent);
         });
 
-        // Add glow effect to card
-        addGlowEffect(cardView);
-    }
-
-    private void setupProgrammingButton(View view, int buttonId) {
-        MaterialButton button = view.findViewById(buttonId);
-        MaterialCardView cardView = (MaterialCardView) button.getParent().getParent();
-
-        button.setOnClickListener(v -> {
-            // Reset previous button if exists
-            if (lastClickedButton != null && lastClickedButton != button) {
-                resetButtonAnimation(lastClickedButton);
-            }
-
-            // Animate current button
-            animateButtonClick(button, cardView);
-            lastClickedButton = button;
-        });
-
-        // Add glow effect to card
         addGlowEffect(cardView);
     }
 
     private void animateButtonClick(MaterialButton button, MaterialCardView cardView) {
-        // Scale animation for button
         button.animate()
                 .scaleX(0.9f)
                 .scaleY(0.9f)
@@ -117,7 +138,6 @@ public class dashboardFragment extends Fragment {
                 })
                 .start();
 
-        // Glow animation for card if available
         if (cardView != null) {
             ValueAnimator colorAnimator = ValueAnimator.ofObject(
                     new ArgbEvaluator(),
@@ -131,11 +151,6 @@ public class dashboardFragment extends Fragment {
 
             colorAnimator.start();
         }
-    }
-
-    private void resetButtonAnimation(MaterialButton button) {
-        button.setScaleX(1f);
-        button.setScaleY(1f);
     }
 
     private void addGlowEffect(MaterialCardView cardView) {
