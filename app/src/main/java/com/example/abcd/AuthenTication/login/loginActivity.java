@@ -20,11 +20,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class loginActivity extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
     private SessionManager sessionManager;
+    private DatabaseReference usersRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,8 @@ public class loginActivity extends AppCompatActivity {
 
         Log.d("LoginActivity", "onCreate called");
         sessionManager = new SessionManager(this);
+        usersRef = FirebaseDatabase.getInstance().getReference("users");
+
         if (sessionManager.isLoggedIn()) {
             startActivity(new Intent(loginActivity.this, mainDashBoard.class));
             finish();
@@ -53,21 +58,39 @@ public class loginActivity extends AppCompatActivity {
                 Log.d("LoginActivity", "Login button clicked");
                 final String emailInput = binding.etUser.getText().toString().trim();
                 final String passwordInput = binding.etPassword.getText().toString().trim();
+
                 if (TextUtils.isEmpty(emailInput) || TextUtils.isEmpty(passwordInput)) {
                     Toast.makeText(loginActivity.this, "Please enter your email and password", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 String sanitizedEmail = emailInput.replace(".", ",");
-                DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
                 usersRef.child(sanitizedEmail).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             String storedPassword = snapshot.child("password").getValue(String.class);
                             if (passwordInput.equals(storedPassword)) {
-                                sessionManager.setLogin(true, emailInput);
-                                startActivity(new Intent(loginActivity.this, mainDashBoard.class));
-                                finish();
+                                // Prepare login data
+                                Map<String, Object> loginData = new HashMap<>();
+                                loginData.put("email", emailInput);
+                                loginData.put("password", passwordInput);
+                                loginData.put("lastLogin", System.currentTimeMillis());
+                                loginData.put("loginStatus", true);
+
+                                // Update user data in Firebase
+                                usersRef.child(sanitizedEmail).updateChildren(loginData)
+                                        .addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                sessionManager.setLogin(true, emailInput);
+                                                startActivity(new Intent(loginActivity.this, mainDashBoard.class));
+                                                finish();
+                                            } else {
+                                                Toast.makeText(loginActivity.this,
+                                                        "Failed to update login data: " + task.getException().getMessage(),
+                                                        Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
                             } else {
                                 Toast.makeText(loginActivity.this, "Incorrect password", Toast.LENGTH_SHORT).show();
                             }
@@ -75,6 +98,7 @@ public class loginActivity extends AppCompatActivity {
                             Toast.makeText(loginActivity.this, "User not found", Toast.LENGTH_SHORT).show();
                         }
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         Toast.makeText(loginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();

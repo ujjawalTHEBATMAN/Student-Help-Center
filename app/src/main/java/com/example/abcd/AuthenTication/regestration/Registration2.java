@@ -24,7 +24,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,10 +40,7 @@ public class Registration2 extends AppCompatActivity {
     private Button btnNext;
     private String selectedCollegeName = null;
     private String role;
-
-    // Registration info passed from previous activity
     private String regName, regEmail, regPassword, regImagesss;
-
     private DatabaseReference collegesReference;
 
     @Override
@@ -56,13 +52,13 @@ public class Registration2 extends AppCompatActivity {
         fabAddCollege = findViewById(R.id.fabAddCollege);
         btnNext = findViewById(R.id.btnNext);
         btnNext.setEnabled(false);
+
         role = getIntent().getStringExtra("role");
         regName = getIntent().getStringExtra("name");
         regEmail = getIntent().getStringExtra("email");
         regPassword = getIntent().getStringExtra("password");
         regImagesss = getIntent().getStringExtra("imageString");
 
-        // Only show add-college option to admin
         if (role != null && role.toLowerCase(Locale.US).equals("admin")) {
             fabAddCollege.setVisibility(FloatingActionButton.VISIBLE);
         } else {
@@ -117,7 +113,7 @@ public class Registration2 extends AppCompatActivity {
             } else {
                 Intent intent = new Intent(Registration2.this, Registration3.class);
                 intent.putExtra("selectedCollege", selectedCollegeName);
-                intent.putExtra("name", regName);  // Used as the username
+                intent.putExtra("name", regName);
                 intent.putExtra("email", regEmail);
                 intent.putExtra("password", regPassword);
                 intent.putExtra("role", role);
@@ -186,14 +182,12 @@ public class Registration2 extends AppCompatActivity {
         }
     }
 
-
     private void saveAdminDataAndNavigate() {
         DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
         Map<String, Object> userData = new HashMap<>();
         userData.put("email", regEmail);
         userData.put("imageSend", regImagesss);
         userData.put("password", regPassword);
-        // Initialize stats to default values (adjust if needed)
         Map<String, Object> stats = new HashMap<>();
         stats.put("earnedPoints", 0);
         stats.put("totalPoints", 0);
@@ -201,13 +195,13 @@ public class Registration2 extends AppCompatActivity {
         userData.put("stats", stats);
         userData.put("user", regName);
         userData.put("userRole", role);
+        userData.put("college", selectedCollegeName);
+        userData.put("registrationDate", System.currentTimeMillis());
 
-        // Use sanitized email as the key
         String sanitizedEmail = regEmail.replace(".", ",");
         usersRef.child(sanitizedEmail).setValue(userData)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // Use the new SessionManager to mark the user as logged in
                         SessionManager sessionManager = new SessionManager(Registration2.this);
                         sessionManager.setLogin(true, regEmail);
                         Intent dashboardIntent = new Intent(Registration2.this, mainDashBoard.class);
@@ -218,5 +212,4 @@ public class Registration2 extends AppCompatActivity {
                     }
                 });
     }
-
 }

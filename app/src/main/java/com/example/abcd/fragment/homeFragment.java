@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -17,9 +16,6 @@ import com.example.abcd.R;
 import com.example.abcd.SendLiveMessageActivity;
 import com.example.abcd.availableAdminPage;
 import com.example.abcd.models.Message;
-import com.example.abcd.notificationSection.NotifictionActivity;
-import com.example.abcd.selectChatModel;
-import com.example.abcd.userSearch.userSearchingActivity;
 import com.example.abcd.utils.SessionManager;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -29,14 +25,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClickListener {
 
     private RecyclerView recyclerView;
     private String currentUserRole;
-    private DatabaseReference messagesRef, userRef;
+    private DatabaseReference messagesRef, userRef, analyticsRef;
     private List<Message> messagesList;
     private HomeAdapter adapter;
     private SessionManager sessionManager;
@@ -51,16 +52,29 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
             Toast.makeText(getContext(), "Please sign in to continue", Toast.LENGTH_LONG).show();
             return view;
         }
+
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         messagesList = new ArrayList<>();
         adapter = new HomeAdapter(messagesList, false);
         adapter.setOnItemLongClickListener(this);
         recyclerView.setAdapter(adapter);
+
         messagesRef = FirebaseDatabase.getInstance().getReference("messages");
         String sanitizedEmail = userEmail.replace(".", ",");
         userRef = FirebaseDatabase.getInstance().getReference("users").child(sanitizedEmail);
+        analyticsRef = FirebaseDatabase.getInstance().getReference("analytics");
+
         setupUserData();
+        loadMessages();
+        trackPageView(sanitizedEmail);
+
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(v -> startActivity(new Intent(getActivity(), SendLiveMessageActivity.class)));
+        return view;
+    }
+
+    private void loadMessages() {
         messagesRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -81,9 +95,57 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
                 Toast.makeText(getContext(), "Failed to load messages", Toast.LENGTH_SHORT).show();
             }
         });
-        FloatingActionButton fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(v -> startActivity(new Intent(getActivity(), SendLiveMessageActivity.class)));
-        return view;
+    }
+
+    private void trackPageView(String sanitizedEmail) {
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        DatabaseReference dateRef = analyticsRef.child(currentDate);
+
+        // Check if user has already visited today
+        dateRef.child("users").child(sanitizedEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    // User hasn't visited today, increment total views and add user
+                    Map<String, Object> analyticsData = new HashMap<>();
+
+                    // Update total app views
+                    dateRef.child("totalAppViews").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot viewSnapshot) {
+                            long currentViews = viewSnapshot.exists() ? viewSnapshot.getValue(Long.class) : 0;
+                            analyticsData.put("totalAppViews", currentViews + 1);
+
+                            // Add user to today's visitors
+                            Map<String, Object> userData = new HashMap<>();
+                            userData.put("email", sessionManager.getEmail());
+                            userData.put("timestamp", System.currentTimeMillis());
+                            analyticsData.put("users/" + sanitizedEmail, userData);
+
+                            // Update Firebase
+                            dateRef.updateChildren(analyticsData)
+                                    .addOnSuccessListener(aVoid -> {
+                                        // Optional: Toast.makeText(getContext(), "View counted", Toast.LENGTH_SHORT).show();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getContext(), "Failed to update analytics", Toast.LENGTH_SHORT).show();
+                                    });
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(getContext(), "Error reading views: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+                // If user already visited, do nothing
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Error checking user visit: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
