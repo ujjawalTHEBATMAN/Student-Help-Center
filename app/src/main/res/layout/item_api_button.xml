@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="4dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@color/saffron"
+    app:strokeColor="@color/primary_variant"
+    app:strokeWidth="1dp">
+
+<LinearLayout
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="horizontal"
+android:gravity="center_vertical"
+android:padding="16dp"
+android:background="@android:drawable/screen_background_light_transparent" >
+
+<ImageView
+android:id="@+id/imageViewApiIcon"
+android:layout_width="48dp"
+android:layout_height="48dp"
+android:scaleType="fitCenter"
+android:src="@drawable/ic_launcher_background"
+android:layout_marginEnd="16dp"
+    app:tint="@color/black"/>
+
+    <TextView
+android:id="@+id/textViewApiName"
+android:layout_width="0dp"
+android:layout_height="wrap_content"
+android:layout_weight="1"
+android:text="API Name"
+android:textSize="18sp"
+    android:textStyle="bold|italic"
+    android:textColor="@color/text_primary"
+    android:fontFamily="serif"
+    android:shadowColor="@color/gray"
+    android:shadowDx="1"
+    android:shadowDy="1"
+    android:shadowRadius="2" />
+
+    </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>

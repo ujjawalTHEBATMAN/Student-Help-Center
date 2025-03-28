@@ -12,6 +12,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import androidx.fragment.app.Fragment;
 
 import com.example.abcd.ExamQuizes.examQuizesMainActivity;
+import com.example.abcd.ExtrateacherFeatures.examTimeTableCreation;
 import com.example.abcd.MathFeature.CGPACalculatorActivity;
 import com.example.abcd.MathFeature.EquationSolver;
 import com.example.abcd.MathFeature.MathFeatures;
@@ -35,6 +36,7 @@ public class dashboardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_dashboard2, container, false);
 
         // Initialize College Support buttons
+        setupButton(view,R.id.btnTimeTableCreation, examTimeTableCreation.class);
         setupButton(view, R.id.btnVideos, com.example.abcd.videoplayers1.MainActivity.class);
         setupButton(view,R.id.btnQuizzes, examQuizesMainActivity.class);
         setupButton(view, R.id.btnOldPapers, SemestersActivity.class);

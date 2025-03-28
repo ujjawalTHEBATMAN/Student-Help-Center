@@ -144,5 +144,7 @@
     <color name="timerCriticalColor">#F44336</color>
     <color name="pointsBadgeBackground">#E8F5E9</color>
     <color name="pointsBadgeText">#2E7D32</color>
-
+    <color name="material_on_surface_emphasis_high_type">#DE000000</color>
+    <color name="material_on_surface_emphasis_medium">#99000000</color>
+    <color name="material_on_surface_emphasis_low">#1F000000</color>
 </resources>

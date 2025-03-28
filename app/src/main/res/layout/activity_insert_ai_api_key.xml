@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    tools:context=".adminfeature.insertAiApiKey">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/card_background">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Insert AI API Key Configuration"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_color"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/editTextId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ID (e.g., huggingface_inference)"
+            android:inputType="text"
+            android:backgroundTint="@color/gradient_start"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name (e.g., Hugging Face GPT-2)"
+            android:inputType="text"
+            android:backgroundTint="@color/gradient_end"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Base URL"
+            android:textSize="16sp"
+            android:textColor="@color/secondary_color"
+            android:layout_marginBottom="4dp" />
+
+        <Spinner
+            android:id="@+id/spinnerBaseUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorAccent"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextEndpoint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Endpoint (e.g., gpt2)"
+            android:inputType="text"
+            android:backgroundTint="@color/tertiary"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextMethod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Method (e.g., POST)"
+            android:inputType="text"
+            android:text="POST"
+            android:backgroundTint="@color/model_gemma"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextHeaders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Headers (JSON format)"
+            android:inputType="textMultiLine"
+            android:backgroundTint="@color/primary_container"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextRequestBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Request Body (JSON format)"
+            android:inputType="textMultiLine"
+            android:backgroundTint="@color/secondary_container"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextQueryParameters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Query Parameters (JSON format, if applicable)"
+            android:inputType="textMultiLine"
+            android:backgroundTint="@color/tertiary_container"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextResponseFormat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Response Format (e.g., json)"
+            android:inputType="text"
+            android:text="json"
+            android:backgroundTint="@color/model_distilgpt2"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Parameters (for a single parameter for now)"
+            android:textSize="16sp"
+            android:visibility="gone"
+            android:textColor="@color/tertiary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextParameterName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Parameter Name (e.g., model_name)"
+            android:inputType="text"
+            android:visibility="gone"
+            android:backgroundTint="@color/colorAccentLight"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextParameterType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:hint="Parameter Type (e.g., string, integer)"
+            android:inputType="text"
+            android:backgroundTint="@color/saffron"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextParameterRequired"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Parameter Required (true/false)"
+            android:inputType="text"
+            android:backgroundTint="@color/correct_green"
+            android:visibility="gone"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/editTextParameterDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:hint="Parameter Description"
+            android:inputType="textMultiLine"
+            android:backgroundTint="@color/explanation_background"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/editTextImageUrl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Image URL (if applicable)"
+            android:inputType="textUri"
+            android:backgroundTint="@color/light_blue"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/buttonSaveApiKey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save API Key"
+            android:backgroundTint="@color/buttonBackgroundColor"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+</ScrollView>

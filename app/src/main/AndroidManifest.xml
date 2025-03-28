@@ -52,6 +52,7 @@
         <activity
             android:name=".ExamQuizes.examQuizesMainActivity"
             android:exported="false" />
+
         <activity
             android:name=".ExamQuizes.addQuestionActivity"
             android:exported="false" />
@@ -127,7 +128,7 @@
         <activity
             android:name=".selectChatModel"
             android:exported="false" />
-
+        <activity android:name=".adminfeature.insertAiApiKey"/>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -192,9 +193,11 @@
         <activity
             android:name=".QuizActivity"
             android:exported="false" />
+        <activity android:name=".MessagingActivity" />
         <activity
             android:name=".SubjectSelectionActivity"
             android:exported="false" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

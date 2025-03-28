@@ -1,14 +1,18 @@
 package com.example.abcd.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
+import androidx.fragment.app.Fragment;
 
 import com.example.abcd.R;
+import com.example.abcd.userSearch.userSearchingActivity;
+
+import com.example.abcd.adminfeature.insertAiApiKey;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,28 +21,19 @@ import com.example.abcd.R;
  */
 public class adminhomeFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+
+    private Button adminActionButton1; // Declare the first button
+    private Button adminActionButton2; // Declare the second button
 
     public adminhomeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment adminhomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static adminhomeFragment newInstance(String param1, String param2) {
         adminhomeFragment fragment = new adminhomeFragment();
         Bundle args = new Bundle();
@@ -60,7 +55,33 @@ public class adminhomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_adminhome, container, false);
+        View view = inflater.inflate(R.layout.fragment_adminhome, container, false);
+
+        // Get the reference to the first button
+        adminActionButton1 = view.findViewById(R.id.adminActionButton1);
+
+        // Set OnClickListener for the first button
+        adminActionButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), userSearchingActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // Get the reference to the second button
+        adminActionButton2 = view.findViewById(R.id.adminActionButton2);
+
+        // Set OnClickListener for the second button
+        adminActionButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create an Intent to navigate to insertAiApiKey
+                Intent intent = new Intent(getActivity(), insertAiApiKey.class);
+                startActivity(intent);
+            }
+        });
+
+        return view;
     }
 }

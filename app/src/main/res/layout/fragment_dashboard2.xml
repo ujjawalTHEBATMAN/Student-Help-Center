@@ -518,7 +518,54 @@
                         android:fontFamily="sans-serif-medium"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                android:layout_margin="8dp"
+                app:cardBackgroundColor="#2C2C2C"
+                app:strokeColor="#3D3D3D"
+                app:strokeWidth="1dp"
+                android:stateListAnimator="@animator/button_state_animator_card"
+                android:clickable="true"
+                android:focusable="true">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:background="@drawable/glow_background">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTimeTableCreation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="72dp"
+                        android:background="@drawable/old_paper"
+                        app:cornerRadius="20dp"
+                        app:rippleColor="#80FFFFFF"
+                        app:strokeWidth="1dp"
+                        app:backgroundTint="@null"
+                        android:insetLeft="0dp"
+                        android:insetTop="0dp"
+                        android:insetRight="0dp"
+                        android:insetBottom="0dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ExamTimeTableCreation"
+                        android:textSize="16sp"
+                        android:textColor="#FFFFFF"
+                        android:textAlignment="center"
+                        android:layout_marginTop="12dp"
+                        android:fontFamily="sans-serif-medium"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </GridLayout>
     </LinearLayout>
 </ScrollView>

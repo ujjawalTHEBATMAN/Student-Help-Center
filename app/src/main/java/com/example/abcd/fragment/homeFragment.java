@@ -44,20 +44,7 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        ImageButton mailButton = view.findViewById(R.id.mailButton);
-        mailButton.setOnClickListener(v -> {
-            if (sessionManager.getEmail() != null) {
-                Intent intent = new Intent(getActivity(), NotifictionActivity.class);
-                intent.putExtra("USER_EMAIL", sessionManager.getEmail());
-                startActivity(intent);
-            } else {
-                Toast.makeText(getContext(), "User not logged in", Toast.LENGTH_SHORT).show();
-            }
-        });
-        ImageButton searchButton = view.findViewById(R.id.searchButton);
-        searchButton.setOnClickListener(v -> checkUserRoleAndNavigate(userSearchingActivity.class));
-        ImageButton chatButton = view.findViewById(R.id.chatButton);
-        chatButton.setOnClickListener(v -> checkUserRoleAndNavigate(selectChatModel.class));
+
         sessionManager = new SessionManager(requireContext());
         String userEmail = sessionManager.getEmail();
         if (userEmail == null || userEmail.isEmpty()) {
