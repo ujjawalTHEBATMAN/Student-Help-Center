@@ -40,7 +40,7 @@
             android:layout_height="@dimen/button_height"
             android:layout_margin="8dp"
             android:padding="0dp"
-            android:text="Action 1"
+            android:text="userManagement"
             android:textSize="14sp"
             android:textColor="@color/on_primary"
             android:background="@drawable/button_gradient"
@@ -55,7 +55,7 @@
             android:layout_height="@dimen/button_height"
             android:layout_margin="8dp"
             android:padding="0dp"
-            android:text="Action 2"
+            android:text="AI API Insertion"
             android:textSize="14sp"
             android:textColor="@color/on_primary"
             android:background="@drawable/button_gradient"
@@ -64,20 +64,6 @@
             app:layout_columnWeight="1"
             app:layout_rowWeight="1" />
 
-        <Button
-            android:id="@+id/adminActionButton3"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/button_height"
-            android:layout_margin="8dp"
-            android:padding="0dp"
-            android:text="Action 3"
-            android:textSize="14sp"
-            android:textColor="@color/on_primary"
-            android:background="@drawable/button_gradient"
-            android:elevation="4dp"
-            android:stateListAnimator="@null"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1" />
 
     </androidx.gridlayout.widget.GridLayout>
 
