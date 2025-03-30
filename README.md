@@ -8,7 +8,6 @@ This Android app is a student's one-stop shop for all their academic needs. It p
 
 * **📝 Automatic Resume Maker:**  Create professional resumes effortlessly.
 * **🤖 Chatbot:** Get instant answers to your questions.
-* **🧠 AI-based Assignment Creator:**  Generate creative and engaging assignments.
 * **📚 Study Resources:** Access a wealth of learning materials, including videos and quizzes.
 
 ## Getting Started
