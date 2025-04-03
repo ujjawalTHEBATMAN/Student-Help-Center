@@ -6,15 +6,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.abcd.R;
 import com.example.abcd.SendLiveMessageActivity;
 import com.example.abcd.availableAdminPage;
+import com.example.abcd.adminfeature.Notification.viewAdminNotification;
 import com.example.abcd.models.Message;
 import com.example.abcd.utils.SessionManager;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
@@ -25,6 +29,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,6 +46,7 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
     private List<Message> messagesList;
     private HomeAdapter adapter;
     private SessionManager sessionManager;
+    private ImageView notificationIcon;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,6 +60,7 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
         }
 
         recyclerView = view.findViewById(R.id.recyclerView);
+        notificationIcon = view.findViewById(R.id.notification_icon);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         messagesList = new ArrayList<>();
         adapter = new HomeAdapter(messagesList, false);
@@ -68,10 +75,18 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
         setupUserData();
         loadMessages();
         trackPageView(sanitizedEmail);
+        setupNotificationIcon();
 
         FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(v -> startActivity(new Intent(getActivity(), SendLiveMessageActivity.class)));
         return view;
+    }
+
+    private void setupNotificationIcon() {
+        notificationIcon.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), viewAdminNotification.class);
+            startActivity(intent);
+        });
     }
 
     private void loadMessages() {
@@ -101,32 +116,25 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
         String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
         DatabaseReference dateRef = analyticsRef.child(currentDate);
 
-        // Check if user has already visited today
         dateRef.child("users").child(sanitizedEmail).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    // User hasn't visited today, increment total views and add user
                     Map<String, Object> analyticsData = new HashMap<>();
 
-                    // Update total app views
                     dateRef.child("totalAppViews").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot viewSnapshot) {
                             long currentViews = viewSnapshot.exists() ? viewSnapshot.getValue(Long.class) : 0;
                             analyticsData.put("totalAppViews", currentViews + 1);
 
-                            // Add user to today's visitors
                             Map<String, Object> userData = new HashMap<>();
                             userData.put("email", sessionManager.getEmail());
                             userData.put("timestamp", System.currentTimeMillis());
                             analyticsData.put("users/" + sanitizedEmail, userData);
 
-                            // Update Firebase
                             dateRef.updateChildren(analyticsData)
-                                    .addOnSuccessListener(aVoid -> {
-                                        // Optional: Toast.makeText(getContext(), "View counted", Toast.LENGTH_SHORT).show();
-                                    })
+                                    .addOnSuccessListener(aVoid -> {})
                                     .addOnFailureListener(e -> {
                                         Toast.makeText(getContext(), "Failed to update analytics", Toast.LENGTH_SHORT).show();
                                     });
@@ -138,7 +146,6 @@ public class homeFragment extends Fragment implements HomeAdapter.OnItemLongClic
                         }
                     });
                 }
-                // If user already visited, do nothing
             }
 
             @Override

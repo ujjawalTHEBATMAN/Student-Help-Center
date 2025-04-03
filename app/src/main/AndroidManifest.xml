@@ -38,6 +38,18 @@
         android:theme="@style/Theme.Abcd"
         tools:targetApi="31">
         <activity
+            android:name=".adminfeature.feedback.ShowFeedback"
+            android:exported="false" />
+        <activity
+            android:name=".adminfeature.feedback.FeedbackCreation"
+            android:exported="false" />
+        <activity
+            android:name=".adminfeature.Notification.viewAdminNotification"
+            android:exported="false" />
+        <activity
+            android:name=".adminfeature.Notification.CreateAdminNotification"
+            android:exported="false" />
+        <activity
             android:name=".adminfeature.FeatureUsageDetailsActivity"
             android:exported="false" />
         <activity

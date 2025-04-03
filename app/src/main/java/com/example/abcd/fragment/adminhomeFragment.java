@@ -18,7 +18,9 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.abcd.R;
 import com.example.abcd.adminfeature.AllAdminDisplay;
+import com.example.abcd.adminfeature.Notification.CreateAdminNotification;
 import com.example.abcd.adminfeature.TotalActivityToday;
+import com.example.abcd.adminfeature.feedback.ShowFeedback;
 import com.example.abcd.selectChatModel;
 import com.example.abcd.userSearch.userSearchingActivity;
 import com.example.abcd.adminfeature.insertAiApiKey;
@@ -47,7 +49,7 @@ public class adminhomeFragment extends Fragment {
     private ImageView ivProfile;
     private MaterialCardView  activeUsersCard;
     private DatabaseReference databaseReference;
-    private MaterialButton btnViewAll, btnInsertApiKey; // Removed btnMessageEditView
+    private MaterialButton btnViewAll, btnInsertApiKey,notification1,FeedBackShow1; // Removed btnMessageEditView
     private MaterialCardView totalUsersCard;
     private SessionManager sessionManager;
     private String email;
@@ -90,6 +92,8 @@ public class adminhomeFragment extends Fragment {
         btnViewAll = view.findViewById(R.id.btnViewAll);
         btnInsertApiKey = view.findViewById(R.id.btnInsertApiKey); // Now outside card
         totalUsersCard = view.findViewById(R.id.totalUsersCard);
+        notification1=view.findViewById(R.id.notification);
+        FeedBackShow1=view.findViewById(R.id.FeedBackShow);
     }
 
     private void addGraphViewToActivityCard(View view) {
@@ -174,6 +178,15 @@ public class adminhomeFragment extends Fragment {
     }
 
     private void setupClickListeners() {
+        FeedBackShow1.setOnClickListener(v->{
+            Intent intent = new Intent(requireContext(), ShowFeedback.class);
+            startActivity(intent);
+        });
+        notification1.setOnClickListener(v -> {
+            Intent intent = new Intent(requireContext(), CreateAdminNotification.class);
+            startActivity(intent);
+        });
+
         btnViewAll.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), AllAdminDisplay.class);
             startActivity(intent);

@@ -32,6 +32,7 @@ import com.cloudinary.android.callback.UploadCallback;
 import com.example.abcd.AuthenTication.login.loginActivity;
 import com.example.abcd.EditUserActivity;
 import com.example.abcd.R;
+import com.example.abcd.adminfeature.feedback.FeedbackCreation;
 import com.example.abcd.loginActivity1;
 import com.example.abcd.firebaseLogin.HelperClassPOJO;
 import com.example.abcd.models.UserStats;
@@ -66,7 +67,7 @@ public class ProfileFragment extends Fragment {
     // Profile Basic Information Views
     private MaterialTextView tvUsername, tvUserEmail, tvUserRole;
     private MaterialTextView tvPostsCount, tvFollowersCount, tvFollowingCount;
-    private MaterialButton btnLogout;
+    private MaterialButton btnLogout,btnCreateFeedback2;
     private ShapeableImageView profileImage;
     private Toolbar toolbar;
     private ImageButton imageButton;
@@ -157,6 +158,7 @@ public class ProfileFragment extends Fragment {
         imageButton.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), storage.class))
         );
+        btnCreateFeedback2.setOnClickListener(v->startActivity(new Intent(getContext(), FeedbackCreation.class)));
     }
 
     @SuppressLint("WrongViewCast")
@@ -168,7 +170,7 @@ public class ProfileFragment extends Fragment {
         tvUserRole = rootView.findViewById(R.id.tvUserRole);
         profileImage = rootView.findViewById(R.id.profileImage);
         imageButton = rootView.findViewById(R.id.imageButton);
-
+        btnCreateFeedback2 = rootView.findViewById(R.id.btnCreateFeedback);
         // Profile Stats
         tvPostsCount = rootView.findViewById(R.id.tvPostsCount);
         tvFollowersCount = rootView.findViewById(R.id.tvFollowersCount);
