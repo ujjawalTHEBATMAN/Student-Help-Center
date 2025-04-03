@@ -16,27 +16,19 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
 
     private final List<HelperClassPOJO> userList;
     private final OnItemClickListener listener;
+    private final OnDeleteClickListener deleteListener;
 
     public interface OnItemClickListener {
         void onItemClick(HelperClassPOJO user);
     }
 
-
-
-
-
-    private final OnDeleteClickListener deleteListener;
-
     public interface OnDeleteClickListener {
         void onDeleteClick(HelperClassPOJO user);
     }
 
-
-
     public UserSearchAdapter(List<HelperClassPOJO> userList,
                              OnItemClickListener listener,
                              OnDeleteClickListener deleteListener) {
-        // Update constructor
         this.userList = userList;
         this.listener = listener;
         this.deleteListener = deleteListener;
@@ -59,7 +51,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
                 deleteListener.onDeleteClick(user);
             }
         });
-        // Load profile image
+
         if (user.getImageSend() != null && !user.getImageSend().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(user.getImageSend())
@@ -70,11 +62,9 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
             holder.ivUserProfile.setImageResource(R.drawable.ic_default_profile);
         }
 
-        // Set user data
         holder.tvUserName.setText(user.getUser());
         holder.tvUserEmail.setText(user.getEmail());
 
-        // Set click listener
         holder.itemView.setOnClickListener(v -> listener.onItemClick(user));
     }
 
@@ -84,7 +74,7 @@ public class UserSearchAdapter extends RecyclerView.Adapter<UserSearchAdapter.Us
     }
 
     static class UserViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivUserProfile,ivDelete;
+        ImageView ivUserProfile, ivDelete;
         TextView tvUserName, tvUserEmail;
 
         public UserViewHolder(@NonNull View itemView) {

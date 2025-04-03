@@ -7,4 +7,56 @@
     android:layout_height="match_parent"
     tools:context=".adminfeature.AllAdminDisplay">
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/crashlyticsCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="6dp"
+        android:padding="16dp"
+        app:cardBackgroundColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Crashlytics Title -->
+            <TextView
+                android:id="@+id/titleCrashlytics"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Crashlytics"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:layout_gravity="center_horizontal"/>
+
+            <!-- Crash Button -->
+            <Button
+                android:id="@+id/btnCrash"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Force Crash"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/red"
+                android:textColor="@color/white"/>
+            <Button
+                android:id="@+id/btnDeepAnalyze"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Deep Analyze"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="@color/blue"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

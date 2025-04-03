@@ -16,6 +16,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,19 +36,18 @@ public class userSearchingActivity extends AppCompatActivity {
         userList = new ArrayList<>();
         adapter = new UserSearchAdapter(userList,
                 user -> {
-                    // Existing click handler
                     Intent intent = new Intent(this, UserProfileActivity.class);
                     intent.putExtra("USER_EMAIL", user.getEmail());
                     startActivity(intent);
                 },
                 user -> {
-                    // New delete handler
+                    String userKey = user.getEmail().replace(".", ",");
                     FirebaseDatabase.getInstance().getReference("users")
-                            .child(user.getEmail().replace(".", ",")) // Assuming email is the node key
+                            .child(userKey)
                             .removeValue()
                             .addOnSuccessListener(aVoid -> {
-                                // Optional: Show confirmation toast
                                 Toast.makeText(this, "User deleted", Toast.LENGTH_SHORT).show();
+                                loadAllUsers(); // Refresh list after deletion
                             })
                             .addOnFailureListener(e -> {
                                 Toast.makeText(this, "Delete failed: " + e.getMessage(),
@@ -60,7 +60,8 @@ public class userSearchingActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return false;
+                searchUsers(query);
+                return true;
             }
 
             @Override
@@ -69,31 +70,67 @@ public class userSearchingActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        // Load all users initially
+        loadAllUsers();
+    }
+
+    private void loadAllUsers() {
+        FirebaseDatabase.getInstance().getReference("users")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        userList.clear();
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            HelperClassPOJO user = snapshot.getValue(HelperClassPOJO.class);
+                            if (user != null) {
+                                userList.add(user);
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                        if (userList.isEmpty()) {
+                            Toast.makeText(userSearchingActivity.this,
+                                    "No users found", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Toast.makeText(userSearchingActivity.this,
+                                "Error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void searchUsers(String searchText) {
-        Query query = FirebaseDatabase.getInstance().getReference("users")
-                .orderByChild("user")
-                .startAt(searchText)
-                .endAt(searchText + "\uf8ff");
+        Query query;
+        if (searchText.isEmpty()) {
+            loadAllUsers();
+        } else {
+            query = FirebaseDatabase.getInstance().getReference("users")
+                    .orderByChild("user")
+                    .startAt(searchText)
+                    .endAt(searchText + "\uf8ff");
 
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                userList.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    HelperClassPOJO user = snapshot.getValue(HelperClassPOJO.class);
-                    if (user != null) {
-                        userList.add(user);
+            query.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    userList.clear();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        HelperClassPOJO user = snapshot.getValue(HelperClassPOJO.class);
+                        if (user != null) {
+                            userList.add(user);
+                        }
                     }
+                    adapter.notifyDataSetChanged();
                 }
-                adapter.notifyDataSetChanged();
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle error
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(userSearchingActivity.this,
+                            "Search error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }

@@ -1,0 +1,163 @@
+package com.example.abcd.adminfeature;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.SearchView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.abcd.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+public class TotalActivityToday extends AppCompatActivity {
+
+    private RecyclerView recyclerView;
+    private ActiveUserAdapter adapter;
+    private List<ActiveUser> userList;
+    private List<ActiveUser> filteredList;
+    private ProgressBar progressBar;
+    private TextView tvTotalCount;
+    private SearchView searchView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_total_today);
+
+        initializeViews();
+        setupRecyclerView();
+        loadTodayActiveUsers();
+    }
+
+    private void initializeViews() {
+        recyclerView = findViewById(R.id.recyclerViewActiveUsers);
+        progressBar = findViewById(R.id.progressBar);
+        tvTotalCount = findViewById(R.id.tvTotalCount);
+        searchView = findViewById(R.id.searchView);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filterUsers(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterUsers(newText);
+                return true;
+            }
+        });
+    }
+
+    private void setupRecyclerView() {
+        userList = new ArrayList<>();
+        filteredList = new ArrayList<>();
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ActiveUserAdapter(filteredList, this::showFeatureDialog);
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void showFeatureDialog(ActiveUser user) {
+        // This method is still kept for backward compatibility
+        // but the main functionality is now handled in the adapter
+        // by starting the FeatureUsageDetailsActivity
+    }
+
+    private void loadTodayActiveUsers() {
+        String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        progressBar.setVisibility(View.VISIBLE);
+
+        FirebaseDatabase.getInstance()
+                .getReference("analytics")
+                .child(todayDate)
+                .child("users")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        userList.clear();
+                        filteredList.clear();
+
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            String email = userSnapshot.child("email").getValue(String.class);
+                            Long timestamp = userSnapshot.child("timestamp").getValue(Long.class);
+
+                            if (email != null && timestamp != null) {
+                                ActiveUser user = new ActiveUser(email, timestamp);
+                                userList.add(user);
+                                filteredList.add(user);
+                            }
+                        }
+
+                        updateUI();
+                        progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(TotalActivityToday.this,
+                                "Error loading data: " + error.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
+    }
+
+    private void filterUsers(String query) {
+        filteredList.clear();
+        if (query.isEmpty()) {
+            filteredList.addAll(userList);
+        } else {
+            String lowerQuery = query.toLowerCase();
+            for (ActiveUser user : userList) {
+                if (user.getEmail().toLowerCase().contains(lowerQuery)) {
+                    filteredList.add(user);
+                }
+            }
+        }
+        adapter.notifyDataSetChanged();
+        updateTotalCount();
+    }
+
+    private void updateUI() {
+        adapter.notifyDataSetChanged();
+        updateTotalCount();
+    }
+
+    private void updateTotalCount() {
+        tvTotalCount.setText(String.format("Total Active Today: %d", filteredList.size()));
+    }
+
+    public static class ActiveUser {
+        private String email;
+        private long timestamp;
+
+        public ActiveUser(String email, long timestamp) {
+            this.email = email;
+            this.timestamp = timestamp;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+    }
+}

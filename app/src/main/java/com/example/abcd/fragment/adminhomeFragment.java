@@ -1,3 +1,4 @@
+// adminhomeFragment.java
 package com.example.abcd.fragment;
 
 import android.content.Intent;
@@ -17,12 +18,14 @@ import androidx.fragment.app.Fragment;
 import com.bumptech.glide.Glide;
 import com.example.abcd.R;
 import com.example.abcd.adminfeature.AllAdminDisplay;
-import com.example.abcd.adminfeature.MessageEditViewAdmin;
-import com.example.abcd.adminfeature.insertAiApiKey;
+import com.example.abcd.adminfeature.TotalActivityToday;
+import com.example.abcd.selectChatModel;
 import com.example.abcd.userSearch.userSearchingActivity;
+import com.example.abcd.adminfeature.insertAiApiKey;
 import com.example.abcd.utils.SessionManager;
 import com.example.abcd.view.CustomGraphView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,13 +45,14 @@ public class adminhomeFragment extends Fragment {
     private TextView tvWelcome, tvDate, tvTotalUsers, tvActiveUsers;
     private CustomGraphView graphView;
     private ImageView ivProfile;
+    private MaterialCardView  activeUsersCard;
     private DatabaseReference databaseReference;
-    private MaterialButton btnViewAll, btnInsertApiKey, btnMessageEditView;
+    private MaterialButton btnViewAll, btnInsertApiKey; // Removed btnMessageEditView
+    private MaterialCardView totalUsersCard;
     private SessionManager sessionManager;
     private String email;
 
     public adminhomeFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -77,14 +81,15 @@ public class adminhomeFragment extends Fragment {
     }
 
     private void initializeViews(View view) {
+        activeUsersCard = view.findViewById(R.id.activeUsersCard);
         tvWelcome = view.findViewById(R.id.tvWelcome);
         tvDate = view.findViewById(R.id.tvDate);
         tvTotalUsers = view.findViewById(R.id.tvTotalUsers);
         tvActiveUsers = view.findViewById(R.id.tvActiveUsers);
         ivProfile = view.findViewById(R.id.ivProfile);
         btnViewAll = view.findViewById(R.id.btnViewAll);
-        btnInsertApiKey = view.findViewById(R.id.btnInsertApiKey);
-        btnMessageEditView = view.findViewById(R.id.btnMessageEditView);
+        btnInsertApiKey = view.findViewById(R.id.btnInsertApiKey); // Now outside card
+        totalUsersCard = view.findViewById(R.id.totalUsersCard);
     }
 
     private void addGraphViewToActivityCard(View view) {
@@ -120,7 +125,7 @@ public class adminhomeFragment extends Fragment {
     private void setDynamicDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.getDefault());
         String currentDate = dateFormat.format(new Date());
-        tvDate.setText(currentDate); // Fixed: Changed tvInnerhalb to tvDate
+        tvDate.setText(currentDate);
     }
 
     private void loadProfileImageFromFirebase() {
@@ -179,10 +184,19 @@ public class adminhomeFragment extends Fragment {
             startActivity(intent);
         });
 
-        btnMessageEditView.setOnClickListener(v -> {
-            Intent intent = new Intent(requireContext(), userSearchingActivity.class);
-            startActivity(intent);
-        });
+        if (totalUsersCard != null) {
+            totalUsersCard.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), userSearchingActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        if (activeUsersCard != null) {
+            activeUsersCard.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), TotalActivityToday.class);
+                startActivity(intent);
+            });
+        }
     }
 
     private void loadDashboardData() {

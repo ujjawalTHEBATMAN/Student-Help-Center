@@ -13,7 +13,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header Card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/headerCard"
             android:layout_width="match_parent"
@@ -64,7 +63,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Stats Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,6 +70,7 @@
             android:layout_marginBottom="16dp">
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/totalUsersCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -106,6 +105,7 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/activeUsersCard"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -140,7 +140,6 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
-        <!-- Activity Section -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -184,35 +183,19 @@
                             app:cornerRadius="8dp"
                             style="@style/Widget.Material3.Button.OutlinedButton" />
 
-                        <!-- New Buttons -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center"
-                            android:layout_marginTop="16dp">
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnInsertApiKey"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Insert API Key"
-                                android:layout_marginEnd="8dp"
-                                app:cornerRadius="8dp"
-                                style="@style/Widget.Material3.Button" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnMessageEditView"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Message Edit View"
-                                app:cornerRadius="8dp"
-                                style="@style/Widget.Material3.Button" />
-                        </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnInsertApiKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Insert API Key"
+            app:cornerRadius="8dp"
+            style="@style/Widget.Material3.Button" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
