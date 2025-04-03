@@ -38,12 +38,14 @@
         android:theme="@style/Theme.Abcd"
         tools:targetApi="31">
         <activity
+            android:name=".adminfeature.AllAdminDisplay"
+            android:exported="false" />
+        <activity
             android:name=".DynamicModelsActivity"
             android:exported="false" />
         <activity
             android:name=".ExtrateacherFeatures.examTimeTableCreation"
             android:exported="false" />
-
         <activity
             android:name=".ImagePreviewActivity"
             android:exported="false" />
