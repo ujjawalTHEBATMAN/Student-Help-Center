@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import com.example.abcd.ExamQuizes.examQuizesMainActivity;
 import com.example.abcd.ExtrateacherFeatures.examTimeTableCreation;
 import com.example.abcd.MathFeature.CGPACalculatorActivity;
+import com.example.abcd.MathFeature.EquationSolver;
 import com.example.abcd.MathFeature.MathFeatures;
 import com.example.abcd.R;
 import com.example.abcd.SemestersActivity;
@@ -44,7 +45,7 @@ public class dashboardFragment extends Fragment {
     private ValueAnimator glowAnimator;
     private SessionManager sessionManager;
     private DatabaseReference databaseReference;
-    private TextView toolbarTitle; // Using existing toolbarTitle to show stats
+    private TextView toolbarTitle;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,10 +58,10 @@ public class dashboardFragment extends Fragment {
 
         // Initialize views
         toolbarTitle = view.findViewById(R.id.toolbarTitle);
+        toolbarTitle.setText("Dashboard"); // Set static title
 
-        // Setup buttons and load stats
+        // Setup buttons
         setupButtonsBasedOnRole(view);
-        loadFeatureStats();
 
         // Setup profile button
         setupProfileButton(view);
@@ -87,7 +88,7 @@ public class dashboardFragment extends Fragment {
                     setupButton(view, R.id.btnOldPapers, SemestersActivity.class, "old_paper");
                     setupButton(view, R.id.btnCoding, imagesizecompresor.class, "imagesize_compressor");
                     setupButton(view, R.id.btnDevTools, ocrcapture.class, "doc_scanner");
-                    setupButton(view, R.id.btnMath, MathFeatures.class, "math_feature");
+                    setupButton(view, R.id.btnMath, EquationSolver.class, "math_feature");
                     setupButton(view, R.id.btnAIModels, selectChatModel.class, "message");
                     setupButton(view, R.id.PersonalStorage, CGPACalculatorActivity.class, "cgpa_calculator");
 
@@ -130,7 +131,7 @@ public class dashboardFragment extends Fragment {
             Intent intent = new Intent(getActivity(), activityClass);
             startActivity(intent);
 
-            // Update feature usage if applicable
+            // Update feature usage if applicable (kept for analytics)
             if (featureKey != null) {
                 updateFeatureUsage(featureKey);
             }
@@ -160,7 +161,6 @@ public class dashboardFragment extends Fragment {
                     Long currentCount = snapshot.getValue(Long.class);
                     if (currentCount == null) currentCount = 0L;
                     featureRef.setValue(currentCount + 1);
-                    loadFeatureStats(); // Refresh stats display
                 }
 
                 @Override
@@ -169,51 +169,6 @@ public class dashboardFragment extends Fragment {
                 }
             });
         }
-    }
-
-    private void loadFeatureStats() {
-        String userEmail = sessionManager.getEmail();
-        if (userEmail != null) {
-            String emailKey = userEmail.replace(".", ",");
-            String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-
-            databaseReference
-                    .child("analytics")
-                    .child(todayDate)
-                    .child("users")
-                    .child(emailKey)
-                    .child("feature_touch")
-                    .child("0")
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.exists()) {
-                                StringBuilder stats = new StringBuilder("Dashboard (Today)\n");
-                                stats.append("V: ").append(getValue(snapshot, "video"))
-                                        .append(" Q: ").append(getValue(snapshot, "quizzes"))
-                                        .append(" OP: ").append(getValue(snapshot, "old_paper"))
-                                        .append(" IC: ").append(getValue(snapshot, "imagesize_compressor"))
-                                        .append(" DS: ").append(getValue(snapshot, "doc_scanner"))
-                                        .append(" M: ").append(getValue(snapshot, "math_feature"))
-                                        .append(" Msg: ").append(getValue(snapshot, "message"))
-                                        .append(" CGPA: ").append(getValue(snapshot, "cgpa_calculator"));
-                                toolbarTitle.setText(stats.toString());
-                            } else {
-                                toolbarTitle.setText("Dashboard (No usage today)");
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            toolbarTitle.setText("Dashboard (Error)");
-                        }
-                    });
-        }
-    }
-
-    private long getValue(DataSnapshot snapshot, String key) {
-        Long value = snapshot.child(key).getValue(Long.class);
-        return value != null ? value : 0;
     }
 
     private void animateButtonClick(MaterialButton button, MaterialCardView cardView) {

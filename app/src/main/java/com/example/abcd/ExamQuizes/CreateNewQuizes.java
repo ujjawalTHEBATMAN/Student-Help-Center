@@ -28,6 +28,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.abcd.R;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -49,29 +50,35 @@ public class CreateNewQuizes extends AppCompatActivity {
     // UI Components and Variables
     private Spinner semesterSpinner, subjectSpinner;
     private Map<String, List<String>> semesterSubjectsMap = new HashMap<>();
-
     private CardView optionsCardView;
     private Button btnExistingQuizzes, btnAddNew;
     private ProgressBar cardProgressBar;
     private DatabaseReference quizzesRef;
-
-    private EditText marksPerQuestionEditText, negativeMarkingEditText;
     private EditText dateEditText, timeEditText, durationEditText;
     private TextView numberOfQuestionsTextView, savedQuestionsCountTextView;
     private Spinner resultViewSpinner;
     private Button saveButton;
-
-    // New UI components for quiz size input inside card view
+    private TextInputLayout quizSizeInputLayout;
     private EditText quizSizeEditText;
     private Button confirmQuizSizeButton;
 
-    private ArrayList<Question> questionsList = new ArrayList<Question>();
+    // New UI elements for marks configuration
+    private TextView marksPerQuestionValue, negativeMarkingValue;
+    private Button marksPerQuestionUpButton, marksPerQuestionDownButton;
+    private Button negativeMarkingUpButton, negativeMarkingDownButton;
+
+    private ArrayList<Question> questionsList = new ArrayList<>();
     private SimpleDateFormat dateFormatter, timeFormatter;
     private Calendar calendar = Calendar.getInstance();
-
-    // Firebase database reference for quizzes
     private DatabaseReference databaseReference;
     private ActivityResultLauncher<Intent> addQuestionsLauncher;
+
+    // Variables to store marks values
+    private float marksPerQuestion = 1.0f;
+    private float negativeMarking = 0.0f;
+    private static final float MARKS_STEP = 0.25f;
+    private static final float MIN_MARKS = 0.0f;
+    private static final float MAX_MARKS = 10.0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +86,6 @@ public class CreateNewQuizes extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_create_new_quizes);
 
-        // Initialize Firebase reference for quizzes
         databaseReference = FirebaseDatabase.getInstance().getReference("quizzes");
 
         setupWindowInsets();
@@ -89,6 +95,7 @@ public class CreateNewQuizes extends AppCompatActivity {
         setupSemesterSubjectSystem();
         setupActivityResultLauncher();
         setupClickListeners();
+        updateMarksDisplay();
     }
 
     private void setupWindowInsets() {
@@ -106,8 +113,6 @@ public class CreateNewQuizes extends AppCompatActivity {
         cardProgressBar = findViewById(R.id.cardProgressBar);
         semesterSpinner = findViewById(R.id.semesterSpinner);
         subjectSpinner = findViewById(R.id.subjectSpinner);
-        marksPerQuestionEditText = findViewById(R.id.marksPerQuestionEditText);
-        negativeMarkingEditText = findViewById(R.id.negativeMarkingEditText);
         dateEditText = findViewById(R.id.dateEditText);
         timeEditText = findViewById(R.id.timeEditText);
         durationEditText = findViewById(R.id.durationEditText);
@@ -116,10 +121,16 @@ public class CreateNewQuizes extends AppCompatActivity {
         saveButton = findViewById(R.id.saveButton);
         numberOfQuestionsTextView = findViewById(R.id.numberOfQuestionsTextView);
         quizzesRef = FirebaseDatabase.getInstance().getReference("quizzes");
-
-        // Initialize new UI elements for quiz size input
+        quizSizeInputLayout = findViewById(R.id.quizSizeInputLayout);
         quizSizeEditText = findViewById(R.id.quizSizeEditText);
         confirmQuizSizeButton = findViewById(R.id.confirmQuizSizeButton);
+
+        marksPerQuestionValue = findViewById(R.id.marksPerQuestionValue);
+        negativeMarkingValue = findViewById(R.id.negativeMarkingValue);
+        marksPerQuestionUpButton = findViewById(R.id.marksPerQuestionUpButton);
+        marksPerQuestionDownButton = findViewById(R.id.marksPerQuestionDownButton);
+        negativeMarkingUpButton = findViewById(R.id.negativeMarkingUpButton);
+        negativeMarkingDownButton = findViewById(R.id.negativeMarkingDownButton);
     }
 
     private void setupDateTimeFormatters() {
@@ -140,18 +151,15 @@ public class CreateNewQuizes extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<String> semesters = new ArrayList<>();
-
                 for (DataSnapshot semesterSnapshot : snapshot.getChildren()) {
                     String semesterKey = semesterSnapshot.getKey();
                     semesters.add(semesterKey.replace("_", " ").toUpperCase());
-
                     List<String> subjects = new ArrayList<>();
                     for (DataSnapshot subjectSnapshot : semesterSnapshot.getChildren()) {
                         subjects.add(subjectSnapshot.getValue(String.class));
                     }
                     semesterSubjectsMap.put(semesterKey, subjects);
                 }
-
                 setupSemesterSpinner(semesters);
             }
 
@@ -188,7 +196,6 @@ public class CreateNewQuizes extends AppCompatActivity {
             subjectSpinner.setAdapter(null);
             return;
         }
-
         ArrayAdapter<String> subjectAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, subjects);
         subjectAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -207,94 +214,109 @@ public class CreateNewQuizes extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        numberOfQuestionsTextView.setOnClickListener(v -> toggleCardView());
+        numberOfQuestionsTextView.setOnClickListener(v -> toggleCardView(true));
 
-        // For "Insert into Database" button, simply launch the addQuestionActivity
         btnAddNew.setOnClickListener(v -> {
             openAddQuestionActivity();
-            optionsCardView.setVisibility(View.GONE);
+            toggleCardView(false);
         });
 
-        // Modified logic for "Get From Available Quizzes" (button 1)
         btnExistingQuizzes.setOnClickListener(v -> {
-            // Show the quiz size input UI and hide the two option buttons
+            quizSizeEditText.setText("");
             btnExistingQuizzes.setVisibility(View.GONE);
             btnAddNew.setVisibility(View.GONE);
-            quizSizeEditText.setVisibility(View.VISIBLE);
+            quizSizeInputLayout.setVisibility(View.VISIBLE);
             confirmQuizSizeButton.setVisibility(View.VISIBLE);
         });
 
-        // Confirm button for quiz size input
         confirmQuizSizeButton.setOnClickListener(v -> {
             String input = quizSizeEditText.getText().toString().trim();
-            if (input.isEmpty()) {
-                Toast.makeText(CreateNewQuizes.this, "Please enter a value", Toast.LENGTH_SHORT).show();
+            if (TextUtils.isEmpty(input)) {
+                quizSizeEditText.setError("Please enter number of questions");
+                Toast.makeText(this, "Please enter a value", Toast.LENGTH_SHORT).show();
                 return;
             }
-            int userInput = Integer.parseInt(input);
-            String subject = subjectSpinner.getSelectedItem() != null ? subjectSpinner.getSelectedItem().toString() : "";
-            if (subject.isEmpty()) {
-                Toast.makeText(CreateNewQuizes.this, "Please select a subject", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            // Query Firebase "Questionbank" to check available questions for the subject
-            DatabaseReference questionBankRef = FirebaseDatabase.getInstance().getReference("Questionbank").child(subject);
-            questionBankRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    int totalAvailable = (int) snapshot.getChildrenCount();
-                    int finalQuizSize = userInput;
-                    if (userInput > totalAvailable) {
-                        finalQuizSize = totalAvailable;
-                        Toast.makeText(CreateNewQuizes.this,
-                                "Input exceeds available questions; using " + totalAvailable, Toast.LENGTH_SHORT).show();
-                    }
-                    // Load available questions from Questionbank with the determined limit
-                    loadExistingQuestionsWithLimit(finalQuizSize);
-                    // Optionally, reset the card view UI
-                    quizSizeEditText.setVisibility(View.GONE);
-                    confirmQuizSizeButton.setVisibility(View.GONE);
-                    // (If needed, you can also restore the two buttons' visibility for later use)
-                    btnExistingQuizzes.setVisibility(View.VISIBLE);
-                    btnAddNew.setVisibility(View.VISIBLE);
-                    optionsCardView.setVisibility(View.GONE);
-                }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(CreateNewQuizes.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            int userInput;
+            try {
+                userInput = Integer.parseInt(input);
+                if (userInput <= 0) {
+                    quizSizeEditText.setError("Enter a number greater than 0");
+                    return;
                 }
-            });
+            } catch (NumberFormatException e) {
+                quizSizeEditText.setError("Invalid number");
+                return;
+            }
+
+            String subject = subjectSpinner.getSelectedItem() != null ?
+                    subjectSpinner.getSelectedItem().toString() : "";
+            if (subject.isEmpty()) {
+                Toast.makeText(this, "Please select a subject first", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            cardProgressBar.setVisibility(View.VISIBLE);
+            loadExistingQuestionsWithLimit(userInput);
         });
 
         dateEditText.setOnClickListener(v -> showDatePicker());
         timeEditText.setOnClickListener(v -> showTimePicker());
         saveButton.setOnClickListener(v -> validateAndSaveQuiz());
+
+        marksPerQuestionUpButton.setOnClickListener(v -> {
+            if (marksPerQuestion < MAX_MARKS) {
+                marksPerQuestion += MARKS_STEP;
+                updateMarksDisplay();
+            }
+        });
+        marksPerQuestionDownButton.setOnClickListener(v -> {
+            if (marksPerQuestion > MIN_MARKS) {
+                marksPerQuestion -= MARKS_STEP;
+                updateMarksDisplay();
+            }
+        });
+
+        negativeMarkingUpButton.setOnClickListener(v -> {
+            if (negativeMarking < MAX_MARKS) {
+                negativeMarking += MARKS_STEP;
+                updateMarksDisplay();
+            }
+        });
+        negativeMarkingDownButton.setOnClickListener(v -> {
+            if (negativeMarking > MIN_MARKS) {
+                negativeMarking -= MARKS_STEP;
+                updateMarksDisplay();
+            }
+        });
     }
 
-    // (Optional) Existing method stub – you can add code if needed.
-    private void loadExistingQuestions() {
-        // Not used in the new flow
-    }
-
-    private void toggleCardView() {
-        if (optionsCardView.getVisibility() == View.VISIBLE) {
-            optionsCardView.setVisibility(View.GONE);
-        } else {
+    private void toggleCardView(boolean show) {
+        if (show) {
             optionsCardView.setVisibility(View.VISIBLE);
-            // Optionally, you can load existing questions count here as before.
+            btnExistingQuizzes.setVisibility(View.VISIBLE);
+            btnAddNew.setVisibility(View.VISIBLE);
+            quizSizeInputLayout.setVisibility(View.GONE);
+            confirmQuizSizeButton.setVisibility(View.GONE);
+            cardProgressBar.setVisibility(View.GONE);
+        } else {
+            optionsCardView.setVisibility(View.GONE);
         }
     }
 
-    // New method to load questions from Questionbank with a limit
-    private void loadExistingQuestionsWithLimit(int limit) {
-        String subject = subjectSpinner.getSelectedItem() != null ? subjectSpinner.getSelectedItem().toString() : "";
+    private void loadExistingQuestionsWithLimit(int requestedLimit) {
+        String subject = subjectSpinner.getSelectedItem() != null ?
+                subjectSpinner.getSelectedItem().toString() : "";
         if (subject.isEmpty()) {
             Toast.makeText(this, "Subject not selected", Toast.LENGTH_SHORT).show();
+            cardProgressBar.setVisibility(View.GONE);
             return;
         }
 
-        DatabaseReference questionBankRef = FirebaseDatabase.getInstance().getReference("Questionbank").child(subject);
+        DatabaseReference questionBankRef = FirebaseDatabase.getInstance()
+                .getReference("Questionbank")
+                .child(subject);
+
         questionBankRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -304,20 +326,14 @@ public class CreateNewQuizes extends AppCompatActivity {
                     Map<String, String> optionsMap = new HashMap<>();
                     int correctAnswer = -1;
 
-                    if (child.exists() && child.getValue() instanceof Map) {
+                    if (child.getValue() instanceof Map) {
                         Map map = (Map) child.getValue();
-                        // Collect options
-                        if (map.containsKey("options")) {
-                            Object optionsObj = map.get("options");
-                            if (optionsObj instanceof Map) {
-                                Map optionsData = (Map) optionsObj;
-                                // Iterate over options (assuming keys like "option1", "option2", etc.)
-                                for (Object key : optionsData.keySet()) {
-                                    optionsMap.put(key.toString(), optionsData.get(key).toString());
-                                }
+                        if (map.containsKey("options") && map.get("options") instanceof Map) {
+                            Map optionsData = (Map) map.get("options");
+                            for (Object key : optionsData.keySet()) {
+                                optionsMap.put(key.toString(), optionsData.get(key).toString());
                             }
                         }
-                        // Parse correct answer
                         if (map.containsKey("correctAnswer")) {
                             try {
                                 correctAnswer = Integer.parseInt(map.get("correctAnswer").toString());
@@ -326,31 +342,44 @@ public class CreateNewQuizes extends AppCompatActivity {
                             }
                         }
                     }
-                    // Create a Question object (ensure your Quiz and Question classes are aligned)
                     Question q = new Question(questionText, optionsMap, correctAnswer);
                     availableQuestions.add(q);
                 }
-                // Randomize the available questions
-                Collections.shuffle(availableQuestions);
-                // Limit the list to the user-specified size
-                if (availableQuestions.size() > limit) {
-                    availableQuestions = new ArrayList<>(availableQuestions.subList(0, limit));
+
+                int totalAvailable = availableQuestions.size();
+                int finalLimit = requestedLimit; // Use a local variable to adjust limit
+
+                if (totalAvailable == 0) {
+                    Toast.makeText(CreateNewQuizes.this,
+                            "No questions available for this subject",
+                            Toast.LENGTH_SHORT).show();
+                } else if (requestedLimit > totalAvailable) {
+                    Toast.makeText(CreateNewQuizes.this,
+                            "Requested " + requestedLimit + " questions, but only " + totalAvailable + " available",
+                            Toast.LENGTH_SHORT).show();
+                    finalLimit = totalAvailable;
                 }
-                // Update your questions list
-                // Note: Change the type of questionsList to ArrayList<Question> or convert accordingly
-                questionsList = availableQuestions;
+
+                Collections.shuffle(availableQuestions);
+                // Ensure we don't try to take more than available
+                questionsList = new ArrayList<>(availableQuestions.subList(0, Math.min(finalLimit, totalAvailable)));
                 updateQuestionCount();
-                Toast.makeText(CreateNewQuizes.this, "Loaded " + questionsList.size() + " questions", Toast.LENGTH_SHORT).show();
+                cardProgressBar.setVisibility(View.GONE);
+                toggleCardView(false);
+                Toast.makeText(CreateNewQuizes.this,
+                        "Loaded " + questionsList.size() + " questions",
+                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(CreateNewQuizes.this, "Failed to load questions: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(CreateNewQuizes.this,
+                        "Failed to load questions: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+                cardProgressBar.setVisibility(View.GONE);
             }
         });
     }
-
-
 
     private void openAddQuestionActivity() {
         Intent intent = new Intent(this, addQuestionActivity.class);
@@ -369,8 +398,8 @@ public class CreateNewQuizes extends AppCompatActivity {
             calendar.set(Calendar.MONTH, month);
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
             dateEditText.setText(dateFormatter.format(calendar.getTime()));
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
-                .show();
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
     private void showTimePicker() {
@@ -378,13 +407,22 @@ public class CreateNewQuizes extends AppCompatActivity {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
             timeEditText.setText(timeFormatter.format(calendar.getTime()));
-        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true)
-                .show();
+        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
     }
 
     private void updateQuestionCount() {
         int count = questionsList != null ? questionsList.size() : 0;
         savedQuestionsCountTextView.setText(String.format("Saved Questions: %d", count));
+    }
+
+    private void updateMarksDisplay() {
+        marksPerQuestionValue.setText(String.format("%.2f", marksPerQuestion));
+        negativeMarkingValue.setText(String.format("%.2f", negativeMarking));
+
+        marksPerQuestionUpButton.setEnabled(marksPerQuestion < MAX_MARKS);
+        marksPerQuestionDownButton.setEnabled(marksPerQuestion > MIN_MARKS);
+        negativeMarkingUpButton.setEnabled(negativeMarking < MAX_MARKS);
+        negativeMarkingDownButton.setEnabled(negativeMarking > MIN_MARKS);
     }
 
     private void validateAndSaveQuiz() {
@@ -407,55 +445,43 @@ public class CreateNewQuizes extends AppCompatActivity {
                     timeCal.get(Calendar.HOUR_OF_DAY),
                     timeCal.get(Calendar.MINUTE));
 
-            // Log or Toast the values for debugging if needed
-            Toast.makeText(this, "Subject: " + subject +
-                            "\nStart Time: " + combinedCal.getTimeInMillis() +
-                            "\nDuration: " + durationEditText.getText().toString(),
-                    Toast.LENGTH_SHORT).show();
-
             Quiz quiz = new Quiz(
                     subject,
                     combinedCal.getTimeInMillis(),
                     Integer.parseInt(durationEditText.getText().toString()),
-                    Float.parseFloat(marksPerQuestionEditText.getText().toString()),
-                    Float.parseFloat(negativeMarkingEditText.getText().toString()),
-                    questionsList, // Ensure this list is not null
+                    marksPerQuestion,
+                    negativeMarking,
+                    questionsList,
                     resultViewSpinner.getSelectedItem().toString()
             );
 
             String quizId = databaseReference.push().getKey();
-            // Optionally set the quizId before saving if needed
             quiz.setQuizId(quizId);
 
-            databaseReference.child(quizId).setValue(quiz.toMap(), new DatabaseReference.CompletionListener() {
-                @Override
-                public void onComplete(DatabaseError error, DatabaseReference ref) {
-                    if (error == null) {
-                        showToast("Quiz saved successfully! ID: " + quizId);
-                        finish();
-                    } else {
-                        showToast("Failed to save quiz: " + error.getMessage());
-                    }
+            databaseReference.child(quizId).setValue(quiz.toMap(), (error, ref) -> {
+                if (error == null) {
+                    showToast("Quiz saved successfully! ID: " + quizId);
+                    finish();
+                } else {
+                    showToast("Failed to save quiz: " + error.getMessage());
                 }
             });
 
         } catch (ParseException e) {
             showToast("Invalid date/time format: " + e.getMessage());
         } catch (NumberFormatException e) {
-            showToast("Invalid number format in marks/duration");
+            showToast("Invalid number format in duration");
         }
     }
 
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (optionsCardView.getVisibility() == View.VISIBLE) {
-                Rect outRect = new Rect();
-                optionsCardView.getGlobalVisibleRect(outRect);
-                if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())) {
-                    optionsCardView.setVisibility(View.GONE);
-                }
+        if (event.getAction() == MotionEvent.ACTION_DOWN &&
+                optionsCardView.getVisibility() == View.VISIBLE) {
+            Rect outRect = new Rect();
+            optionsCardView.getGlobalVisibleRect(outRect);
+            if (!outRect.contains((int) event.getRawX(), (int) event.getRawY())) {
+                toggleCardView(false);
             }
         }
         return super.onTouchEvent(event);
@@ -468,18 +494,12 @@ public class CreateNewQuizes extends AppCompatActivity {
             Toast.makeText(this, "Please select a semester", Toast.LENGTH_SHORT).show();
             isValid = false;
         }
-
         if (subjectSpinner.getSelectedItem() == null) {
             Toast.makeText(this, "Please select a subject", Toast.LENGTH_SHORT).show();
             isValid = false;
         }
-
-        if (TextUtils.isEmpty(marksPerQuestionEditText.getText())) {
-            marksPerQuestionEditText.setError("Marks per question required");
-            isValid = false;
-        }
-        if (TextUtils.isEmpty(negativeMarkingEditText.getText())) {
-            negativeMarkingEditText.setError("Negative marking required");
+        if (marksPerQuestion <= 0) {
+            Toast.makeText(this, "Marks per question must be greater than 0", Toast.LENGTH_SHORT).show();
             isValid = false;
         }
         if (TextUtils.isEmpty(dateEditText.getText())) {
@@ -498,7 +518,6 @@ public class CreateNewQuizes extends AppCompatActivity {
             showToast("Add at least one question");
             isValid = false;
         }
-
         return isValid;
     }
 
