@@ -8,7 +8,6 @@
     android:background="@color/surface"
     tools:context=".ocrcapture.ocrcapture">
 
-    <!-- AppBar with Back Button -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +23,6 @@
             app:navigationIconTint="@color/on_primary_container" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Scrollable Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -37,7 +35,6 @@
             android:padding="16dp"
             android:gravity="center">
 
-            <!-- Scan Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/scanCard"
                 android:layout_width="match_parent"
@@ -63,30 +60,67 @@
                         app:backgroundTint="@color/primary"
                         app:icon="@drawable/ic_camera"
                         app:iconTint="@color/on_primary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/galleryButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Pick from Gallery"
+                        android:textColor="@color/on_primary"
+                        app:backgroundTint="@color/primary"
+                        app:icon="@drawable/ic_image"
+                        app:iconTint="@color/on_primary" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Image Preview Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/imageCard"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:visibility="gone"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="6dp"
                 app:cardBackgroundColor="@color/surface_container_high">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/scannedImage"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:contentDescription="Scanned Image"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.LargeComponent" />
+                    android:layout_height="wrap_content">
+
+                    <FrameLayout
+                        android:id="@+id/imageContainer"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_margin="8dp"
+                        app:layout_constraintDimensionRatio="4:3"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/scannedImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="Scanned Image"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.LargeComponent" />
+
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btnFullScreen"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end|top"
+                            android:layout_margin="12dp"
+                            android:contentDescription="Full screen preview"
+                            android:src="@drawable/ic_fullscreen_enter"
+                            app:backgroundTint="@color/primary"
+                            app:fabSize="mini"
+                            app:tint="@color/on_primary" />
+                    </FrameLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- OCR Result Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/resultCard"
                 android:layout_width="match_parent"
@@ -107,7 +141,6 @@
                         android:id="@+id/resultText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="OCR Result will appear here"
                         android:textSize="16sp"
                         android:textColor="@color/on_surface"
                         android:padding="8dp"
@@ -126,7 +159,6 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Circular Progress Indicator -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBar"
         android:layout_width="64dp"

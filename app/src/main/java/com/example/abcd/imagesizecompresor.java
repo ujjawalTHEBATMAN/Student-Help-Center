@@ -23,6 +23,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.core.widget.NestedScrollView;
 import androidx.exifinterface.media.ExifInterface;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -55,7 +56,7 @@ public class imagesizecompresor extends AppCompatActivity {
     private TextView imageNameText;
     private TextView imageDimensionsText;
     private TextView imageSizeText;
-    private TextView comparisonText; // New TextView for comparison details
+    private TextView comparisonText;
     private android.view.View resultLayout;
     private ImageView originalThumbnail;
     private ImageView compressedThumbnail;
@@ -65,6 +66,7 @@ public class imagesizecompresor extends AppCompatActivity {
     private MaterialButton btnShare;
     private MaterialButton btnSave;
     private FloatingActionButton btnFullScreen;
+    private NestedScrollView nestedScrollView; // Added for scrolling
 
     // Data
     private Uri imageUri;
@@ -94,7 +96,6 @@ public class imagesizecompresor extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> finish());
 
-        // Restore state if available
         if (savedInstanceState != null) {
             String uriString = savedInstanceState.getString("imageUri");
             if (uriString != null) {
@@ -103,7 +104,6 @@ public class imagesizecompresor extends AppCompatActivity {
             }
         }
 
-        // Handle intent if launched from another app
         handleIncomingIntent();
     }
 
@@ -122,7 +122,7 @@ public class imagesizecompresor extends AppCompatActivity {
         imageNameText = findViewById(R.id.imageNameText);
         imageDimensionsText = findViewById(R.id.imageDimensionsText);
         imageSizeText = findViewById(R.id.imageSizeText);
-        comparisonText = findViewById(R.id.comparisonText); // Make sure to add this TextView in your layout
+        comparisonText = findViewById(R.id.comparisonText);
         resultLayout = findViewById(R.id.resultLayout);
         originalThumbnail = findViewById(R.id.originalThumbnail);
         compressedThumbnail = findViewById(R.id.compressedThumbnail);
@@ -132,18 +132,16 @@ public class imagesizecompresor extends AppCompatActivity {
         btnShare = findViewById(R.id.btnShare);
         btnSave = findViewById(R.id.btnSave);
         btnFullScreen = findViewById(R.id.btnFullScreen);
+        nestedScrollView = findViewById(R.id.nestedScrollView); // Initialize NestedScrollView
 
-        // Setup format spinner
         ArrayAdapter<CharSequence> formatAdapter = ArrayAdapter.createFromResource(this,
                 R.array.compression_formats, android.R.layout.simple_spinner_item);
         formatAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         formatSpinner.setAdapter(formatAdapter);
         formatSpinner.setText("JPEG", false);
 
-        // Set default quality
         qualitySeekBar.setValue(DEFAULT_QUALITY);
 
-        // Initially hide some views
         imageView.setVisibility(android.view.View.GONE);
         imageInfoOverlay.setVisibility(android.view.View.GONE);
         resultLayout.setVisibility(android.view.View.GONE);
@@ -158,7 +156,6 @@ public class imagesizecompresor extends AppCompatActivity {
         btnSave.setOnClickListener(v -> saveImageToGallery());
         btnFullScreen.setOnClickListener(v -> showFullScreenPreview());
 
-        // Format spinner listener
         formatSpinner.setOnItemClickListener((parent, view, position, id) -> {
             String format = parent.getItemAtPosition(position).toString();
             updateQualitySliderForFormat(format);
@@ -167,13 +164,11 @@ public class imagesizecompresor extends AppCompatActivity {
 
     private void handleIncomingIntent() {
         Intent intent = getIntent();
-        if (intent != null && intent.getAction() != null) {
-            if (Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
-                if (intent.getType().startsWith("image/")) {
-                    Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
-                    if (uri != null) {
-                        handleImageSelection(uri);
-                    }
+        if (intent != null && Intent.ACTION_SEND.equals(intent.getAction()) && intent.getType() != null) {
+            if (intent.getType().startsWith("image/")) {
+                Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+                if (uri != null) {
+                    handleImageSelection(uri);
                 }
             }
         }
@@ -214,38 +209,30 @@ public class imagesizecompresor extends AppCompatActivity {
         if (uri == null) return;
         imageUri = uri;
 
-        // Show loading indicator
         Snackbar.make(imageView, "Loading image...", Snackbar.LENGTH_SHORT).show();
 
         executor.execute(() -> {
             try {
-                // Get image metadata
                 originalSize = getFileSize(uri);
                 String fileName = getFileName(uri);
-
-                // Load bitmap with optimized decoding
                 BitmapFactory.Options options = getOptimalBitmapOptions(uri);
                 final Bitmap bitmap = loadBitmap(uri, options);
 
-                // Update UI on main thread
                 runOnUiThread(() -> {
                     imageView.setImageBitmap(bitmap);
                     imageView.setVisibility(android.view.View.VISIBLE);
                     previewPlaceholder.setVisibility(android.view.View.GONE);
-
                     imageNameText.setText(fileName != null ? fileName : "Image");
                     imageDimensionsText.setText(String.format(Locale.getDefault(),
                             "%d × %d px", imageWidth, imageHeight));
                     imageSizeText.setText(formatFileSize(originalSize));
                     imageInfoOverlay.setVisibility(android.view.View.VISIBLE);
-
                     btnFullScreen.setVisibility(android.view.View.VISIBLE);
                     resultLayout.setVisibility(android.view.View.GONE);
                 });
             } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(imagesizecompresor.this,
-                        "Error loading image: " + e.getMessage(),
-                        Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(this,
+                        "Error loading image: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -286,14 +273,13 @@ public class imagesizecompresor extends AppCompatActivity {
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     snackbar.dismiss();
-                    Toast.makeText(imagesizecompresor.this,
+                    Toast.makeText(this,
                             "Compression failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
             }
         });
     }
 
-    // New helper method to get dimensions from a File without fully loading the bitmap
     private int[] getImageDimensions(File file) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -301,7 +287,6 @@ public class imagesizecompresor extends AppCompatActivity {
         return new int[]{options.outWidth, options.outHeight};
     }
 
-    // Updated comparison display with more detailed info
     private void updateCompressionResults(long compressedSize, double ratio) {
         resultLayout.setVisibility(android.view.View.VISIBLE);
         originalThumbnail.setImageURI(imageUri);
@@ -309,7 +294,6 @@ public class imagesizecompresor extends AppCompatActivity {
 
         String originalName = getFileName(imageUri);
         String compressedName = compressedFile.getName();
-
         int[] originalDimensions = { imageWidth, imageHeight };
         int[] compressedDimensions = getImageDimensions(compressedFile);
 
@@ -324,27 +308,22 @@ public class imagesizecompresor extends AppCompatActivity {
                         "Dimensions: %d × %d px\n" +
                         "Size: %s\n\n" +
                         "Saved: %.1f%%",
-                originalName,
-                originalDimensions[0], originalDimensions[1],
-                formatFileSize(originalSize),
-                compressedName,
-                compressedDimensions[0], compressedDimensions[1],
-                formatFileSize(compressedSize),
+                originalName, originalDimensions[0], originalDimensions[1], formatFileSize(originalSize),
+                compressedName, compressedDimensions[0], compressedDimensions[1], formatFileSize(compressedSize),
                 ratio);
 
-        // Display the comparison details in the new TextView
         comparisonText.setText(comparisonDetails);
 
         Snackbar.make(resultLayout, "Compression complete. See comparison details below.",
-                        Snackbar.LENGTH_LONG)
-                .setAction("OK", v -> {})
-                .show();
+                Snackbar.LENGTH_LONG).setAction("OK", v -> {}).show();
+
+        // Scroll to result section
+        nestedScrollView.post(() -> nestedScrollView.smoothScrollTo(0, resultLayout.getTop()));
     }
 
     private File compressImage() throws IOException {
         Bitmap.CompressFormat format = getSelectedFormat();
         int quality = getSelectedQuality();
-
         File outputFile = createOutputFile(format);
         BitmapFactory.Options options = getOptimalBitmapOptions(imageUri);
         Bitmap bitmap = loadBitmap(imageUri, options);
@@ -375,20 +354,21 @@ public class imagesizecompresor extends AppCompatActivity {
         try (InputStream input = getContentResolver().openInputStream(uri)) {
             bitmap = BitmapFactory.decodeStream(input, null, options);
         }
-        imageWidth = bitmap.getWidth();
-        imageHeight = bitmap.getHeight();
 
         try (InputStream exifStream = getContentResolver().openInputStream(uri)) {
             if (exifStream != null) {
                 ExifInterface exif = new ExifInterface(exifStream);
                 int orientation = exif.getAttributeInt(
-                        ExifInterface.TAG_ORIENTATION,
-                        ExifInterface.ORIENTATION_UNDEFINED);
+                        ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
                 bitmap = rotateBitmap(bitmap, orientation);
             }
         } catch (Exception e) {
-            // Some URI schemes might not support EXIF data
+            // Handle cases where EXIF data is unavailable
         }
+
+        // Set dimensions after rotation
+        imageWidth = bitmap.getWidth();
+        imageHeight = bitmap.getHeight();
         return bitmap;
     }
 
@@ -405,32 +385,19 @@ public class imagesizecompresor extends AppCompatActivity {
     private Bitmap.CompressFormat getSelectedFormat() {
         String format = formatSpinner.getText().toString();
         switch (format) {
-            case "PNG":
-                return Bitmap.CompressFormat.PNG;
-            case "WEBP":
-                return Bitmap.CompressFormat.WEBP;
-            default:
-                return Bitmap.CompressFormat.JPEG;
+            case "PNG": return Bitmap.CompressFormat.PNG;
+            case "WEBP": return Bitmap.CompressFormat.WEBP;
+            default: return Bitmap.CompressFormat.JPEG;
         }
     }
 
     private int getSelectedQuality() {
-        int quality = (int) qualitySeekBar.getValue();
-        return Math.max(quality, 1);
+        return Math.max((int) qualitySeekBar.getValue(), 1);
     }
 
     private File createOutputFile(Bitmap.CompressFormat format) {
-        String extension;
-        switch (format) {
-            case PNG:
-                extension = "png";
-                break;
-            case WEBP:
-                extension = "webp";
-                break;
-            default:
-                extension = "jpg";
-        }
+        String extension = format == Bitmap.CompressFormat.PNG ? "png" :
+                format == Bitmap.CompressFormat.WEBP ? "webp" : "jpg";
         String fileName = "compressed_" + System.currentTimeMillis() + "." + extension;
         return new File(getExternalFilesDir(null), fileName);
     }
@@ -438,12 +405,8 @@ public class imagesizecompresor extends AppCompatActivity {
     private Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
         Matrix matrix = new Matrix();
         switch (orientation) {
-            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
-                matrix.setScale(-1, 1);
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                matrix.setRotate(180);
-                break;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL: matrix.setScale(-1, 1); break;
+            case ExifInterface.ORIENTATION_ROTATE_180: matrix.setRotate(180); break;
             case ExifInterface.ORIENTATION_FLIP_VERTICAL:
                 matrix.setRotate(180);
                 matrix.postScale(-1, 1);
@@ -452,25 +415,18 @@ public class imagesizecompresor extends AppCompatActivity {
                 matrix.setRotate(90);
                 matrix.postScale(-1, 1);
                 break;
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                matrix.setRotate(90);
-                break;
+            case ExifInterface.ORIENTATION_ROTATE_90: matrix.setRotate(90); break;
             case ExifInterface.ORIENTATION_TRANSVERSE:
                 matrix.setRotate(-90);
                 matrix.postScale(-1, 1);
                 break;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                matrix.setRotate(-90);
-                break;
-            default:
-                return bitmap;
+            case ExifInterface.ORIENTATION_ROTATE_270: matrix.setRotate(-90); break;
+            default: return bitmap;
         }
         try {
             Bitmap rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0,
                     bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            if (bitmap != rotatedBitmap) {
-                bitmap.recycle();
-            }
+            if (bitmap != rotatedBitmap) bitmap.recycle();
             return rotatedBitmap;
         } catch (OutOfMemoryError e) {
             return bitmap;
@@ -479,16 +435,14 @@ public class imagesizecompresor extends AppCompatActivity {
 
     private long getFileSize(Uri uri) throws IOException {
         try (ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(uri, "r")) {
-            if (pfd != null) {
-                return pfd.getStatSize();
-            }
+            if (pfd != null) return pfd.getStatSize();
         }
         return 0;
     }
 
     private String formatFileSize(long size) {
         if (size <= 0) return "0 B";
-        final String[] units = new String[]{"B", "KB", "MB", "GB"};
+        final String[] units = {"B", "KB", "MB", "GB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
@@ -499,15 +453,11 @@ public class imagesizecompresor extends AppCompatActivity {
             try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                    if (index != -1) {
-                        result = cursor.getString(index);
-                    }
+                    if (index != -1) result = cursor.getString(index);
                 }
             }
         }
-        if (result == null) {
-            result = uri.getLastPathSegment();
-        }
+        if (result == null) result = uri.getLastPathSegment();
         return result;
     }
 
@@ -532,9 +482,18 @@ public class imagesizecompresor extends AppCompatActivity {
         }
         executor.execute(() -> {
             try {
-                String fileName = "Compressed_" +
-                        new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-                                .format(new Date()) + ".jpg";
+                String originalName = getFileName(imageUri);
+                String fileName;
+                if (originalName != null) {
+                    int dotIndex = originalName.lastIndexOf('.');
+                    String baseName = dotIndex == -1 ? originalName : originalName.substring(0, dotIndex);
+                    String extension = dotIndex == -1 ? ".jpg" : originalName.substring(dotIndex);
+                    fileName = baseName + "_compressed" + extension;
+                } else {
+                    fileName = "Compressed_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                            .format(new Date()) + ".jpg";
+                }
+
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
                 values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");

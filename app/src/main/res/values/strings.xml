@@ -68,7 +68,7 @@
 
     <string-array name="compression_formats">
         <item>JPEG</item>
-        <item>PNG</item>
+
         <item>WEBP</item>
     </string-array>
 

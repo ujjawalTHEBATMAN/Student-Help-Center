@@ -1,32 +1,47 @@
 package com.example.abcd.MathFeature;
 
-import android.graphics.Color;
+import android.animation.ValueAnimator;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.abcd.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
-import com.google.android.material.progressindicator.LinearProgressIndicator;
-import com.google.android.material.slider.Slider;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CGPACalculatorActivity extends AppCompatActivity {
 
-    private LinearLayout inputContainer, subjectResults;
+    private RecyclerView subjectsRecyclerView;
+    private SubjectsAdapter subjectsAdapter;
+    private LinearLayout subjectResults;
     private MaterialCardView resultsCard;
     private CircularProgressIndicator cgpaProgress;
-    private List<SubjectInput> subjectInputs = new ArrayList<>();
+    private TextView tvOverallCgpa;
+    private MaterialButton btnCalculate;
+    private ExecutorService executor = Executors.newSingleThreadExecutor();
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,162 +49,75 @@ public class CGPACalculatorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_cgpacalculator);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if(getSupportActionBar()!=null){
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(v -> finish());
-        /* bhai, above set back btn, dekh le */
-
         initializeViews();
+        setupRecyclerView();
         setupButtonClickListeners();
     }
 
     private void initializeViews() {
-        inputContainer = findViewById(R.id.input_container);
+        subjectsRecyclerView = findViewById(R.id.subjects_recycler_view);
         subjectResults = findViewById(R.id.subject_results);
         resultsCard = findViewById(R.id.results_card);
         cgpaProgress = findViewById(R.id.cgpa_progress);
+        tvOverallCgpa = findViewById(R.id.tv_overall_cgpa);
+        btnCalculate = findViewById(R.id.btn_calculate);
         cgpaProgress.setMax(100);
-        /* initializing sab views, mast work hai */
+        resultsCard.setVisibility(View.GONE);
+    }
+
+    private void setupRecyclerView() {
+        subjectsAdapter = new SubjectsAdapter();
+        subjectsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        subjectsRecyclerView.setAdapter(subjectsAdapter);
+        subjectsAdapter.addSubject();
     }
 
     private void setupButtonClickListeners() {
-        findViewById(R.id.btn_add_subject).setOnClickListener(v -> addSubjectInput());
-        findViewById(R.id.btn_calculate).setOnClickListener(v -> calculateCGPA());
-        /* button click set, simple sa kaam hai yaar */
-    }
-
-    private void addSubjectInput() {
-        MaterialCardView subjectCard = (MaterialCardView) getLayoutInflater().inflate(R.layout.subject_input, null);
-        inputContainer.addView(subjectCard);
-        SubjectInput subjectInput = new SubjectInput(
-                subjectCard.findViewById(R.id.et_subject_name),
-                subjectCard.findViewById(R.id.slider_credits),
-                subjectCard.findViewById(R.id.et_total_marks),
-                subjectCard.findViewById(R.id.et_obtained_marks),
-                subjectCard.findViewById(R.id.btn_remove_subject),
-                subjectCard.findViewById(R.id.tv_subject_number),
-                subjectCard.findViewById(R.id.marks_progress),
-                subjectCard
-        );
-        int subjectNumber = subjectInputs.size() + 1;
-        subjectInput.tvSubjectNumber.setText(getString(R.string.subject_number, subjectNumber));
-        setupRemoveButton(subjectInput);
-        setupCreditsSlider(subjectInput);
-        setupMarksWatchers(subjectInput);
-        subjectInputs.add(subjectInput);
-    }
-
-    private void setupRemoveButton(SubjectInput subjectInput) {
-        subjectInput.btnRemove.setOnClickListener(v -> {
-            inputContainer.removeView(subjectInput.cardView);
-            subjectInputs.remove(subjectInput);
-            updateSubjectNumbers();
-        });
-    }
-
-    private void setupCreditsSlider(SubjectInput subjectInput) {
-        subjectInput.sliderCredits.addOnChangeListener((slider, value, fromUser) -> {
-            // no extra logic, simple slider
-        });
-    }
-
-    private void setupMarksWatchers(SubjectInput subjectInput) {
-        TextWatcher marksWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                updateMarksProgress(subjectInput);
-            }
-        };
-        subjectInput.etTotalMarks.addTextChangedListener(marksWatcher);
-        subjectInput.etObtainedMarks.addTextChangedListener(marksWatcher);
-    }
-
-    private void updateMarksProgress(SubjectInput subjectInput) {
-        try {
-            String totalStr = subjectInput.etTotalMarks.getText().toString().trim();
-            String obtainedStr = subjectInput.etObtainedMarks.getText().toString().trim();
-            if(totalStr.isEmpty() || obtainedStr.isEmpty()){
-                subjectInput.marksProgress.setProgress(0);
-                return;
-            }
-            double total = Double.parseDouble(totalStr);
-            double obtained = Double.parseDouble(obtainedStr);
-            if(total <= 0){
-                subjectInput.marksProgress.setProgress(0);
-                return;
-            }
-            int progress = (int) ((obtained / total) * 100);
-            subjectInput.marksProgress.setProgress(Math.min(progress, 100));
-        } catch (NumberFormatException e) {
-            subjectInput.marksProgress.setProgress(0);
-        }
-    }
-
-    private void updateSubjectNumbers() {
-        for (int i = 0; i < subjectInputs.size(); i++) {
-            SubjectInput input = subjectInputs.get(i);
-            input.tvSubjectNumber.setText(getString(R.string.subject_number, i + 1));
-        }
+        findViewById(R.id.btn_add_subject).setOnClickListener(v -> subjectsAdapter.addSubject());
+        btnCalculate.setOnClickListener(v -> calculateCGPA());
     }
 
     private void calculateCGPA() {
-        try {
-            resultsCard.setVisibility(View.VISIBLE);
-            subjectResults.removeAllViews();
-            cgpaProgress.setVisibility(View.VISIBLE);
-            double totalWeightedPoints = 0;
-            int totalCredits = 0;
-            int validSubjects = 0;
-            for (SubjectInput input : subjectInputs) {
-                String subjectName = input.etSubjectName.getText().toString().trim();
-                int credits = (int) input.sliderCredits.getValue();
-                String totalStr = input.etTotalMarks.getText().toString().trim();
-                String obtainedStr = input.etObtainedMarks.getText().toString().trim();
-                if(subjectName.isEmpty() || totalStr.isEmpty() || obtainedStr.isEmpty()) continue;
-                double totalMarks = Double.parseDouble(totalStr);
-                double obtainedMarks = Double.parseDouble(obtainedStr);
-                if(totalMarks <= 0){
-                    throw new IllegalArgumentException("Total marks must be greater than 0");
+        btnCalculate.setEnabled(false);
+        cgpaProgress.setVisibility(View.VISIBLE);
+        executor.execute(() -> {
+            try {
+                Deque<SubjectData> validSubjects = subjectsAdapter.getValidSubjects();
+                if (validSubjects.isEmpty()) {
+                    mainHandler.post(() -> showError("Please enter at least one valid subject"));
+                    return;
                 }
-                if(obtainedMarks < 0 || obtainedMarks > totalMarks){
-                    throw new IllegalArgumentException("Obtained marks must be 0-" + totalMarks);
+                double totalWeightedPoints = 0;
+                int totalCredits = 0;
+                subjectResults.removeAllViews();
+                for (SubjectData subject : validSubjects) {
+                    double percentage = (subject.obtainedMarks / subject.totalMarks) * 100;
+                    double subjectCGPA = calculateSubjectCGPA(percentage);
+                    totalWeightedPoints += subjectCGPA * subject.credits;
+                    totalCredits += subject.credits;
+                    mainHandler.post(() -> addSubjectResultView(subject.name, subject.credits, subjectCGPA));
                 }
-                double percentage = (obtainedMarks / totalMarks) * 100;
-                double subjectCGPA = calculateSubjectCGPA(percentage);
-                addSubjectResultView(subjectName, credits, subjectCGPA);
-                totalWeightedPoints += subjectCGPA * credits;
-                totalCredits += credits;
-                validSubjects++;
+                double overallCGPA = totalWeightedPoints / totalCredits;
+                mainHandler.post(() -> displayOverallCGPA(overallCGPA));
+            } catch (Exception e) {
+                mainHandler.post(() -> showError("Invalid input: " + e.getMessage()));
+            } finally {
+                mainHandler.post(() -> {
+                    cgpaProgress.setVisibility(View.GONE);
+                    btnCalculate.setEnabled(true);
+                });
             }
-            if(validSubjects == 0){
-                showError("Please fill atleast one complete subject");
-                return;
-            }
-            double overallCGPA = totalWeightedPoints / totalCredits;
-            displayOverallCGPA(overallCGPA);
-        } catch (NumberFormatException e) {
-            showError("Please enter valid numbrs in all fields");
-        } catch (IllegalArgumentException e) {
-            showError(e.getMessage());
-        } finally {
-            cgpaProgress.setVisibility(View.GONE);
-        }
+        });
     }
 
     private double calculateSubjectCGPA(double percentage) {
-        if(percentage >= 90) return 10.0;
-        if(percentage >= 80) return 9.0;
-        if(percentage >= 70) return 8.0;
-        if(percentage >= 60) return 7.0;
-        if(percentage >= 50) return 6.0;
-        if(percentage >= 40) return 5.0;
+        double[] thresholds = {90, 80, 70, 60, 50, 40};
+        double[] cgpaValues = {10.0, 9.0, 8.0, 7.0, 6.0, 5.0};
+        for (int i = 0; i < thresholds.length; i++) {
+            if (percentage >= thresholds[i]) return cgpaValues[i];
+        }
         return 0.0;
     }
 
@@ -198,49 +126,170 @@ public class CGPACalculatorActivity extends AppCompatActivity {
         tv.setText(String.format("%s (%d credits): %.2f/10", subjectName, credits, cgpa));
         tv.setTextColor(ContextCompat.getColor(this, R.color.primary));
         tv.setTextSize(16);
-        tv.setPadding(0,8,0,8);
+        tv.setPadding(0, 8, 0, 8);
         subjectResults.addView(tv);
+        resultsCard.setVisibility(View.VISIBLE);
     }
 
     private void displayOverallCGPA(double overallCGPA) {
-        TextView tvOverall = findViewById(R.id.tv_overall_cgpa);
-        tvOverall.setText(String.format("Overall CGPA: %.2f/10", overallCGPA));
-        tvOverall.setTextColor(ContextCompat.getColor(this, R.color.primary));
-        cgpaProgress.setProgress((int)(overallCGPA*10));
+        tvOverallCgpa.setText(String.format("Overall CGPA: %.2f/10", overallCGPA));
+        ValueAnimator animator = ValueAnimator.ofInt(0, (int) (overallCGPA * 10));
+        animator.setDuration(1000);
+        animator.addUpdateListener(animation -> cgpaProgress.setProgress((int) animation.getAnimatedValue()));
+        animator.start();
+        resultsCard.setVisibility(View.VISIBLE);
     }
 
     private void showError(String message) {
         Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG)
                 .setBackgroundTint(ContextCompat.getColor(this, R.color.saffron))
-                .setTextColor(Color.WHITE)
+                .setTextColor(ContextCompat.getColor(this, android.R.color.white))
                 .show();
+        resultsCard.setVisibility(View.GONE);
+        cgpaProgress.setVisibility(View.GONE);
+        btnCalculate.setEnabled(true);
     }
 
-    private static class SubjectInput {
-        final TextInputEditText etSubjectName;
-        final Slider sliderCredits;
-        final TextInputEditText etTotalMarks;
-        final TextInputEditText etObtainedMarks;
-        final MaterialButton btnRemove;
-        final TextView tvSubjectNumber;
-        final LinearProgressIndicator marksProgress;
-        final MaterialCardView cardView;
-        SubjectInput(TextInputEditText etSubjectName,
-                     Slider sliderCredits,
-                     TextInputEditText etTotalMarks,
-                     TextInputEditText etObtainedMarks,
-                     MaterialButton btnRemove,
-                     TextView tvSubjectNumber,
-                     LinearProgressIndicator marksProgress,
-                     MaterialCardView cardView) {
-            this.etSubjectName = etSubjectName;
-            this.sliderCredits = sliderCredits;
-            this.etTotalMarks = etTotalMarks;
-            this.etObtainedMarks = etObtainedMarks;
-            this.btnRemove = btnRemove;
-            this.tvSubjectNumber = tvSubjectNumber;
-            this.marksProgress = marksProgress;
-            this.cardView = cardView;
+    private class SubjectsAdapter extends RecyclerView.Adapter<SubjectsAdapter.SubjectViewHolder> {
+
+        private Deque<SubjectData> subjects = new ArrayDeque<>();
+
+        @Override
+        public SubjectViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.subject_input_advanced, parent, false);
+            return new SubjectViewHolder(view);
         }
+
+        @Override
+        public void onBindViewHolder(SubjectViewHolder holder, int position) {
+            SubjectData subject = subjects.toArray(new SubjectData[0])[position];
+            holder.tvSubjectNumber.setText(getString(R.string.subject_number, position + 1));
+            holder.etSubjectName.setText(subject.name);
+            holder.etTotalMarks.setText(subject.totalMarks > 0 ? String.valueOf(subject.totalMarks) : "");
+            holder.etObtainedMarks.setText(subject.obtainedMarks > 0 ? String.valueOf(subject.obtainedMarks) : "");
+            holder.sliderCredits.setValue(subject.credits);
+            updateMarksProgress(holder, subject);
+            holder.btnRemove.setOnClickListener(v -> {
+                subjects.remove(subject);
+                notifyDataSetChanged();
+            });
+            holder.etSubjectName.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    subject.name = s.toString().trim();
+                }
+            });
+            holder.etTotalMarks.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try {
+                        subject.totalMarks = s.toString().isEmpty() ? 0 : Double.parseDouble(s.toString());
+                        updateMarksProgress(holder, subject);
+                    } catch (NumberFormatException e) {
+                        subject.totalMarks = 0;
+                    }
+                }
+            });
+            holder.etObtainedMarks.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    try {
+                        subject.obtainedMarks = s.toString().isEmpty() ? 0 : Double.parseDouble(s.toString());
+                        updateMarksProgress(holder, subject);
+                    } catch (NumberFormatException e) {
+                        subject.obtainedMarks = 0;
+                    }
+                }
+            });
+            holder.sliderCredits.addOnChangeListener((slider, value, fromUser) -> subject.credits = (int) value);
+        }
+
+        @Override
+        public int getItemCount() {
+            return subjects.size();
+        }
+
+        void addSubject() {
+            subjects.add(new SubjectData("", 3, 0, 0));
+            notifyItemInserted(subjects.size() - 1);
+        }
+
+        Deque<SubjectData> getValidSubjects() {
+            Deque<SubjectData> validSubjects = new ArrayDeque<>();
+            for (SubjectData subject : subjects) {
+                if (!subject.name.isEmpty() && subject.totalMarks > 0 && subject.obtainedMarks >= 0 && subject.obtainedMarks <= subject.totalMarks) {
+                    validSubjects.add(subject);
+                }
+            }
+            return validSubjects;
+        }
+
+        private void updateMarksProgress(SubjectViewHolder holder, SubjectData subject) {
+            if (subject.totalMarks <= 0 || subject.obtainedMarks < 0) {
+                holder.marksProgress.setProgress(0);
+                return;
+            }
+            int progress = (int) ((subject.obtainedMarks / subject.totalMarks) * 100);
+            holder.marksProgress.setProgress(Math.min(progress, 100));
+        }
+
+        class SubjectViewHolder extends RecyclerView.ViewHolder {
+            TextInputEditText etSubjectName;
+            TextInputEditText etTotalMarks;
+            TextInputEditText etObtainedMarks;
+            com.google.android.material.slider.Slider sliderCredits;
+            MaterialButton btnRemove;
+            TextView tvSubjectNumber;
+            com.google.android.material.progressindicator.LinearProgressIndicator marksProgress;
+
+            SubjectViewHolder(View itemView) {
+                super(itemView);
+                etSubjectName = itemView.findViewById(R.id.et_subject_name);
+                etTotalMarks = itemView.findViewById(R.id.et_total_marks);
+                etObtainedMarks = itemView.findViewById(R.id.et_obtained_marks);
+                sliderCredits = itemView.findViewById(R.id.slider_credits);
+                btnRemove = itemView.findViewById(R.id.btn_remove_subject);
+                tvSubjectNumber = itemView.findViewById(R.id.tv_subject_number);
+                marksProgress = itemView.findViewById(R.id.marks_progress);
+            }
+        }
+    }
+
+    private static class SubjectData {
+        String name;
+        int credits;
+        double totalMarks;
+        double obtainedMarks;
+
+        SubjectData(String name, int credits, double totalMarks, double obtainedMarks) {
+            this.name = name;
+            this.credits = credits;
+            this.totalMarks = totalMarks;
+            this.obtainedMarks = obtainedMarks;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        executor.shutdown();
+        super.onDestroy();
     }
 }
