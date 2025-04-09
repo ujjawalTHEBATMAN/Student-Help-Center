@@ -21,6 +21,8 @@ public class CrashlyticsDeepAnalysis extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private CrashLogAdapter adapter;
+    private ValueEventListener crashLogsListener;
+
     private List<LogEntry> crashLogs = new ArrayList<>();
     private DatabaseReference logsRef;
     private LogStorageHelper logStorageHelper;
@@ -43,10 +45,7 @@ public class CrashlyticsDeepAnalysis extends AppCompatActivity {
     }
 
     private void fetchCrashLogs() {
-        FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
-        logStorageHelper.log("Crashlytics", "Admin is checking crash logs");  // Replaced Log
-
-        logsRef.addValueEventListener(new ValueEventListener() {
+        crashLogsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 crashLogs.clear();
@@ -66,12 +65,17 @@ public class CrashlyticsDeepAnalysis extends AppCompatActivity {
                         new Exception("Firebase fetch error: " + databaseError.getMessage())
                 );
             }
-        });
+        };
+
+        logsRef.addValueEventListener(crashLogsListener);
+
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-        logsRef.removeEventListener((ValueEventListener) this);
+         super.onDestroy();
+        if (crashLogsListener != null) {
+            logsRef.removeEventListener(crashLogsListener);
+        }
     }
 }

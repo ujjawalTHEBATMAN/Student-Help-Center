@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:background="?attr/colorSurface">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/feedback_card_view"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
-        android:layout_margin="8dp">
+        android:background="?attr/colorPrimary">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Submit Feedback"
+            app:titleCentered="true"
+            app:titleTextColor="?attr/colorOnPrimary"
+            app:navigationIcon="@drawable/ic_arrow_back" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -22,66 +33,66 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Submit Feedback"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp"/>
-
-            <EditText
-                android:id="@+id/feedback_title_edittext"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/title_input_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:hint="Feedback Title"
-                android:textColorHint="@color/gray"
-                android:backgroundTint="@color/primary"
-                android:padding="12dp"
-                android:maxLength="100"
-                android:layout_marginBottom="16dp"/>
+                app:counterEnabled="true"
+                app:counterMaxLength="100">
 
-            <EditText
-                android:id="@+id/feedback_description_edittext"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/feedback_title_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:maxLength="100"
+                    android:textColor="?attr/colorOnSurface" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/description_input_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:hint="Feedback Description"
-                android:textColorHint="@color/gray"
-                android:backgroundTint="@color/primary"
-                android:padding="12dp"
-                android:gravity="top"
-                android:maxLength="500"
-                android:layout_marginBottom="8dp"/>
-
-            <TextView
-                android:id="@+id/char_count_textview"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0/500"
-                android:textSize="14sp"
-                android:layout_gravity="end"
-                android:layout_marginBottom="16dp"/>
+                android:hint="Feedback Description"
+                app:counterEnabled="true"
+                app:counterMaxLength="500">
 
-            <Button
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/feedback_description_edittext"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:gravity="top|start"
+                    android:inputType="textMultiLine"
+                    android:maxLength="500"
+                    android:textColor="?attr/colorOnSurface" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/submit_feedback_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Submit"
-                android:textSize="16sp"
+                android:layout_marginTop="24dp"
                 android:padding="12dp"
-                android:layout_gravity="center_horizontal"/>
+                android:text="Submit"
+                android:textSize="16sp" />
 
             <ProgressBar
                 android:id="@+id/submission_progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:visibility="gone"
                 android:layout_marginTop="16dp"
-                style="?android:attr/progressBarStyle"/>
+                android:visibility="gone"
+                style="?android:attr/progressBarStyle" />
 
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
-</LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

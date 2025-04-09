@@ -256,7 +256,9 @@ public class imagesizecompresor extends AppCompatActivity {
             qualitySeekBar.setEnabled(false);
         } else {
             qualitySeekBar.setEnabled(true);
-            qualitySeekBar.setValue(DEFAULT_QUALITY);
+            if (!qualitySeekBar.isEnabled()) {
+                qualitySeekBar.setValue(DEFAULT_QUALITY);
+            }
         }
     }
 

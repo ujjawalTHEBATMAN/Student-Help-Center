@@ -1,32 +1,24 @@
 package com.example.abcd.adminfeature.feedback;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import com.example.abcd.R;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -38,13 +30,14 @@ import java.util.Map;
 
 public class FeedbackCreation extends AppCompatActivity {
 
-    private EditText feedbackTitleEditText;
-    private EditText feedbackDescriptionEditText;
-    private Button submitFeedbackButton;
+    private TextInputEditText feedbackTitleEditText;
+    private TextInputEditText feedbackDescriptionEditText;
+    private MaterialButton submitFeedbackButton;
     private ProgressBar submissionProgressBar;
-    private CardView feedbackCardView;
-    private LinearLayout rootLayout;
-    private TextView charCountTextView;
+    private TextInputLayout titleInputLayout;
+    private TextInputLayout descriptionInputLayout;
+    private View rootLayout;
+    private MaterialToolbar toolbar;
     private DatabaseReference feedbackRef;
 
     @Override
@@ -52,37 +45,21 @@ public class FeedbackCreation extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback_creation);
 
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
         feedbackTitleEditText = findViewById(R.id.feedback_title_edittext);
         feedbackDescriptionEditText = findViewById(R.id.feedback_description_edittext);
         submitFeedbackButton = findViewById(R.id.submit_feedback_button);
         submissionProgressBar = findViewById(R.id.submission_progress_bar);
-        feedbackCardView = findViewById(R.id.feedback_card_view);
+        titleInputLayout = findViewById(R.id.title_input_layout);
+        descriptionInputLayout = findViewById(R.id.description_input_layout);
         rootLayout = findViewById(R.id.root_layout);
-        charCountTextView = findViewById(R.id.char_count_textview);
 
         feedbackRef = FirebaseDatabase.getInstance().getReference("feedback");
 
-        setupUI();
         setupListeners();
-        applyAnimations();
-    }
-
-    private void setupUI() {
-        GradientDrawable cardBackground = new GradientDrawable(
-                GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{
-                        ContextCompat.getColor(this, R.color.gradient_start),
-                        ContextCompat.getColor(this, R.color.gradient_end)
-                }
-        );
-        cardBackground.setCornerRadius(24f);
-        feedbackCardView.setBackground(cardBackground);
-
-        submitFeedbackButton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.buttonBackgroundColor));
-        submitFeedbackButton.setTextColor(ContextCompat.getColor(this, R.color.white));
-        feedbackTitleEditText.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
-        feedbackDescriptionEditText.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
-        charCountTextView.setTextColor(ContextCompat.getColor(this, R.color.secondaryTextColor));
     }
 
     private void setupListeners() {
@@ -92,13 +69,8 @@ public class FeedbackCreation extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                int length = s.length();
-                charCountTextView.setText(length + "/500");
-                if (length > 500) {
-                    charCountTextView.setTextColor(ContextCompat.getColor(FeedbackCreation.this, R.color.error));
-                } else {
-                    charCountTextView.setTextColor(ContextCompat.getColor(FeedbackCreation.this, R.color.secondaryTextColor));
-                }
+                titleInputLayout.setError(null);
+                descriptionInputLayout.setError(null);
             }
 
             @Override
@@ -109,30 +81,18 @@ public class FeedbackCreation extends AppCompatActivity {
             String title = feedbackTitleEditText.getText().toString().trim();
             String description = feedbackDescriptionEditText.getText().toString().trim();
 
-            if (title.isEmpty() || description.isEmpty()) {
-                showSnackbar("Please fill all fields");
-            } else if (description.length() > 500) {
-                showSnackbar("Description exceeds 500 characters");
-            } else {
-                submitFeedback(title, description);
+            if (title.isEmpty()) {
+                titleInputLayout.setError("Title cannot be empty");
+                return;
             }
+
+            if (description.isEmpty()) {
+                descriptionInputLayout.setError("Description cannot be empty");
+                return;
+            }
+
+            submitFeedback(title, description);
         });
-    }
-
-    private void applyAnimations() {
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(feedbackCardView, "alpha", 0f, 1f);
-        fadeIn.setDuration(1000);
-        fadeIn.setInterpolator(new AccelerateDecelerateInterpolator());
-        fadeIn.start();
-
-        ObjectAnimator scaleX = ObjectAnimator.ofFloat(submitFeedbackButton, "scaleX", 0.8f, 1f);
-        ObjectAnimator scaleY = ObjectAnimator.ofFloat(submitFeedbackButton, "scaleY", 0.8f, 1f);
-        scaleX.setDuration(500);
-        scaleY.setDuration(500);
-        scaleX.setInterpolator(new AccelerateDecelerateInterpolator());
-        scaleY.setInterpolator(new AccelerateDecelerateInterpolator());
-        scaleX.start();
-        scaleY.start();
     }
 
     private void submitFeedback(String title, String description) {
@@ -153,9 +113,9 @@ public class FeedbackCreation extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> {
                     submissionProgressBar.setVisibility(View.GONE);
                     submitFeedbackButton.setEnabled(true);
-                    showSuccessAnimation();
-                    clearFields();
                     showSnackbar("Feedback submitted successfully!");
+                    hideKeyboard();
+                    clearFields();
                 })
                 .addOnFailureListener(e -> {
                     submissionProgressBar.setVisibility(View.GONE);
@@ -164,30 +124,26 @@ public class FeedbackCreation extends AppCompatActivity {
                 });
     }
 
-    private void showSuccessAnimation() {
-        ObjectAnimator scaleX = ObjectAnimator.ofFloat(feedbackCardView, "scaleX", 1f, 1.1f, 1f);
-        ObjectAnimator scaleY = ObjectAnimator.ofFloat(feedbackCardView, "scaleY", 1f, 1.1f, 1f);
-        scaleX.setDuration(600);
-        scaleY.setDuration(600);
-        scaleX.setInterpolator(new AccelerateDecelerateInterpolator());
-        scaleY.setInterpolator(new AccelerateDecelerateInterpolator());
-        scaleX.start();
-        scaleY.start();
-    }
-
     private void clearFields() {
         feedbackTitleEditText.setText("");
         feedbackDescriptionEditText.setText("");
-        charCountTextView.setText("0/500");
     }
 
     private void showSnackbar(String message) {
         Snackbar snackbar = Snackbar.make(rootLayout, message, Snackbar.LENGTH_LONG);
         View snackbarView = snackbar.getView();
-        snackbarView.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.primary_container));
+        snackbarView.setBackgroundTintList(ContextCompat.getColorStateList(this, com.google.android.material.R.color.design_default_color_primary));
         TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
-        textView.setTextColor(ContextCompat.getColor(this, R.color.on_primary_container));
+        textView.setTextColor(ContextCompat.getColor(this, android.R.color.white));
         snackbar.show();
+    }
+
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     @Override
