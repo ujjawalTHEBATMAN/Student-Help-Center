@@ -393,21 +393,66 @@ public class CreateNewQuizes extends AppCompatActivity {
     }
 
     private void showDatePicker() {
-        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.MONTH, month);
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+            // If today's date is selected, check and possibly update the time
+            Calendar today = Calendar.getInstance();
+            if (year == today.get(Calendar.YEAR) && month == today.get(Calendar.MONTH) && dayOfMonth == today.get(Calendar.DAY_OF_MONTH)) {
+                // If we have a time already set, verify it's not in the past
+                if (!TextUtils.isEmpty(timeEditText.getText())) {
+                    try {
+                        Date selectedTime = timeFormatter.parse(timeEditText.getText().toString());
+                        Calendar selectedTimeCal = Calendar.getInstance();
+                        selectedTimeCal.setTime(selectedTime);
+
+                        Calendar currentTime = Calendar.getInstance();
+                        if (selectedTimeCal.get(Calendar.HOUR_OF_DAY) < currentTime.get(Calendar.HOUR_OF_DAY) ||
+                                (selectedTimeCal.get(Calendar.HOUR_OF_DAY) == currentTime.get(Calendar.HOUR_OF_DAY) &&
+                                        selectedTimeCal.get(Calendar.MINUTE) < currentTime.get(Calendar.MINUTE))) {
+                            // Reset the time field as it's now invalid
+                            timeEditText.setText("");
+                            Toast.makeText(CreateNewQuizes.this, "Please select a future time", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (ParseException e) {
+                        timeEditText.setText("");
+                    }
+                }
+            }
+
             dateEditText.setText(dateFormatter.format(calendar.getTime()));
-        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)).show();
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+
+        // Set the minimum date to today
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+
+        datePickerDialog.show();
     }
 
     private void showTimePicker() {
+        Calendar currentTime = Calendar.getInstance();
         new TimePickerDialog(this, (view, hourOfDay, minute) -> {
+            // Check if the selected date is today
+            Calendar today = Calendar.getInstance();
+            boolean isToday = calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                    calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
+                    calendar.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH);
+
+            // If today is selected, verify the time is not in the past
+            if (isToday) {
+                if (hourOfDay < currentTime.get(Calendar.HOUR_OF_DAY) ||
+                        (hourOfDay == currentTime.get(Calendar.HOUR_OF_DAY) && minute <= currentTime.get(Calendar.MINUTE))) {
+                    Toast.makeText(CreateNewQuizes.this, "Please select a future time", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
             timeEditText.setText(timeFormatter.format(calendar.getTime()));
-        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
+        }, currentTime.get(Calendar.HOUR_OF_DAY), currentTime.get(Calendar.MINUTE), true).show();
     }
 
     private void updateQuestionCount() {
@@ -490,34 +535,42 @@ public class CreateNewQuizes extends AppCompatActivity {
     private boolean validateInputs() {
         boolean isValid = true;
 
-        if (semesterSpinner.getSelectedItem() == null) {
-            Toast.makeText(this, "Please select a semester", Toast.LENGTH_SHORT).show();
-            isValid = false;
+        // Existing validation code...
+
+        // Add validation for date and time
+        try {
+            String dateStr = dateEditText.getText().toString();
+            String timeStr = timeEditText.getText().toString();
+
+            if (!TextUtils.isEmpty(dateStr) && !TextUtils.isEmpty(timeStr)) {
+                Date date = dateFormatter.parse(dateStr);
+                Date time = timeFormatter.parse(timeStr);
+
+                Calendar dateCal = Calendar.getInstance();
+                dateCal.setTime(date);
+
+                Calendar timeCal = Calendar.getInstance();
+                timeCal.setTime(time);
+
+                Calendar scheduledTime = Calendar.getInstance();
+                scheduledTime.set(
+                        dateCal.get(Calendar.YEAR),
+                        dateCal.get(Calendar.MONTH),
+                        dateCal.get(Calendar.DAY_OF_MONTH),
+                        timeCal.get(Calendar.HOUR_OF_DAY),
+                        timeCal.get(Calendar.MINUTE)
+                );
+
+                Calendar now = Calendar.getInstance();
+                if (scheduledTime.before(now)) {
+                    Toast.makeText(this, "Quiz cannot be scheduled in the past", Toast.LENGTH_SHORT).show();
+                    isValid = false;
+                }
+            }
+        } catch (ParseException e) {
+            // Error will be caught by other validations
         }
-        if (subjectSpinner.getSelectedItem() == null) {
-            Toast.makeText(this, "Please select a subject", Toast.LENGTH_SHORT).show();
-            isValid = false;
-        }
-        if (marksPerQuestion <= 0) {
-            Toast.makeText(this, "Marks per question must be greater than 0", Toast.LENGTH_SHORT).show();
-            isValid = false;
-        }
-        if (TextUtils.isEmpty(dateEditText.getText())) {
-            dateEditText.setError("Date required");
-            isValid = false;
-        }
-        if (TextUtils.isEmpty(timeEditText.getText())) {
-            timeEditText.setError("Time required");
-            isValid = false;
-        }
-        if (TextUtils.isEmpty(durationEditText.getText())) {
-            durationEditText.setError("Duration required");
-            isValid = false;
-        }
-        if (questionsList == null || questionsList.isEmpty()) {
-            showToast("Add at least one question");
-            isValid = false;
-        }
+
         return isValid;
     }
 

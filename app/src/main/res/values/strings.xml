@@ -79,7 +79,7 @@
     </string-array>
 
     <string-array name="result_view_options">
-        <item>Email</item>
+
         <item>Advance Result View</item>
     </string-array>
     <string name="duration_format">Duration: %d mins</string>
