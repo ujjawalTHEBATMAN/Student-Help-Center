@@ -405,13 +405,18 @@ public class PDFViewerActivity extends AppCompatActivity {
                             return;
                         }
 
+                        if (!fileName.toLowerCase().endsWith(".pdf")) {
+                            fileName += ".pdf";
+                        }
+
                         String key = databaseReference.child(selectedSemester)
                                 .child(selectedSubject)
                                 .push()
                                 .getKey();
 
                         if (key != null) {
-                            PDF pdfData = new PDF(fileName, url);
+                            // Fix: Swap the order to match PDF constructor (url, name)
+                            PDF pdfData = new PDF(url, fileName); // Corrected order
                             databaseReference.child(selectedSemester)
                                     .child(selectedSubject)
                                     .child(key)
@@ -787,21 +792,10 @@ public class PDFViewerActivity extends AppCompatActivity {
             this.name = name;
         }
 
-        public String getUrl() {
-            return url;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
+        public String getUrl() { return url; }
+        public String getName() { return name; }
+        public void setUrl(String url) { this.url = url; }
+        public void setName(String name) { this.name = name; }
     }
 
     private boolean isValidFileName(String fileName) {

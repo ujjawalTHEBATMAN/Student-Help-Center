@@ -9,19 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:hint="PDF URL">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/urlInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textUri"/>
-
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:hint="File Name">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -32,4 +19,17 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-</LinearLayout> 
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="PDF URL">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/urlInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textUri"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

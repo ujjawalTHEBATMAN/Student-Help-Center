@@ -1,593 +1,503 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:fitsSystemWindows="true"
+    android:background="?attr/colorSurface"
     tools:context=".ExtrateacherFeatures.examTimeTableCreation">
-
-    <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-        app:elevation="4dp">
-
+        android:theme="@style/ThemeOverlay.Material3.Dark.ActionBar"
+        app:elevation="8dp"
+        android:stateListAnimator="@animator/appbar_elevation">
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
             app:title="Exam Timetable Creator"
-            app:titleTextColor="@android:color/white"
+            app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             app:navigationIcon="@drawable/ic_back_arrow"
             app:navigationIconTint="@android:color/white"
-            app:menu="@menu/toolbar_menu" />
-
+            app:menu="@menu/toolbar_menu"
+            app:contentInsetStart="16dp"
+            app:background="?attr/colorPrimarySurface" />
     </com.google.android.material.appbar.AppBarLayout>
-
-    <!-- Main Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- Header Section -->
+            android:padding="@dimen/spacing_medium">
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+                android:id="@+id/header_card"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="12dp"
-                android:layout_marginBottom="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutline"
+                android:layout_marginBottom="@dimen/spacing_large"
                 android:transitionName="header_card_transition">
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
-
+                    android:padding="@dimen/spacing_medium">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Exam Schedule Manager"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/material_on_surface_emphasis_high_type"
-                        android:fontFamily="sans-serif-medium" />
-
+                        style="@style/TextAppearance.Material3.HeadlineSmall"
+                        android:textColor="?attr/colorOnSurface" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Organize exams effortlessly"
-                        android:textSize="14sp"
-                        android:textColor="@color/material_on_surface_emphasis_medium"
-                        android:layout_marginTop="4dp" />
-
+                        android:text="Plan and organize exams efficiently"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginTop="@dimen/spacing_small" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <!-- Form Section -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
+                android:id="@+id/form_card"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:cardElevation="2dp"
-                app:cardCornerRadius="12dp"
-                android:layout_marginBottom="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/header_card"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutline"
+                android:layout_marginBottom="@dimen/spacing_large"
                 android:animateLayoutChanges="true">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <!-- Subject Input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/subjectInputLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:hintAnimationEnabled="true"
-                    app:hintTextAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/subjectInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Subject *"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Marks Input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/marksInputLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    app:hintAnimationEnabled="true"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/marksInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Marks *"
-                        android:inputType="number"
-                        android:maxLength="3"
-                        android:maxLines="1"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Duration Input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/durationInputLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    app:hintAnimationEnabled="true"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/durationInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Duration (minutes)"
-                        android:inputType="number"
-                        android:maxLength="3"
-                        android:maxLines="1"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Exam Type Input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/examTypeInputLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    app:hintAnimationEnabled="true"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu">
-
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/examTypeInput"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Exam Type"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Date Picker Section -->
-                <TextView
-                    android:id="@+id/selectedDateText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Selected Date: "
-                    android:textSize="16sp"
-                    android:textColor="@android:color/black"
-                    android:fontFamily="sans-serif-medium" />
-
-                <CalendarView
-                    android:id="@+id/calendarView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/calendar_background"
-                    android:dateTextAppearance="@style/TextAppearance.MaterialComponents.Body2"
-                    android:weekDayTextAppearance="@style/TextAppearance.MaterialComponents.Caption"
-                    android:focusedMonthDateColor="@color/material_on_surface_emphasis_high_type"
-                    android:selectedDateVerticalBar="@color/material_on_surface_emphasis_medium" />
-
-                <!-- Time Picker Section -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="16dp"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/selectedTimeText"
-                        android:layout_width="0dp"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_medium">
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/subjectInputLayout"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Select Time *"
-                        android:textSize="16sp"
-                        android:textColor="@android:color/black"
-                        android:fontFamily="sans-serif-medium" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/timePickerButton"
+                        app:boxStrokeColor="@color/selector_input_stroke"
+                        app:hintTextColor="?attr/colorOnSurfaceVariant"
+                        app:startIconDrawable="@drawable/ic_subject"
+                        app:endIconMode="dropdown_menu">
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/subjectInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Subject *"
+                            android:inputType="text"
+                            android:maxLines="1"
+                            style="@style/TextAppearance.Material3.BodyLarge" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="@dimen/spacing_medium">
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/marksInputLayout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            app:boxStrokeColor="@color/selector_input_stroke"
+                            app:hintTextColor="?attr/colorOnSurfaceVariant"
+                            app:startIconDrawable="@drawable/ic_score"
+                            android:layout_marginEnd="@dimen/spacing_small">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/marksInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Marks *"
+                                android:inputType="number"
+                                android:maxLength="3"
+                                style="@style/TextAppearance.Material3.BodyLarge" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/durationInputLayout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            app:boxStrokeColor="@color/selector_input_stroke"
+                            app:hintTextColor="?attr/colorOnSurfaceVariant"
+                            app:startIconDrawable="@drawable/ic_timer"
+                            android:layout_marginStart="@dimen/spacing_small">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/durationInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Duration (min)"
+                                android:inputType="number"
+                                android:maxLength="3"
+                                style="@style/TextAppearance.Material3.BodyLarge" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/examTypeInputLayout"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_medium"
+                        app:boxStrokeColor="@color/selector_input_stroke"
+                        app:hintTextColor="?attr/colorOnSurfaceVariant"
+                        app:startIconDrawable="@drawable/ic_exam">
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/examTypeInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Exam Type"
+                            android:inputType="text"
+                            style="@style/TextAppearance.Material3.BodyLarge" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <TextView
+                        android:id="@+id/selectedDateText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pick Time"
-                        app:cornerRadius="8dp"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        app:strokeColor="?attr/colorPrimary"
-                        app:icon="@drawable/ic_chat"
-                        app:iconGravity="start"
-                        android:textSize="14sp" />
-
+                        android:layout_marginTop="@dimen/spacing_medium"
+                        style="@style/TextAppearance.Material3.LabelLarge"
+                        android:textColor="?attr/colorOnSurface" />
+                    <CalendarView
+                        android:id="@+id/calendarView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        app:layout_constraintTop_toBottomOf="@id/selectedDateText"
+                        android:background="@drawable/shape_rounded_rect" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="@dimen/spacing_medium"
+                        android:gravity="center_vertical">
+                        <TextView
+                            android:id="@+id/selectedTimeText"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            style="@style/TextAppearance.Material3.LabelLarge"
+                            android:textColor="?attr/colorOnSurface" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/timePickerButton"
+                            style="@style/Widget.Material3.Button.ElevatedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pick Time"
+                            app:icon="@drawable/ic_clock"
+                            app:cornerRadius="12dp"
+                            app:rippleColor="@color/selector_ripple" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="@dimen/spacing_medium">
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/roomInputLayout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            app:boxStrokeColor="@color/selector_input_stroke"
+                            app:hintTextColor="?attr/colorOnSurfaceVariant"
+                            app:startIconDrawable="@drawable/ic_room"
+                            android:layout_marginEnd="@dimen/spacing_small">
+                            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                                android:id="@+id/roomInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Room"
+                                android:inputType="text"
+                                style="@style/TextAppearance.Material3.BodyLarge" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/capacityInputLayout"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            app:boxStrokeColor="@color/selector_input_stroke"
+                            app:hintTextColor="?attr/colorOnSurfaceVariant"
+                            app:startIconDrawable="@drawable/ic_capacity"
+                            android:layout_marginStart="@dimen/spacing_small">
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/capacityInput"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Capacity"
+                                android:inputType="number"
+                                android:maxLength="3"
+                                style="@style/TextAppearance.Material3.BodyLarge" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/invigilatorInputLayout"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_medium"
+                        app:boxStrokeColor="@color/selector_input_stroke"
+                        app:hintTextColor="?attr/colorOnSurfaceVariant"
+                        app:startIconDrawable="@drawable/ic_person"
+                        app:endIconMode="dropdown_menu">
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/invigilatorInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Invigilator"
+                            android:inputType="textPersonName"
+                            style="@style/TextAppearance.Material3.BodyLarge" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/selectedInvigilatorsChipGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        app:chipSpacing="8dp"
+                        app:chipStyle="@style/Widget.Material3.Chip.Suggestion"
+                        app:singleLine="false" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/instructionsInputLayout"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_medium"
+                        app:boxStrokeColor="@color/selector_input_stroke"
+                        app:hintTextColor="?attr/colorOnSurfaceVariant"
+                        app:startIconDrawable="@drawable/ic_info">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/instructionsInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Instructions"
+                            android:inputType="textMultiLine"
+                            android:minLines="2"
+                            android:maxLines="4"
+                            style="@style/TextAppearance.Material3.BodyLarge" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/submitButton"
+                        style="@style/Widget.Material3.Button.ElevatedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_large"
+                        android:text="Add to Schedule"
+                        app:icon="@drawable/ic_add"
+                        app:cornerRadius="12dp"
+                        app:rippleColor="@color/selector_ripple"
+                        android:transitionName="submit_transition" />
                 </LinearLayout>
-
-                <!-- Room Input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/roomInputLayout"
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/preview_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/form_card"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutline"
+                android:layout_marginBottom="@dimen/spacing_large"
+                android:animateLayoutChanges="true">
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    app:hintAnimationEnabled="true"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-
-                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                        android:id="@+id/roomInput"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_medium">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Schedule Preview"
+                        style="@style/TextAppearance.Material3.HeadlineSmall"
+                        android:textColor="?attr/colorOnSurface" />
+                    <android.widget.HorizontalScrollView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Room Number"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Capacity Input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/capacityInputLayout"
-                android:layout_width="match_parent"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        android:scrollbars="horizontal"
+                        android:background="@drawable/shape_rounded_rect">
+                        <TableLayout
+                            android:id="@+id/examTable"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:stretchColumns="*"
+                            android:divider="?attr/colorOutline"
+                            android:showDividers="middle">
+                            <TableRow
+                                android:background="?attr/colorSurfaceVariant"
+                                android:padding="@dimen/spacing_small">
+                                <TextView
+                                    android:text="Subject"
+                                    style="@style/TextAppearance.Material3.LabelLarge"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:padding="@dimen/spacing_small" />
+                                <TextView
+                                    android:text="Date"
+                                    style="@style/TextAppearance.Material3.LabelLarge"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:padding="@dimen/spacing_small" />
+                                <TextView
+                                    android:text="Time"
+                                    style="@style/TextAppearance.Material3.LabelLarge"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:padding="@dimen/spacing_small" />
+                                <TextView
+                                    android:text="Duration"
+                                    style="@style/TextAppearance.Material3.LabelLarge"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:padding="@dimen/spacing_small" />
+                                <TextView
+                                    android:text="Room"
+                                    style="@style/TextAppearance.Material3.LabelLarge"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:padding="@dimen/spacing_small" />
+                                <TextView
+                                    android:text="Invigilator"
+                                    style="@style/TextAppearance.Material3.LabelLarge"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:padding="@dimen/spacing_small" />
+                                <TextView
+                                    android:text="Action"
+                                    style="@style/TextAppearance.Material3.LabelLarge"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:padding="@dimen/spacing_small" />
+                            </TableRow>
+                        </TableLayout>
+                    </android.widget.HorizontalScrollView>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/export_card"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:hintAnimationEnabled="true"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/capacityInput"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/preview_card"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutline"
+                android:layout_marginBottom="@dimen/spacing_large">
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Room Capacity"
-                    android:inputType="number"
-                    android:maxLength="3"
-                    android:maxLines="1"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Invigilator Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/invigilatorInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:hintAnimationEnabled="true"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-
-                <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                    android:id="@+id/invigilatorInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Invigilator Name"
-                    android:inputType="textPersonName"
-                    android:maxLines="1"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Selected Invigilators Chip Group -->
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/selectedInvigilatorsChipGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:chipSpacing="8dp"
-                app:singleLine="false"
-                app:selectionRequired="false" />
-
-            <!-- Instructions Input -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/instructionsInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:hintAnimationEnabled="true"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/instructionsInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Special Instructions"
-                    android:inputType="textMultiLine"
-                    android:maxLines="4"
-                    android:minLines="2"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Submit Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/submitButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Add to Schedule"
-                android:textSize="16sp"
-                app:cornerRadius="12dp"
-                style="@style/Widget.MaterialComponents.Button"
-                android:backgroundTint="?attr/colorPrimary"
-                android:textColor="@android:color/white"
-                android:transitionName="submit_transition"
-                app:icon="@drawable/ic_add"
-                app:iconGravity="start"
-                app:rippleColor="@color/material_on_surface_emphasis_medium" />
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Exam Schedule Preview Section -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardElevation="2dp"
-        app:cardCornerRadius="12dp"
-        android:layout_marginBottom="16dp"
-        android:animateLayoutChanges="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Exam Schedule Preview"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/material_on_surface_emphasis_high_type"
-                android:fontFamily="sans-serif-medium" />
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:scrollbars="horizontal">
-
-                <TableLayout
-                    android:id="@+id/examTable"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:stretchColumns="*"
-                    android:background="@drawable/table_background">
-
-                    <!-- Table Header -->
-                    <TableRow
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_medium">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Export Options"
+                        style="@style/TextAppearance.Material3.HeadlineSmall"
+                        android:textColor="?attr/colorOnSurface" />
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@color/material_on_surface_emphasis_low"
-                        android:padding="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="@dimen/spacing_small">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/getImageButton"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Subject"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/black"
-                            android:padding="8dp"
-                            android:background="@drawable/table_cell_border" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Export Image"
+                            app:icon="@drawable/ic_image"
+                            app:cornerRadius="12dp"
+                            app:rippleColor="@color/selector_ripple"
+                            android:layout_marginEnd="@dimen/spacing_small"
+                            android:transitionName="export_image_transition" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/exportTextButton"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Date"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/black"
-                            android:padding="8dp"
-                            android:background="@drawable/table_cell_border" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Time"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/black"
-                            android:padding="8dp"
-                            android:background="@drawable/table_cell_border" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Duration"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/black"
-                            android:padding="8dp"
-                            android:background="@drawable/table_cell_border" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Room"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/black"
-                            android:padding="8dp"
-                            android:background="@drawable/table_cell_border" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Invigilator"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/black"
-                            android:padding="8dp"
-                            android:background="@drawable/table_cell_border" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Action"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/black"
-                            android:padding="8dp"
-                            android:background="@drawable/table_cell_border" />
-
-                    </TableRow>
-
-                </TableLayout>
-            </HorizontalScrollView>
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Export Options Section -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardElevation="2dp"
-        app:cardCornerRadius="12dp"
-        android:layout_marginBottom="16dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Export Text"
+                            app:icon="@drawable/ic_text"
+                            app:cornerRadius="12dp"
+                            app:rippleColor="@color/selector_ripple"
+                            android:layout_marginStart="@dimen/spacing_small"
+                            android:transitionName="export_text_transition" />
+                    </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/shareButton"
+                        style="@style/Widget.Material3.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_medium"
+                        android:text="Share Schedule"
+                        app:icon="@drawable/ic_share"
+                        app:cornerRadius="12dp"
+                        app:rippleColor="@color/selector_ripple"
+                        android:transitionName="share_transition" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Export Your Schedule"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/material_on_surface_emphasis_high_type"
-                android:fontFamily="sans-serif-medium" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="12dp"
-                android:gravity="center">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/getImageButton"
-                    android:layout_width="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/export_card"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutline">
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Export as Image"
-                    android:textSize="14sp"
-                    app:cornerRadius="10dp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:strokeColor="?attr/colorPrimary"
-                    app:icon="@drawable/ic_image"
-                    app:iconGravity="start"
-                    app:rippleColor="@color/material_on_surface_emphasis_medium"
-                    android:layout_marginEnd="8dp"
-                    android:transitionName="export_image_transition" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/exportTextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Export as Text"
-                    android:textSize="14sp"
-                    app:cornerRadius="10dp"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:strokeColor="?attr/colorPrimary"
-                    app:icon="@drawable/ic_text"
-                    app:iconGravity="start"
-                    app:rippleColor="@color/material_on_surface_emphasis_medium"
-                    android:transitionName="export_text_transition" />
-
-            </LinearLayout>
-
-            <!-- Share Button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/shareButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Share Schedule"
-                android:textSize="14sp"
-                app:cornerRadius="10dp"
-                style="@style/Widget.MaterialComponents.Button"
-                android:backgroundTint="?attr/colorAccent"
-                android:textColor="@android:color/white"
-                app:icon="@drawable/ic_share"
-                app:iconGravity="start"
-                app:rippleColor="@color/material_on_surface_emphasis_medium"
-                android:transitionName="share_transition" />
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Tips Section -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardElevation="2dp"
-        app:cardCornerRadius="12dp"
-        android:layout_marginBottom="16dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Quick Tips"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/material_on_surface_emphasis_high_type"
-                android:fontFamily="sans-serif-medium" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="• Fill all mandatory fields marked with *.\n• Use the calendar to pick a date.\n• Export your schedule as an image or text.\n• Share directly with colleagues or students."
-                android:textSize="14sp"
-                android:textColor="@color/material_on_surface_emphasis_medium"
-                android:lineSpacingExtra="4dp" />
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-</LinearLayout>
-
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_medium">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Quick Tips"
+                        style="@style/TextAppearance.Material3.HeadlineSmall"
+                        android:textColor="?attr/colorOnSurface" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        android:text="@string/exam_tips"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:lineSpacingExtra="4dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/spacing_medium"
+        app:srcCompat="@drawable/ic_help"
+        app:backgroundTint="?attr/colorPrimary"
+        app:rippleColor="@color/selector_ripple"
+        app:elevation="6dp"
+        app:hoveredFocusedTranslationZ="12dp" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

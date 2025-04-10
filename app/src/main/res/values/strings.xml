@@ -65,7 +65,7 @@
     <string name="admin_access_message">This premium feature requires administrator privileges. Contact your system administrator for access.</string>
     <string name="learn_more">Learn More</string>
     <string name="ok">Got It!</string>
-
+    <string name="exam_tips">• Complete all required fields (*)\n• Select date using calendar\n• Export as image or text\n• Share with colleagues/students</string>
     <string-array name="compression_formats">
         <item>JPEG</item>
 
